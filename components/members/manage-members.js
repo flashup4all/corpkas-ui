@@ -10,9 +10,10 @@ import { GET_MEMBERS } from '../../gql/members';
 class ManageMembers extends Component {
     constructor(props) {
         super(props);
-        
+        // setMode 0 = default, 1- create, 2- update 
         this.state = {
-            members: []
+            members: [],
+            setMode: 0
         }
         console.log(this.state)
     }
@@ -38,8 +39,6 @@ class ManageMembers extends Component {
     
 
     render () {
-        let index = 1;
-
         const filterMembers = (status = "") => {
             let membersData = [];
             if(status != "")
@@ -51,56 +50,64 @@ class ManageMembers extends Component {
             this.setState({membersData: membersData})
             console.log(membersData)
         }
-    const {members } = this.state
+    const {members, setMode} = this.state
     return (
         <div>
+        {setMode === 0 &&
+             <div className="bg-grey">
+             <div className="search-con mb-4">
+                 <input type="search" name="search" className="mini-search" placeholder="Search"></input>
+                 <button type="button" onClick={()=> this.setState({setMode: 1})}>Search</button>
+             </div>
+             <div className="table-responsive p-3">
+                 { members.length > 0 &&
+                 <table className="table">
+                 <thead>
+                 <tr>
+                     <th>&#x23;</th>
+                     <th>Name</th>
+                     <th>Rank</th>
+                     <th>Gender</th>
+                     <th>Department</th>
+                     <th>Total Balance(₦)</th>
+                     <th>Phone number</th>
+                     <th>Status</th>
+                     <th>Actions</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                 { members.map((member, index) => (
+                 <tr key={index}>
+                     <td>{index + 1}</td>
+                     <td>{member.surname} {member.other_names}</td>
+                     <td>{member.rank}</td>
+                     <td>{member.gender}</td>
+                     <td>{member.dept}</td>
+                     <td>{member.current_balance}</td>
+                     <td>{member.phone_number}</td>
+                     <td className={member.status}>{member.status}</td>
+                     <td>View</td>
+                     <td>...</td>
+                 </tr>
+                  ))}
+                
+                 </tbody>
+             </table>
+                 }
+                 {!members.length && 
+                     <EmptyData />
+                 } 
+             
+             </div>
+         </div>
+        }
+        {
+            setMode === 1 &&
+
+            <div>create page</div>
+        }
             {/* <StyledMain> */}
-                <div className="bg-grey">
-        <div className="search-con mb-4">
-            <input type="search" name="search" className="mini-search" placeholder="Search"></input>
-            <input type="button" value="Search"></input>
-        </div>
-        <div className="table-responsive p-3">
-            { members.length > 0 &&
-            <table className="table">
-            <thead>
-            <tr>
-                <th>&#x23;</th>
-                <th>Name</th>
-                <th>Rank</th>
-                <th>Gender</th>
-                <th>Department</th>
-                <th>Total Balance(₦)</th>
-                <th>Phone number</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            { members.map((member, index) => (
-            <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{member.surname} {member.other_names}</td>
-                <td>{member.rank}</td>
-                <td>{member.gender}</td>
-                <td>{member.dept}</td>
-                <td>{member.current_balance}</td>
-                <td>{member.phone_number}</td>
-                <td className={member.status}>{member.status}</td>
-                <td>View</td>
-                <td>...</td>
-            </tr>
-             ))}
-           
-            </tbody>
-        </table>
-            }
-            {!members.length && 
-                <EmptyData />
-            } 
-        
-        </div>
-    </div>
+       
            
             {/* </StyledMain> */}
         </div>

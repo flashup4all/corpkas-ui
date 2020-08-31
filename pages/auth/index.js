@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import Router , {useRouter}  from 'next/router';
+import {useRouter}  from 'next/router';
 import Spinner from '@atlaskit/spinner';
 import { LOGIN } from '../../gql/user'
 

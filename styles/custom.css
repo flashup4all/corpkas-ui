@@ -151,7 +151,7 @@
 	font-family: Arial, Helvetica, sans-serif;
 	text-transform: capitalize;
 }
-.sidebar-navigation li a {
+.sidebar-navigation li a, .css-1v7jouq {
 	display: flex;
 	align-items: center;
 	/* width: 100px; */
