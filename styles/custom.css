@@ -81,8 +81,13 @@
 	100% { transform: rotate(360deg); transform: rotate(360deg); }
   }
   
+  body{
+	  background: #fff;
+  }
 
-  
+  p{
+	  font-size: 15px;
+  }
  #wrapper {
     overflow-x: hidden;
  }
@@ -256,9 +261,27 @@ input.mini-search:focus {
 .bg-menu{
 	background: #2684FF;
 }
+.center{
+	text-align: center;
+}
 table{
 	border-top: hidden;
 	border-bottom: 1px solid grey;
+}
+.table thead th {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 12px;
+	line-height: 16px;
+    color: #6B778C;
+}
+.table td{
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 20px;
+	align-items: center;
+	color: #172B4D;
 }
 thead {
 	border-bottom: 1px solid grey;
@@ -282,10 +305,48 @@ thead {
 .ks-menu-dropdown-item:hover{
 
 	background: #2684FF;
+	color: #ffffff;
 }
 .ks-dropdown-toogle{
     text-decoration: none !important;
 }
 .ks-profile-dropdown {
 	color: #172B4D;
+}
+
+.ks-form-control{
+	background: #FAFBFC;
+	border: 2px solid #DFE1E6;
+	box-sizing: border-box;
+	border-radius: 3px;
+}
+
+.ks-form-control:focus{
+	border: 2px solid #4C9AFF;
+	box-shadow: none;
+}
+.sc-AxjAm::after{
+	content: none;
+   }
+   .dropdown-toggle::after {
+	display: none;
+   }
+
+.table-responsive{
+	min-height: 100vh;
+}
+.btn{
+	background: #0065FF;
+	border-radius: 3px;
+	color: #ffffff;
+	font-size: 16px;
+}
+.btn:hover{
+	background: #0065FF;
+	border-radius: 3px;
+	color: #ffffff;
+}
+
+.drop-link{
+	float: right;
 }

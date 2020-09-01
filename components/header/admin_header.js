@@ -24,7 +24,6 @@ class Adminheader extends React.Component {
         }}
       >
         {children}
-        &#x25bc;
       </a>
     ));
     return ( 

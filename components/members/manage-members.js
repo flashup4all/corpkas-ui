@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
+import WatchIcon from '@atlaskit/icon/glyph/watch';
+import EditorMoreIcon from '@atlaskit/icon/glyph/editor/more';
+import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../components/empty';
-
+import Loader from '../../components/loader';
+import Pagination from '@atlaskit/pagination';
 // import styled from 'styled-components';
 import Link from 'next/link';
 import { GET_MEMBERS } from '../../gql/members';
@@ -13,7 +17,7 @@ class ManageMembers extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
-            setMode: 1
+            setMode: 0
         }
         console.log(this.state)
     }
@@ -51,16 +55,36 @@ class ManageMembers extends Component {
             console.log(membersData)
         }
     const {members, setMode} = this.state
+
+    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+        <a
+          href=""
+          ref={ref}
+          onClick={(e) => {
+            e.preventDefault();
+            onClick(e);
+          }}
+        >
+            <EditorMoreIcon />
+          {children}
+        </a>
+      ));
+      const paginate = (e, page, analyticsEvent) => {
+        console.log(e)
+        console.log(page)
+        console.log(analyticsEvent)
+      }
     return (
         <div>
         {setMode === 0 &&
              <div className="bg-grey">
              <div className="search-con mb-4">
-                 <input type="search" name="search" className="mini-search" placeholder="Search"></input>
-                 <button type="button" onClick={()=> this.setState({setMode: 1})}>Search</button>
+                 <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
+                 <button type="button" className="btn" onClick={()=> this.setState({setMode: 1})}>Search</button>
              </div>
              <div className="table-responsive p-3">
                  { members.length > 0 &&
+                 <div>
                  <table className="table">
                  <thead>
                  <tr>
@@ -86,17 +110,39 @@ class ManageMembers extends Component {
                      <td>{member.current_balance}</td>
                      <td>{member.phone_number}</td>
                      <td className={member.status}>{member.status}</td>
-                     <td>View</td>
-                     <td>...</td>
+                     <td><WatchIcon size="small"/> View
+                     <Dropdown className="drop-link">
+                        <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className="ks-menu-dropdown bg-menu">
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Manage</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>Reset Login Details</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('manage-members')}>Send Statement</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Deactivate</Dropdown.Item>
+                        </Dropdown.Menu>
+                        </Dropdown>
+                     </td>
                  </tr>
                   ))}
                 
                  </tbody>
              </table>
+                <div className="row align-items-center justify-content-center">
+                <Pagination onChange={(event, page, analyticsEvent) => paginate(event, page, analyticsEvent)} pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
+                </div>
+             </div>
                  }
-                 {!members.length && 
-                     <EmptyData />
+                 { members && !members.length && 
+                     <EmptyData title="Empty Members" text="No Available Members Data"/>
                  } 
+                 { !members
+                     &&
+                    <Loader />
+                 }
              
              </div>
          </div>
@@ -104,12 +150,15 @@ class ManageMembers extends Component {
         {
             setMode === 1 &&
 
-            <div>create page</div>
+            <div>
+                create page
+                <div className="col-12">
+                    <input className="ks-form-control form-control" />
+                </div>
+            </div>
         }
             {/* <StyledMain> */}
-            <div className="col-12">
-                <input className="ks-form-control form-control" />
-            </div>
+            
            
             {/* </StyledMain> */}
         </div>

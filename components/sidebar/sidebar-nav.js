@@ -39,7 +39,6 @@ class SideBarNav extends React.Component {
         }}
       >
         {children}
-        &#x25bc;
       </a>
     ));
 

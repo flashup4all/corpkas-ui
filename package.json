@@ -11,6 +11,7 @@
     "@apollo/client": "^3.1.4",
     "@atlaskit/dropdown-menu": "^10.0.3",
     "@atlaskit/icon": "^21.0.3",
+    "@atlaskit/pagination": "^13.0.4",
     "@atlaskit/spinner": "^15.0.2",
     "bootstrap": "^4.5.2",
     "graphql": "^15.3.0",
