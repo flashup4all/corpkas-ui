@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useEffect } from "react"
 import Link from 'next/link'
-import {withRouter}  from 'next/router';
+import Router  from 'next/router';
 
 import HomeIcon from '@atlaskit/icon/glyph/home';
 import SettingsIcon from '@atlaskit/icon/glyph/settings';
@@ -8,8 +8,7 @@ import PeopleIcon from '@atlaskit/icon/glyph/people';
 import CreditcardIcon from '@atlaskit/icon/glyph/creditcard';
 import DetailViewIcon from '@atlaskit/icon/glyph/detail-view';
 import TrayIcon from '@atlaskit/icon/glyph/tray';
-
-import DropdownMenu, { DropdownItem, DropdownItemGroup } from '@atlaskit/dropdown-menu';
+import Dropdown from 'react-bootstrap/Dropdown'
 
 class SideBarNav extends React.Component {
 
@@ -23,21 +22,28 @@ class SideBarNav extends React.Component {
   }
 
   componentDidMount(){
-
+    
   }
-  
-  gotoRoute = () => {
-    console.log('goto')
-    // this.props.router.push('/posts')
-    // this.router.push("post")
-  }
-
 
   render()
   {
 
     const { name } = this.state
+    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+      <a
+        href=""
+        ref={ref}
+        onClick={(e) => {
+          e.preventDefault();
+          onClick(e);
+        }}
+      >
+        {children}
+        &#x25bc;
+      </a>
+    ));
 
+    
     
     return ( 
       <div className="sidebar-navigation" id="sidebar-wrapper">
@@ -49,18 +55,26 @@ class SideBarNav extends React.Component {
                         <li className='link'><Link href="/users"><a><CreditcardIcon />manage transactions</a></Link></li>
                         <li className='link'><Link href="#"><a><DetailViewIcon />contribution history</a></Link></li>
                         <li className='link'><Link href="/loans"><a><TrayIcon /> Manage Loans</a></Link></li>
-                        <li className='link'><Link href="#">
-                        <DropdownMenu trigger="settings" triggerType="button"><a>
-                            <SettingsIcon /> 
-                            <span className="ml-2">settings </span>
-                            
-                              <DropdownItemGroup>
-                                <DropdownItem id="sydney" onClick={() => this.gotoRoute()}>Sydney</DropdownItem>
-                                <DropdownItem id="melbourne">Melbourne</DropdownItem>
-                              </DropdownItemGroup>
-                            
-                        </a>
-                        </DropdownMenu></Link></li>
+                        <li className='link'>
+                        <Dropdown className="link">
+                          <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
+                          <SettingsIcon /> <span className="ml-2 mr-2">Settings</span>
+                          </Dropdown.Toggle>
+
+                          <Dropdown.Menu className="ks-menu-dropdown bg-menu">
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Cooperative Profile</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>Staff Settings</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('manage-members')}>Loan Settings</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Transaction Settings</Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Notification Settings</Dropdown.Item>
+                          </Dropdown.Menu>
+                        </Dropdown>
+                        </li>
+                        
                         
                 </ul>
             </div>
