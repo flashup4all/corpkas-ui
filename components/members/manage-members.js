@@ -13,7 +13,7 @@ class ManageMembers extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
-            setMode: 0
+            setMode: 1
         }
         console.log(this.state)
     }
@@ -107,7 +107,9 @@ class ManageMembers extends Component {
             <div>create page</div>
         }
             {/* <StyledMain> */}
-       
+            <div className="col-12">
+                <input className="ks-form-control form-control" />
+            </div>
            
             {/* </StyledMain> */}
         </div>
