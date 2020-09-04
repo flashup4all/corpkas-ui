@@ -1,5 +1,5 @@
 import { gql, useMutation } from '@apollo/client';
-import AdminMainLayout from '../../components/layouts/main/main';
+import AdminMainLayout from '../../layouts/main/main';
 import Link from 'next/link'
 
 // const ADD_TODO = gql`

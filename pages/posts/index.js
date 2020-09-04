@@ -1,7 +1,7 @@
 import React from "react"
 import Link from 'next/link'
 import { useQuery, gql } from '@apollo/client';
-import AdminMainLayout from '../../components/layouts/main/main';
+import AdminMainLayout from '../../layouts/main/main';
 
 import { USERS } from '../../gql/user'
 

@@ -1,66 +1,105 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import Link from 'next/link'
+import React, { useState, useEffect } from 'react'
+import { gql, useMutation, useLazyQuery } from '@apollo/client';
+import {useRouter}  from 'next/router';
+import Spinner from '@atlaskit/spinner';
+import { LOGIN } from '../gql/user'
+import { storeToken, storeUser, storeVendor, storeStaff, storeMember} from '../components/shared/local';
 
-export default function Home() {
+const LoginForm = ({ setError, setToken }) =>{
+    const router = useRouter()
+
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
+
+  const [ authenticate, { loading, error } ] = useMutation(LOGIN, {
+    onError: (error) => {
+        // console.log(error)
+    //   setError(error.graphQLErrors[0].message)
+    },
+    onCompleted({authenticate}){
+      const token = authenticate.token
+      const user = authenticate.user
+      const vendor = authenticate.vendor
+      console.log(vendor)
+      storeToken(token)
+      storeUser(user)
+      storeVendor(vendor)
+      
+      if(user.role === "member")
+      {
+          const member = authenticate.member
+          storeMember(member)
+      }
+      if(user.role === "admin" || user.role === "staff" || user.role === "manager")
+      {
+          const staff = authenticate.staff
+          storeStaff(staff)
+      }
+      setTimeout(() => {
+          router.push('/posts')
+      }, 500);
+    }
+
+  })
+
+  // useEffect(() => {
+  //   if ( result.data ) {
+  //       console.log(result)
+  //     
+      
+  //     //   setToken(token)
+  //       
+  //   }
+  // }, [result.data]) 
+
+  const submit = async (event) => {
+    event.preventDefault()
+    authenticate({ variables: { email, password } })
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <Link href="/posts"><a>this post!</a></Link> <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-9 col-md-7 col-lg-5 mx-auto">
+          <div className="card card-signin my-5">
+            <div className="card-body">
+              <h5 className="card-title text-center">Sign In</h5>
+              <form className="form-signin" onSubmit={submit}>
+                  <div className="form-label-group">
+                    <input
+                      className="form-control"
+                      type="email"
+                      value={email || ""}
+                      onChange={({ target }) => setEmail(target.value)}
+                    />
+                    <label htmlFor="inputEmail">Email</label>
+                  </div>
+                  <div>
+                    <input
+                      className="form-control"
+                      type='password'
+                      value={password || ""}
+                      onChange={({ target }) => setPassword(target.value)}
+                    />
+    
+                    <label htmlFor="inputEmail" onClick={()=> router.push('/posts')}>Password</label>
+                  </div>
+                  <button disabled={loading} className="btn btn-md btn-primary btn-block text-uppercase" type='submit'>
+                      {
+                        loading &&
+                        <Spinner appearance="invert" size="medium"/>
+                      }
+                     <span className="ml-2" >login</span>
+                     </button>
+              </form>
+            </div>
+          </div>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+      </div>
     </div>
   )
 }
+
+export default LoginForm;
+
+

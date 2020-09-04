@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import Adminheader from '../../header/admin_header';
-import SideBarNav from '../../sidebar/sidebar-nav';
+import Adminheader from '../header/admin_header';
+import SideBarNav from '../sidebar/sidebar-nav';
 
 const AdminMainLayout = ({ children }) => (
   <div className="d-flex" id="wrapper">
@@ -13,9 +13,9 @@ const AdminMainLayout = ({ children }) => (
     <div id="page-content-wrapper">
     
     <Adminheader/>
-    <div className="container-fluid mb-5">
+    <div className="container-fluid mb-4 ks-pages0container">
       <br></br>
-      <div className="content-wrapper mt-5">{children}</div>
+      <div className="content-wrapper layout mt-1 ">{children}</div>
     </div>
     </div>
     
@@ -27,6 +27,10 @@ const AdminMainLayout = ({ children }) => (
       *::before,
       *::after {
         box-sizing: border-box;
+      }
+      .layout{
+        padding-left: 16px;
+        padding-right: 24px;
       }
      
     `}</style>

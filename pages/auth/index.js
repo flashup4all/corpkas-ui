@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { gql, useMutation, useLazyQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import {useRouter}  from 'next/router';
 import Spinner from '@atlaskit/spinner';
 import { LOGIN } from '../../gql/user'
@@ -16,7 +16,6 @@ const LoginForm = ({ setError, setToken }) =>{
     //   setError(error.graphQLErrors[0].message)
     },
     onCompleted({authenticate}){
-      console.log(authenticate)
       const token = authenticate.token
       const user = authenticate.user
       localStorage.setItem('katk', token)

@@ -50,12 +50,12 @@ class SideBarNav extends React.Component {
             <div className="sidebar-navigation">
                 <ul>
                 <li className='link'><Link href="/"><a><HomeIcon /> <span className="ml-2">Dashboard</span></a></Link></li>
-                       <li className='link'><Link href="/manage-members"><a><PeopleIcon /> Manage Members</a></Link></li>
-                        <li className='link'><Link href="/users"><a><CreditcardIcon />manage transactions</a></Link></li>
-                        <li className='link'><Link href="#"><a><DetailViewIcon />contribution history</a></Link></li>
-                        <li className='link'><Link href="/loans"><a><TrayIcon /> Manage Loans</a></Link></li>
+                       <li className='link'><Link href="/manage-members"><a><PeopleIcon />  <span className="ml-2">Manage Members</span></a></Link></li>
+                        <li className='link'><Link href="/users"><a><CreditcardIcon /> <span className="ml-2">manage transactions</span></a></Link></li>
+                        <li className='link'><Link href="#"><a><DetailViewIcon /> <span className="ml-2">contribution history</span></a></Link></li>
+                        <li className='link'><Link href="/loans"><a><TrayIcon />  <span className="ml-2">Manage Loans</span></a></Link></li>
                         <li className='link'>
-                        <Dropdown className="link">
+                        <Dropdown className="link settings-side-menu">
                           <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                           <SettingsIcon /> <span className="ml-2 mr-2">Settings</span>
                           </Dropdown.Toggle>
@@ -63,7 +63,7 @@ class SideBarNav extends React.Component {
                           <Dropdown.Menu className="ks-menu-dropdown bg-menu">
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Cooperative Profile</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>Staff Settings</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('staff')}>Staff Settings</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('manage-members')}>Loan Settings</Dropdown.Item>
                             <Dropdown.Divider />

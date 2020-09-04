@@ -3,13 +3,18 @@ import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import EditorMoreIcon from '@atlaskit/icon/glyph/editor/more';
+import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
+import PersonWithTickIcon from '@atlaskit/icon/glyph/person-with-tick';
+import PeopleIcon from '@atlaskit/icon/glyph/people';
+import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+
 import Dropdown from 'react-bootstrap/Dropdown'
-import EmptyData from '../../components/empty';
-import Loader from '../../components/loader';
+import EmptyData from '../../layouts/empty';
+import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-// import styled from 'styled-components';
-import Link from 'next/link';
 import { GET_MEMBERS } from '../../gql/members';
+import { CustomToggle, Status } from '../../layouts/extras'
+import CreateMember from './create-member'
 
 class ManageMembers extends Component {
     constructor(props) {
@@ -17,18 +22,15 @@ class ManageMembers extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
-            setMode: 0
+            sorted: [],
+            setMode: 0,
+            activeWidget: ''
         }
-        console.log(this.state)
     }
 
     componentDidMount()
     {
-        // const { loading, error, m_data } = useQuery(GET_MEMBERS);
         this.getMembers()
-        
-    // if (error) return <div><h1>Error</h1></div>;
-    // if (loading) return <div>Loading...</div>;
     }
 
     getMembers(page = 0)
@@ -36,54 +38,85 @@ class ManageMembers extends Component {
         createApolloClient.query({
             query: GET_MEMBERS
           }).then(response => {
-              console.log(response.data.members)
-              this.setState({members: response.data.members})
+              this.setState({members: response.data.members, sorted: response.data.members})
             }, error => console.log(error))
     }
     
+    paginate = (e, page, analyticsEvent) => {
+        console.log(page)
+      }
 
     render () {
         const filterMembers = (status = "") => {
             let membersData = [];
+            this.setState({activeWidget: status, setMode: 0})
             if(status != "")
             {
-                membersData = data.filter(x => x.status === status)
+                membersData = members.filter(x => x.status === status)
             }else{
-                membersData = data
+                membersData = members
             }
-            this.setState({membersData: membersData})
-            console.log(membersData)
+            this.setState({sorted: membersData})
         }
-    const {members, setMode} = this.state
+    const {members, sorted, setMode, activeWidget } = this.state
 
-    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
-        <a
-          href=""
-          ref={ref}
-          onClick={(e) => {
-            e.preventDefault();
-            onClick(e);
-          }}
-        >
-            <EditorMoreIcon />
-          {children}
-        </a>
-      ));
-      const paginate = (e, page, analyticsEvent) => {
-        console.log(e)
-        console.log(page)
-        console.log(analyticsEvent)
-      }
+  
+      
     return (
         <div>
+            <div className="widget-section">
+                <div className="widget-heading d-flex justify-content-between align-items-baseline">
+                    <h3 className="page-title bold">manage members</h3>
+                </div>
+                <div className="widget-con">
+                    <div onClick={() => filterMembers('')} className={ activeWidget ==='' ? 'widget no-shadow' : 'widget shadow'}>
+                        <div className="widget-icon widget-icon-primary">
+                            <PeopleGroupIcon />
+                        </div>
+                    <div>
+                        <h1>362</h1>
+                        <p>Total number of members</p>
+                    </div>
+                    </div>
+                    <div onClick={() => filterMembers('active')} className={ activeWidget ==='active' ? 'widget no-shadow' : 'widget shadow'}>
+                    <div className="widget-icon widget-icon-success">
+                        <PersonWithTickIcon />
+                    </div>
+                    <div>
+                        <h1>272</h1>
+                        <p>Total Active Members</p>
+                    </div>
+                    </div>
+                    <div onClick={() => filterMembers('inactive')} className={ activeWidget ==='inactive' ? 'widget no-shadow' : 'widget shadow'}>
+                    <div className="widget-icon widget-icon-danger">
+                        <PeopleIcon />
+                    </div>
+                    <div>
+                        <h1>362</h1>
+                        <p>Inactive Suspended members</p>
+                    </div>
+                    </div>
+                </div>
+                </div>
+        <div className="bg-grey">
+            
         {setMode === 0 &&
-             <div className="bg-grey">
-             <div className="search-con mb-4">
-                 <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                 <button type="button" className="btn" onClick={()=> this.setState({setMode: 1})}>Search</button>
-             </div>
+             <div >
+                 <div className="row">
+                     <div className="col-md-4">
+                        <div className="search-con mb-4">
+                            <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
+                            <button type="button mr-3" className="btn">Search</button>
+                        </div>
+                    </div>
+                    <div className="col-md-8">
+                        <button type="button" className="btn float-right mr-3 mt-4" onClick={()=> this.setState({setMode: 1})}>CREATE NEW MEMBER</button>
+                    </div>
+                 </div>
+             
+
              <div className="table-responsive p-3">
-                 { members.length > 0 &&
+                 { sorted.length > 0 &&
                  <div>
                  <table className="table">
                  <thead>
@@ -100,7 +133,7 @@ class ManageMembers extends Component {
                  </tr>
                  </thead>
                  <tbody>
-                 { members.map((member, index) => (
+                 { sorted.map((member, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
                      <td>{member.surname} {member.other_names}</td>
@@ -109,8 +142,8 @@ class ManageMembers extends Component {
                      <td>{member.dept}</td>
                      <td>{member.current_balance}</td>
                      <td>{member.phone_number}</td>
-                     <td className={member.status}>{member.status}</td>
-                     <td><WatchIcon size="small"/> View
+                     <td className={member.status}> <Status status={member.status} /></td>
+                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
@@ -132,14 +165,14 @@ class ManageMembers extends Component {
                  </tbody>
              </table>
                 <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => paginate(event, page, analyticsEvent)} pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
+                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
                 </div>
              </div>
                  }
-                 { members && !members.length && 
+                 { sorted && !sorted.length && 
                      <EmptyData title="Empty Members" text="No Available Members Data"/>
                  } 
-                 { !members
+                 { !sorted
                      &&
                     <Loader />
                  }
@@ -149,12 +182,11 @@ class ManageMembers extends Component {
         }
         {
             setMode === 1 &&
-
-            <div>
-                create page
-                <div className="col-12">
-                    <input className="ks-form-control form-control" />
-                </div>
+            <div className="p-4">
+                <p className="page-title mt-5">Create Staff Page
+                    <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                </p>
+                <CreateMember />
             </div>
         }
             {/* <StyledMain> */}
@@ -162,6 +194,8 @@ class ManageMembers extends Component {
            
             {/* </StyledMain> */}
         </div>
+        </div>
+
     )
 }
 };

@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToastProvider } from 'react-toast-notifications'
 import { ApolloProvider } from '@apollo/client';
-import AdminMainLayout from '../components/layouts/main/main';
 import { createApolloClient } from '../lib/apolloClient'
 import '../styles/globals.css'
 
@@ -18,11 +18,11 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ApolloProvider client={createApolloClient}>
+      <ToastProvider>
       <Layout>
-    {/* <AdminMainLayout> */}
       <Component {...pageProps} />
-    {/* </AdminMainLayout> */}
     </Layout>
+    </ToastProvider>
     </ApolloProvider>
   );
 
