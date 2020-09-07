@@ -6,23 +6,11 @@ import { ToastProvider, useToasts } from 'react-toast-notifications'
 const LoanRequests = () =>  {
     const { addToast } = useToasts()
 
-    const [staff_no, setStaffNo] = useState()
-    const [surname, setSurname] = useState()
-    const [other_names, setOtherNames] = useState()
-    // const [first_name, setFirstName] = useState()
-    const [dob, setDob] = useState()
-    const [rank, setRank] = useState()
-    const [current_monthly_income, setCurrentMonthlyIncome] = useState()
-    const [monthly_contribution, setMonthlyContribution] = useState()
-    const [dept, setDept] = useState()
-    const [membership_date, setMembershipDate] = useState()
-    const [phone_number, setPhoneNumber] = useState()
-    const [alt_phone_number, setAltPhoneNumber] = useState()
-    const [gender, setGender] = useState()
-    const [status, setStatus] = useState()
-    const [role, setRole] = useState('member')
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    const [loan_type, setLoanType] = useState()
+    const [repayment_period, setRepaymentPeriod] = useState()
+    const [account_credited, setAccountCredited] = useState()
+    const [account_no, setAccountNo] = useState()
+   
 
     //create staff mutation
     const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
@@ -34,9 +22,9 @@ const LoanRequests = () =>  {
                 autoDismiss: true,
               })
         },
-        onCompleted: (createMember) =>{
-            console.log(createMember)
-            addToast("Staff Created", {
+        onCompleted: (sendFollowUpMessage) =>{
+            console.log(sendFollowUpMessage)
+            addToast("Message Sent", {
                 appearance: 'success',
                 autoDismiss: true,
               })
@@ -44,130 +32,64 @@ const LoanRequests = () =>  {
         }
     })
     const resetForm = () => {
-        setStaffNo('')
-        setSurname('')
-        setOtherNames('')
-        setDob('')
-        setPhoneNumber('')
-        setAltPhoneNumber('')
-        setGender('')
-        setStatus('')
-        setRole('')
-        setEmail('')
-        setRank('')
-        setMembershipDate('')
-        setDept('')
-        setMonthlyContribution('')
-        setCurrentMonthlyIncome('')
-        setMembershipDate('')
+        setLoanType('')
+        setRepaymentPeriod('')
+        setAccountCredited('')
+        setAccountNo('')
     }
 
-    let errors = { staff_no: '', surname: '', other_names: '', dept:'', rank:'', gender: '', dob: '', current_monthly_income:'', monthly_contribution:'', phone_number: '', alt_phone_number:'', status:'', role:'', email:'', password: '' };
-
-    function handleValidation() {
-       console.log('validation')
-        if (!staff_no) {
-       console.log('no staff validation')
-            
-            errors.staff_no = "Staff number is required";
-        }
-
-        if (!surname) {
-            errors.surname = "Surname is required";
-        }
-
-        if (!other_names) {
-            errors.other_names = "Other name is required";
-        }
-
-        if (!dept) {
-            errors.dept = "Department is required";
-        }
-
-        if (!rank) {
-            errors.dept = "Rank is required";
-        }
-
-        if (!gender){
-            errors.gender = "Select your gender";
-        }
-
-        if (!current_monthly_income){
-            errors.current_monthly_income = "Current monthly income is required";
-        }
-
-        if (!monthly_contribution){
-            errors.monthly_contribution = "Monthly contribution is required";
-        }
-
-        if (!phone_number){
-            errors.phone_number = "Phone number is required";
-        }
-
-        if (!alt_phone_number){
-            errors.alt_phone_number = "Alternative phone number is required";
-        }
-
-        if (!status) {
-            errors.status = "Select a status";
-        }
-
-        if (!dob) {
-            errors.status = "Set date of birth";
-        }
-        console.log(errors)
-    }
 
     const submit = async (e) => {
         e.preventDefault();
-        if(handleValidation()) {
-        createMember({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), 
-            membership_date: new Date(membership_date), phone_number, alt_phone_number, 
-            status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
+        sendFollowUpMessage({variables:{loan_type, repayment_period, account_credited, account_no }})
         }
-    }
+    
         return (
-            <div className="">
+            <div className="grey-container">
+                
                 <form onSubmit={submit}>
-                    <div className="row mt-5">
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff ID {errors && errors.staff_no}</label>
+                    {/* <div className="row">
+                     <p className="ks-request-text">Loan request for </p>
+                    </div> */}
+                    <div className="row mt-5 white">
+                        <div className="col-md-3 mt-5">
+                            <label className="ks-label">Type of Loan</label>
                             <input 
                                 className="ks-form-control form-control" 
-                                placeholder="E.g KASU002"
-                                value={staff_no || ""}
-                                onChange={({ target }) => setStaffNo(target.value)}
+                                placeholder="Car and Housing"
+                                value={loan_type || ""}
+                                onChange={({ target }) => setLoanType(target.value)}
                             />
-                         <span style={{color: "red"}}>{errors.staff_no}</span>                            
+                         {/* <span style={{color: "red"}}>{errors.staff_no}</span> */}
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Surname</label>
+                        <div className="col-md-3 mt-5">
+                            <label className="ks-label">Period of Repayment</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g John"
-                                value={surname || ""}
-                                onChange={({ target }) => setSurname(target.value)}
+                                placeholder="18 months"
+                                value={repayment_period || ""}
+                                onChange={({ target }) => setRepaymentPeriod(target.value)}
                             />
-                            {errors.surname != '' && <span style={{color: "red"}}>{errors.surname}</span>}
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Others</label>
+                        <div className="col-md-3 mt-5">
+                            <label className="ks-label">Account to be Credited</label>
                             <input className="ks-form-control form-control"
-                                value={other_names || ""}
-                                onChange={({ target }) => setOtherNames(target.value)}
+                            placeholder="Access Diamond"
+                                value={account_credited || ""}
+                                onChange={({ target }) => setAccountCredited(target.value)}
                              />
-                             {errors.other_names != '' && <span style={{color: "red"}}>{errors.other_names}</span>}
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Rank</label>
+                        <div className="col-md-3 mt-5">
+                            <label className="ks-label">Account Number</label>
                             <input className="ks-form-control form-control"
-                                value={rank || ""}
-                                placeholder="e.g Senior Lecture"
-                                onChange={({ target }) => setRank(target.value)}
+                                value={account_no || ""}
+                                placeholder="0026637289"
+                                onChange={({ target }) => setAccountNo(target.value)}
                              />
-                             {errors.rank != '' && <span style={{color: "red"}}>{errors.rank}</span>}
                         </div>
                        
-                        <div className="col-12">
+                       
+                    </div>
+                    <div className="col-12">
                             <button disabled={loading}  className="btn float-right mt-5 " type="submit">
                             {
                                 loading &&
@@ -175,7 +97,6 @@ const LoanRequests = () =>  {
                             }
                             SEND FOLLOW UP MESSAGE</button>
                         </div>
-                    </div>
                 </form>
             </div>
         )

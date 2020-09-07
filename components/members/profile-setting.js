@@ -1,32 +1,26 @@
 import React, { useState } from 'react';
-import { gql, useMutation, useLazyQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import {CREATE_MEMBER} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
-import { ToastProvider, useToasts } from 'react-toast-notifications'
+import { useToasts } from 'react-toast-notifications'
+
 const ProfileSetting = () =>  {
     const { addToast } = useToasts()
 
     const [staff_no, setStaffNo] = useState()
-    const [surname, setSurname] = useState()
-    const [other_names, setOtherNames] = useState()
-    // const [first_name, setFirstName] = useState()
-    const [dob, setDob] = useState()
+    const [staff_name, setStaffName] = useState()
     const [rank, setRank] = useState()
-    const [current_monthly_income, setCurrentMonthlyIncome] = useState()
-    const [monthly_contribution, setMonthlyContribution] = useState()
     const [dept, setDept] = useState()
-    const [membership_date, setMembershipDate] = useState()
+    const [monthly_contribution, setMonthlyContribution] = useState()
+    const [date_joined, setDateJoined] = useState()
+    const [email, setEmail] = useState()
     const [phone_number, setPhoneNumber] = useState()
     const [alt_phone_number, setAltPhoneNumber] = useState()
-    const [gender, setGender] = useState()
-    const [status, setStatus] = useState()
-    const [role, setRole] = useState('member')
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    
 
     //create staff mutation
     const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
-        onError: (e) => {
+        onError: () => {
             // console.log(e.graphQLErrors[0].message)
             console.log(error)
             addToast("Validation Error", {
@@ -34,9 +28,9 @@ const ProfileSetting = () =>  {
                 autoDismiss: true,
               })
         },
-        onCompleted: (createMember) =>{
-            console.log(createMember)
-            addToast("Staff Created", {
+        onCompleted: (updateProfile) =>{
+            console.log(updateProfile)
+            addToast("Profile Updated", {
                 appearance: 'success',
                 autoDismiss: true,
               })
@@ -45,223 +39,101 @@ const ProfileSetting = () =>  {
     })
     const resetForm = () => {
         setStaffNo('')
-        setSurname('')
-        setOtherNames('')
-        setDob('')
+        setStaffName('')
+        setRank('')
+        setDepartment('')
+        setMonthlyContribution('')
+        setDateJoined('')
+        setEmail('')
         setPhoneNumber('')
         setAltPhoneNumber('')
-        setGender('')
-        setStatus('')
-        setRole('')
-        setEmail('')
-        setRank('')
-        setMembershipDate('')
-        setDept('')
-        setMonthlyContribution('')
-        setCurrentMonthlyIncome('')
-        setMembershipDate('')
-    }
-
-    let errors = { staff_no: '', surname: '', other_names: '', dept:'', rank:'', gender: '', dob: '', current_monthly_income:'', monthly_contribution:'', phone_number: '', alt_phone_number:'', status:'', role:'', email:'', password: '' };
-
-    function handleValidation() {
-       console.log('validation')
-        if (!staff_no) {
-       console.log('no staff validation')
-            
-            errors.staff_no = "Staff number is required";
-        }
-
-        if (!surname) {
-            errors.surname = "Surname is required";
-        }
-
-        if (!other_names) {
-            errors.other_names = "Other name is required";
-        }
-
-        if (!dept) {
-            errors.dept = "Department is required";
-        }
-
-        if (!rank) {
-            errors.dept = "Rank is required";
-        }
-
-        if (!gender){
-            errors.gender = "Select your gender";
-        }
-
-        if (!current_monthly_income){
-            errors.current_monthly_income = "Current monthly income is required";
-        }
-
-        if (!monthly_contribution){
-            errors.monthly_contribution = "Monthly contribution is required";
-        }
-
-        if (!phone_number){
-            errors.phone_number = "Phone number is required";
-        }
-
-        if (!alt_phone_number){
-            errors.alt_phone_number = "Alternative phone number is required";
-        }
-
-        if (!status) {
-            errors.status = "Select a status";
-        }
-
-        if (!dob) {
-            errors.status = "Set date of birth";
-        }
-        console.log(errors)
     }
 
     const submit = async (e) => {
         e.preventDefault();
-        if(handleValidation()) {
-        createMember({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), 
-            membership_date: new Date(membership_date), phone_number, alt_phone_number, 
-            status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
+        updateProfile({variables:{staff_no, staff_name, rank, dept, monthly_contribution, 
+            date_joined: new Date(date_joined), 
+            email, phone_number, alt_phone_number }})
         }
-    }
+
         return (
-            <div className="">
+            <div className="grey-container">
+                <h3 className="ks-header">Profile Details</h3>
                 <form onSubmit={submit}>
                     <div className="row mt-5">
                         <div className="col-md-3">
-                            <label className="ks-label">Staff ID {errors && errors.staff_no}</label>
+                            <label className="ks-label">Staff No</label>
                             <input 
                                 className="ks-form-control form-control" 
-                                placeholder="E.g KASU002"
+                                placeholder="DU234FNA3"
                                 value={staff_no || ""}
                                 onChange={({ target }) => setStaffNo(target.value)}
                             />
-                         <span style={{color: "red"}}>{errors.staff_no}</span>                            
+                         <span style={{color: "red"}}></span>                            
                         </div>
                         <div className="col-md-3">
-                            <label className="ks-label">Surname</label>
+                            <label className="ks-label">Staff Name</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g John"
-                                value={surname || ""}
-                                onChange={({ target }) => setSurname(target.value)}
+                                placeholder="Moses Samuel Vybz"
+                                value={staff_name || ""}
+                                onChange={({ target }) => setStaffName(target.value)}
                             />
-                            {errors.surname != '' && <span style={{color: "red"}}>{errors.surname}</span>}
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Others</label>
-                            <input className="ks-form-control form-control"
-                                value={other_names || ""}
-                                onChange={({ target }) => setOtherNames(target.value)}
-                             />
-                             {errors.other_names != '' && <span style={{color: "red"}}>{errors.other_names}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Rank</label>
                             <input className="ks-form-control form-control"
                                 value={rank || ""}
-                                placeholder="e.g Senior Lecture"
+                                placeholder="Dean"
                                 onChange={({ target }) => setRank(target.value)}
                              />
-                             {errors.rank != '' && <span style={{color: "red"}}>{errors.rank}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Department</label>
                             <input className="ks-form-control form-control"
                                 value={dept || ""}
-                                placeholder="e.g Mass Communication"
+                                placeholder="Civil Engineering"
                                 onChange={({ target }) => setDept(target.value)}
                              />
-                             {errors.dept != '' && <span style={{color: "red"}}>{errors.dept}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Monthly Contribution</label>
                             <input className="ks-form-control form-control"
                                 value={monthly_contribution || ""}
-                                placeholder="e.g 10000"
+                                placeholder="₦72,000"
                                 onChange={({ target }) => setMonthlyContribution(target.value)}
                              />
-                             {errors.monthly_contribution != '' && <span style={{color: "red"}}>{errors.monthly_contribution}</span>}
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Current Monthly Income</label>
-                            <input className="ks-form-control form-control"
-                                value={current_monthly_income || ""}
-                                placeholder="e.g 100000"
-                                onChange={({ target }) => setCurrentMonthlyIncome(target.value)}
-                             />
-                             {errors.current_monthly_income != '' && <span style={{color: "red"}}>{errors.current_monthly_income}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Date Joined</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="dd/mm/yyy" type="date"
-                                value={membership_date || ""}
-                                onChange={({ target }) => setMembershipDate(target.value)}
+                                value={date_joined || ""}
+                                onChange={({ target }) => setDateJoined(target.value)}
                             />
-                        </div>
-
-                        <div className="col-md-3">
-                            <label className="ks-label">Date of Birth</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="dd/mm/yyy" type="date"
-                                value={dob || ""}
-                                onChange={({ target }) => setDob(target.value)}
-                            />
-                            {errors.dob != '' && <span style={{color: "red"}}>{errors.dob}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Email</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g Johndoe@email.com"
+                                placeholder="samuelvybz@gmail.com"
                                 value={email || ""}
                                 onChange={({ target }) => setEmail(target.value)}
                              />
-                             {errors.email != '' && <span style={{color: "red"}}>{errors.email}</span>}
                         </div>
                         <div className="col-md-3">    
                             <label className="ks-label">Phone Number</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g 09080009000"
+                                placeholder="09080009000"
                                 value={phone_number || ""}
                                 onChange={({ target }) => setPhoneNumber(target.value)}
                              />
-                             {errors.phone_number != '' && <span style={{color: "red"}}>{errors.phone_number}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Alt Phone Number</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g 09080009000"
+                                placeholder="09080009000"
                                 value={alt_phone_number || ""}
                                 onChange={({ target }) => setAltPhoneNumber(target.value)}
                              />
-                             {errors.alt_phone_number != '' && <span style={{color: "red"}}>{errors.alt_phone_number}</span>}
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Gender</label>
-                            <select className="ks-form-control form-control" 
-                                value={gender || ""}
-                                onChange={({ target }) => setGender(target.value)}
-                                >
-                                <option value="">Options</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                            {errors.gender != '' && <span style={{color: "red"}}>{errors.gender}</span>}
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Account Status</label>
-                            <select className="ks-form-control form-control"
-                                value={status || ""}
-                                onChange={({ target }) => setStatus(target.value)} 
-                            >
-                                <option value="">Options</option>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                                <option value="2">Closed</option>
-                            </select>
-                            {errors.status != '' && <span style={{color: "red"}}>{errors.status}</span>}
                         </div>
                         <div className="col-12">
                             <button disabled={loading}  className="btn float-right mt-5 " type="submit">

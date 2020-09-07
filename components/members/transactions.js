@@ -86,53 +86,24 @@ class Transactions extends Component {
       
     return (
         <div>
-            <div className="widget-section">
-                <div className="widget-heading d-flex justify-content-between align-items-baseline">
-                     <p>Settings</p><h3 className="page-title bold">| COORPERATIVE PROFILE</h3>
-                </div>
-                {/* <div className="widget-con">
-                    <div onClick={() => filterMembers('')} className={ activeWidget ==='' ? 'widget no-shadow' : 'widget shadow'}>
-                        <div className="widget-icon widget-icon-primary">
-                            <PeopleGroupIcon />
-                        </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.total}</h1>
-                        <p>Total number of members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(1)} className={ activeWidget === 1 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-success">
-                        <PersonWithTickIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.active}</h1>
-                        <p>Total Active Members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(0)} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-danger">
-                        <PeopleIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.inactive}</h1>
-                        <p>Inactive Suspended members</p>
-                    </div>
-                    </div>
-                </div>
-                </div> */}
-        <div className="bg-grey">
             
+            <div className="widget-section">
+        <div className="bg-grey">
+        <h3 className="ks-header transaction-header">Transaction Details</h3>
         {setMode === 0 &&
-             <div >
+             <div style={{padding:'20px'}}>
+                 
                  <div className="row">
-                     {/* <div className="col-md-4">
-                        <div className="search-con mb-4">
-                            <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                            <button type="button mr-3" className="btn">Search</button>
+                 <div className="col-md-3">
+                            <select className="ks-form-control form-control mt-4" 
+                                >
+                                <option value="">Filter Date</option>
+                                <option></option>
+                                <option></option>
+                            </select>
                         </div>
-                    </div> */}
                     <div className="col-md-8">
-                        <button type="button" className="btn float-right mr-3 mt-4" onClick={()=> this.setState({setMode: 1})}>ADD LOAN TYPE</button>
+                        <button type="button" className="btn float-right mr-0 mt-4" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
                     </div>
                  </div>
              
@@ -144,12 +115,12 @@ class Transactions extends Component {
                  <thead>
                  <tr>
                      <th>&#x23;</th>
-                     <th>Loan Type</th>
-                     <th>Max Duration</th>
-                     <th>Interest</th>
-                     <th>Interest Type</th>
-                     <th>Insurance Rate</th>
-                     <th>Date Created</th>
+                     <th>Approved by</th>
+                     <th>Rank</th>
+                     <th>Posted by</th>
+                     <th>Transaction Type</th>
+                     <th>Total balance</th>
+                     <th>Status</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
@@ -206,10 +177,10 @@ class Transactions extends Component {
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Add Loan Type
+                <p className="page-title mt-5">Print Transaction
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
-                <AddLoanType />
+                <span>Print Transaction</span>
             </div>
         }
             {/* <StyledMain> */}
