@@ -12,8 +12,9 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { GET_MEMBERS } from '../../gql/members';
+import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
 import { CustomToggle, Status } from '../../layouts/extras'
+import { page_range } from '../shared/utils'
 import CreateMember from './create-member'
 
 class ManageMembers extends Component {
@@ -22,6 +23,11 @@ class ManageMembers extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
+            memberTotals: {},
+            pageNumber: 1,
+            pageSize: 0,
+            totalEntries: 0,
+            totalPages: 0,
             sorted: [],
             setMode: 0,
             activeWidget: ''
@@ -31,21 +37,40 @@ class ManageMembers extends Component {
     componentDidMount()
     {
         this.getMembers()
+        this.getMemberTotals()
     }
 
-    getMembers(page = 0)
+    getMembers(page = 1)
     {
         createApolloClient.query({
-            query: GET_MEMBERS
+            query: GET_PAGINATE_MEMBERS,
+            variables: {page: page}
           }).then(response => {
-              this.setState({members: response.data.members, sorted: response.data.members})
+              const result = response.data.paginateMembers
+              this.setState({
+                  members: result.entries, 
+                  sorted: result.entries,
+                  totalEntries: result.totalEntries,
+                  totalPages: result.totalPages,
+                  pageNumber: result.pageNumber,
+                  pageSize: result.pageSize,
+
+                })
+            }, error => console.log(error))
+    }
+    getMemberTotals(page = 1)
+    {
+        createApolloClient.query({
+            query: GET_MEMBER_TOTALS,
+          }).then(response => {
+              this.setState({memberTotals: response.data.memberTotals})
             }, error => console.log(error))
     }
     
     paginate = (e, page, analyticsEvent) => {
-        console.log(page)
+        this.getMembers(page)
       }
-
+    
     render () {
         const filterMembers = (status = "") => {
             let membersData = [];
@@ -58,9 +83,7 @@ class ManageMembers extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {members, sorted, setMode, activeWidget } = this.state
-
-  
+    const {members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
       
     return (
         <div>
@@ -74,25 +97,25 @@ class ManageMembers extends Component {
                             <PeopleGroupIcon />
                         </div>
                     <div>
-                        <h1>362</h1>
+                        <h1>{memberTotals && memberTotals.total}</h1>
                         <p>Total number of members</p>
                     </div>
                     </div>
-                    <div onClick={() => filterMembers('active')} className={ activeWidget ==='active' ? 'widget no-shadow' : 'widget shadow'}>
+                    <div onClick={() => filterMembers(1)} className={ activeWidget === 1 ? 'widget no-shadow' : 'widget shadow'}>
                     <div className="widget-icon widget-icon-success">
                         <PersonWithTickIcon />
                     </div>
                     <div>
-                        <h1>272</h1>
+                        <h1>{memberTotals && memberTotals.active}</h1>
                         <p>Total Active Members</p>
                     </div>
                     </div>
-                    <div onClick={() => filterMembers('inactive')} className={ activeWidget ==='inactive' ? 'widget no-shadow' : 'widget shadow'}>
+                    <div onClick={() => filterMembers(0)} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
                     <div className="widget-icon widget-icon-danger">
                         <PeopleIcon />
                     </div>
                     <div>
-                        <h1>362</h1>
+                        <h1>{memberTotals && memberTotals.inactive}</h1>
                         <p>Inactive Suspended members</p>
                     </div>
                     </div>
@@ -118,7 +141,7 @@ class ManageMembers extends Component {
              <div className="table-responsive p-3">
                  { sorted.length > 0 &&
                  <div>
-                 <table className="table">
+                 <table className="table table-borderless">
                  <thead>
                  <tr>
                      <th>&#x23;</th>
@@ -164,9 +187,12 @@ class ManageMembers extends Component {
                 
                  </tbody>
              </table>
+             { totalPages > 1 && 
                 <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
+                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
                 </div>
+             }
+                
              </div>
                  }
                  { sorted && !sorted.length && 
@@ -183,7 +209,7 @@ class ManageMembers extends Component {
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Create Staff Page
+                <p className="page-title mt-5">Create Member Page
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
                 <CreateMember />

@@ -1,5 +1,33 @@
 import { gql } from '@apollo/client';
 
+export const GET_PAGINATE_STAFF = gql`
+query ($page: Int){
+  paginateStaff(page: $page) {
+    entries {
+      id
+      email
+      surname
+      other_names
+      user_id
+      altPhoneNumber
+      avatar
+      details
+      dob
+      email
+      gender
+      phone_number
+      role
+      insertedAt
+      updatedAt
+      status
+        }
+      pageSize
+    pageNumber
+    totalPages
+    totalEntries
+  }
+}
+`;
 export const GET_STAFFS = gql`
 query {
     staff {

@@ -6,6 +6,7 @@ import HomeIcon from '@atlaskit/icon/glyph/home';
 import SettingsIcon from '@atlaskit/icon/glyph/settings';
 import PeopleIcon from '@atlaskit/icon/glyph/people';
 import CreditcardIcon from '@atlaskit/icon/glyph/creditcard';
+import ChevronDownIcon from '@atlaskit/icon/glyph/chevron-down';
 import DetailViewIcon from '@atlaskit/icon/glyph/detail-view';
 import TrayIcon from '@atlaskit/icon/glyph/tray';
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -39,6 +40,7 @@ class SideBarNav extends React.Component {
         }}
       >
         {children}
+        <div className=""><ChevronDownIcon /></div>
       </a>
     ));
 

@@ -7,18 +7,12 @@ import { ToastProvider, useToasts } from 'react-toast-notifications'
 const UpdateVendorProfile = () =>  {
     const { addToast } = useToasts()
 
-    const [staff_no, setStaffNo] = useState()
-    const [surname, setSurname] = useState()
-    const [other_names, setOtherNames] = useState()
-    // const [first_name, setFirstName] = useState()
-    const [dob, setDob] = useState()
-    const [phone_number, setPhoneNumber] = useState()
-    const [alt_phone_number, setAltPhoneNumber] = useState()
-    const [gender, setGender] = useState()
-    const [status, setStatus] = useState()
-    const [role, setRole] = useState()
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    const [name, setName] = useState()
+    const [description, setDescription] = useState()
+    const [phone_numbers, setPhoneNumbers] = useState()
+    const [account_status, setAccountStatus] = useState()
+    const [default_currency, setDefaultCurrency] = useState('NGN')
+    const [address, SetAddress] = useState()
 
     //create staff mutation
     const  [createStaff, {loading, error}] = useMutation( CREATE_STAFF, {
@@ -38,131 +32,74 @@ const UpdateVendorProfile = () =>  {
         }
     })
     const resetForm = () => {
-        setStaffNo('')
-        setSurname('')
-        setOtherNames('')
-        setDob('')
-        setPhoneNumber('')
-        setAltPhoneNumber('')
-        setGender('')
-        setStatus('')
-        setRole('')
-        setEmail('')
-        setPassword('')
+        setName('')
+        setDescription('')
+        setPhoneNumbers('')
+        setAccountStatus('')
+        setDefaultCurrency('NGN')
+        SetAddress('')
     }
     const submit = async (e) => {
         e.preventDefault();
-        createStaff({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), phone_number, alt_phone_number, status, role, email, password}})
+        createStaff({variables:{name, description, default_currency, phone_numbers, account_status, address}})
     }
         return (
             <div className="p-4">
                 <form onSubmit={submit}>
                     <div className="row mt-5">
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff ID</label>
-                            <input 
-                                className="ks-form-control form-control" 
-                                placeholder="E.g KASU002"
-                                value={staff_no || ""}
-                                onChange={({ target }) => setStaffNo(target.value)}
+                        <div className="col-md-6">
+                            <label className="ks-label">Name</label>
+                            <input className="ks-form-control form-control" 
+                                placeholder="e.g KASU Multipurpose Cooperative Society"
+                                value={name || ""}
+                                onChange={({ target }) => setName(target.value)}
                             />
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Surname</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="e.g John"
-                                value={surname || ""}
-                                onChange={({ target }) => setSurname(target.value)}
-                            />
-                        </div>
-                        {/* <div className="col-md-3">
-                            <label className="ks-label">First Name</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="e.g Doe"
-                                value={first_name || ""}
-                                onChange={({ target }) => setFirstName(target.value)}
-                            />
-                        </div> */}
-                        <div className="col-md-3">
-                            <label className="ks-label">Others</label>
+                        <div className="col-md-6">
+                            <label className="ks-label">Address</label>
                             <input className="ks-form-control form-control"
-                                value={other_names || ""}
-                                onChange={({ target }) => setOtherNames(target.value)}
+                                placeholder="e.g U/rimi, Kaduna" type="date"
+                                value={address || ""}
+                                onChange={({ target }) => SetAddress(target.value)}
                              />
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Date of Birth</label>
+                        
+                        <div className="col-md-6">
+                            <label className="ks-label">Phone Number(s)</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="dd/mm/yyy" type="date"
-                                value={dob || ""}
-                                onChange={({ target }) => setDob(target.value)}
-                            />
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Phone Number</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="e.g 09080009000"
-                                value={phone_number || ""}
-                                onChange={({ target }) => setPhoneNumber(target.value)}
+                                placeholder="e.g 09080009000, 08099998888"
+                                value={phone_numbers || ""}
+                                onChange={({ target }) => setPhoneNumbers(target.value)}
                              />
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Alt Phone Number</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="e.g 09080009000"
-                                value={alt_phone_number || ""}
-                                onChange={({ target }) => setAltPhoneNumber(target.value)}
-                             />
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Gender</label>
-                            <select className="ks-form-control form-control" 
-                                value={gender || ""}
-                                onChange={({ target }) => setGender(target.value)}
-                                >
-                                <option value="">Options</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff Status</label>
+                        <div className="col-md-6">
+                            <label className="ks-label">Status</label>
                             <select className="ks-form-control form-control"
-                                value={status || ""}
-                                onChange={({ target }) => setStatus(target.value)} 
+                                value={account_status || ""}
+                                onChange={({ target }) => setAccountStatus(target.value)} 
                             >
                                 <option value="">Options</option>
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
                             </select>
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff Role</label>
+                        <div className="col-md-6">
+                            <label className="ks-label">Default Currency</label>
                             <select className="ks-form-control form-control"
-                                value={role || ""}
-                                onChange={({ target }) => setRole(target.value)}
+                                value={default_currency || ""}
+                                onChange={({ target }) => setDefaultCurrency(target.value)} 
                             >
                                 <option value="">Options</option>
-                                <option value="admin">Admin</option>
-                                <option value="manager">Manager</option>
-                                <option value="staff">Staff</option>
+                                <option value="NGN">NGN</option>
                             </select>
                         </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff Login Email</label>
+                        <div className="col-md-6">
+                            <label className="ks-label">Description</label>
                             <input className="ks-form-control form-control" 
-                                placeholder="e.g Johndoe@email.com"
-                                value={email || ""}
-                                onChange={({ target }) => setEmail(target.value)}
+                                placeholder="e.g details"
+                                value={description || ""}
+                                onChange={({ target }) => setDescription(target.value)}
                              />
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Staff Login Password</label>
-                            <input className="ks-form-control form-control" 
-                                value={password || ""}
-                                onChange={({ target }) => setPassword(target.value)}
-                                placeholder="Create Password for Staff" 
-                            />
                         </div>
                         <div className="col-12">
                             <button disabled={loading}  className="btn float-right mt-5 " type="submit">
@@ -170,7 +107,7 @@ const UpdateVendorProfile = () =>  {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
                             }
-                            CREATE NEW STAFF</button>
+                            UPDATE PROFILE</button>
                         </div>
                     </div>
                 </form>
