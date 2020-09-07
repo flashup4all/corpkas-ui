@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import Pagination from '@atlaskit/pagination';
 import Dropdown from 'react-bootstrap/Dropdown'
-import { GET_PAGINATE_STAFF } from '../../gql/staff';
+import { GET_PAGINATE_STAFF, FILTER_STAFF } from '../../gql/staff';
 import { createApolloClient } from '../../lib/apolloClient'
 import { CustomToggle, Status } from '../../layouts/extras'
 import EmptyData from '../../layouts/empty'
@@ -22,10 +22,9 @@ class ListOfStaff extends Component {
             totalEntries: 0,
             totalPages: 0,
             setMode: 0,
-            filter: {
-                gender:'',
-                status: '',
-            }
+            filter_status:'',
+            filter_role:'',
+            filter_term:'',
         }
     }
 
@@ -59,61 +58,75 @@ class ListOfStaff extends Component {
 
     render() {
 
-        const {staffList, sorted, setMode, totalPages, staffTotals, filter} = this.state
+        const {staffList, sorted, setMode, totalPages, staffTotals, filter_status, filter_role, filter_term} = this.state
+        const filter_form = () => {
+
+            let variables = {}
+            if(filter_role || filter_status)
+            {
+                console.log(filter_role)
+                console.log(filter_status)
+                filter_role ? variables.role = filter_role  : null
+                filter_status ? variables.status = filter_status : null
+               console.log('one pass')
+               createApolloClient.mutate({
+                   mutation: FILTER_STAFF,
+                   variables: variables
+               }).then(response => {
+                   console.log(response)
+                   let result = response.data.filterStaff
+                   this.setState({
+                        staffList: result, 
+                        sorted: result,
+                        totalEntries: 0,
+                        totalPages: 0,
+                        pageNumber: 0,
+                        pageSize: 0,
+        
+                    })
+               }, (error)=> console.log(error)) 
+            }
+        }
         return (
             <div className="">
                 {setMode === 0 &&
              <div>
-                 <div className="p-2">
-                    <div className="row mt-5">
-                        <div className="col-md-2">
-                            <select className="ks-form-control form-control" 
-                                value={filter.gender || ""}
-                                onChange={({ target }) => this.setState({gender: target.value})}
-                                >
-                                <option value="">Filter by Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                            </div>
-                            <div className="col-md-2">
-                                <select className="ks-form-control form-control" 
-                                    value={filter.status || ""}
-                                    onChange={({ target }) => this.setState({status: target.value})}
-                                    >
-                                    <option value="">Filter by Status</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Inactive</option>
-                                    <option value="2">Closed</option>
-                                </select>
-                            </div>
-                            <div className="col-md-2">
-                                <select className="ks-form-control form-control" 
-                                    value={filter.status || ""}
-                                    onChange={({ target }) => this.setState({status: target.value})}
-                                    >
-                                    <option value="">Filter by Role</option>
-                                    <option value="admin">Admin</option>
-                                <option value="manager">Manager</option>
-                                <option value="staff">Staff</option>
-                                </select>
-                            </div>
-                            <div className="col-md-4">
-
-                                    <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                                    <button type="button" className="btn" onClick={()=> this.setState({setMode: 1})}>Search</button>
-
-                            </div>
-                        </div>
-                 </div>
-                 
-                 
-             
-             
              <div className="table-responsive p-2">
+                <div className="row pl-2 mt-5 mb-3">
+                                <div className="col-md-3 ks-col">
+                                    <select className="ks-form-control form-control" 
+                                        value={filter_status || ""}
+                                        onChange={({ target }) => this.setState({filter_status: target.value})}
+                                        >
+                                        <option value="">Filter Status</option>
+                                        <option value="1">Active</option>
+                                        <option value="0">Inactive</option>
+                                        <option value="2">Closed</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-3 ks-col">
+                                    <select className="ks-form-control form-control" 
+                                        value={filter_role || ""}
+                                        onChange={({ target }) => this.setState({filter_role: target.value})}
+                                        >
+                                        <option value="">Filter Role</option>
+                                        <option value="admin">Admin</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="staff">Staff</option>
+                                    </select>
+                                </div>
+                                <div className="col-md-3 ks-col">
+                                    <input type="search" name="search" 
+                                    className="mini-search form-control ks-form-control" 
+                                    placeholder="Search" 
+                                    value={filter_term || ""}
+                                    onChange={({ target }) => this.setState({filter_term: target.value})}></input>
+                                </div>
+                                <button type="button" className="btn" onClick={()=> filter_form()}>Search</button>
+                            </div>
                  { staffList.length > 0 &&
                  <div>
-                 <table className="table">
+                 <table className="table table-borderless">
                  <thead>
                  <tr>
                      <th>&#x23;</th>
@@ -134,7 +147,7 @@ class ListOfStaff extends Component {
                      <td>{staff.role}</td>
                      <td>{staff.gender}</td>
                      <td>{staff.email}</td>
-                     <td>{staff.inserted_at}</td>
+                     <td>{staff.inserted_at.toLocaleString()}</td>
                      <td className={staff.status}>
                      <Status status={staff.status} />
                          </td>
@@ -159,9 +172,11 @@ class ListOfStaff extends Component {
                 
                  </tbody>
              </table>
+            { totalPages > 1 && 
                 <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
+                    <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
                 </div>
+            }
              </div>
                  }
                  { sorted && !sorted.length && 
@@ -174,16 +189,6 @@ class ListOfStaff extends Component {
              
              </div>
          </div>
-        }
-        {
-            setMode === 1 &&
-
-            <div>
-                create page
-                <div className="col-12">
-                    <input className="ks-form-control form-control" />
-                </div>
-            </div>
         }
             </div>
         )

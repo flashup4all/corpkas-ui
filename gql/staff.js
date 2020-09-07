@@ -17,8 +17,8 @@ query ($page: Int){
       gender
       phone_number
       role
-      insertedAt
-      updatedAt
+      inserted_at
+      updated_at
       status
         }
       pageSize
@@ -93,3 +93,40 @@ export const CREATE_STAFF = gql`
       }
   }
 `;
+
+export const FILTER_STAFF = gql`
+  mutation filterStaff(
+      $status: String,
+      $from: String,
+      $to: String, 
+      $gender: String, 
+      $role: String) {
+        filterStaff(filter: {
+        from: $from,
+        status: $status,
+        role: $role,
+        to: $to,
+        gender: $gender 
+      }){
+        
+        id
+        surname
+        other_names
+        email
+        phone_number
+        alt_phone_number
+        gender
+        avatar
+        dob
+        avatar
+        role
+        status
+        userId
+        inserted_at
+        updated_at
+           
+        
+      }
+  }
+`;
+

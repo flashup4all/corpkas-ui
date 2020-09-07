@@ -118,6 +118,10 @@
   .ks-pages0container{
 	margin-top: 60px;
   }
+  .ks-col{
+	padding-left: 8px;
+    padding-right: 8px;
+  }
  #wrapper {
     overflow-x: hidden;
  }
