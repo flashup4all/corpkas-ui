@@ -50,8 +50,12 @@ const CreateStaff = () =>  {
         setEmail('')
         setPassword('')
     }
+
+   
+
     const submit = async (e) => {
         e.preventDefault();
+        
         createStaff({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), phone_number, alt_phone_number, status, role, email, password}})
     }
         return (
