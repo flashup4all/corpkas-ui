@@ -27,7 +27,7 @@ const CreateMember = () =>  {
     //create staff mutation
     const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
         onError: (e) => {
-            console.log(e.graphQLErrors[0].message)
+            // console.log(e.graphQLErrors[0].message)
             console.log(error)
             addToast("Validation Error", {
                 appearance: 'warning',
@@ -61,24 +61,84 @@ const CreateMember = () =>  {
         setCurrentMonthlyIncome('')
         setMembershipDate('')
     }
+
+    let errors = { staff_no: '', surname: '', other_names: '', dept:'', rank:'', gender: '', dob: '', current_monthly_income:'', monthly_contribution:'', phone_number: '', alt_phone_number:'', status:'', role:'', email:'', password: '' };
+
+    function handleValidation() {
+       console.log('validation')
+        if (!staff_no) {
+       console.log('no staff validation')
+            
+            errors.staff_no = "Staff number is required";
+        }
+
+        if (!surname) {
+            errors.surname = "Surname is required";
+        }
+
+        if (!other_names) {
+            errors.other_names = "Other name is required";
+        }
+
+        if (!dept) {
+            errors.dept = "Department is required";
+        }
+
+        if (!rank) {
+            errors.dept = "Rank is required";
+        }
+
+        if (!gender){
+            errors.gender = "Select your gender";
+        }
+
+        if (!current_monthly_income){
+            errors.current_monthly_income = "Current monthly income is required";
+        }
+
+        if (!monthly_contribution){
+            errors.monthly_contribution = "Monthly contribution is required";
+        }
+
+        if (!phone_number){
+            errors.phone_number = "Phone number is required";
+        }
+
+        if (!alt_phone_number){
+            errors.alt_phone_number = "Alternative phone number is required";
+        }
+
+        if (!status) {
+            errors.status = "Select a status";
+        }
+
+        if (!dob) {
+            errors.status = "Set date of birth";
+        }
+        console.log(errors)
+    }
+
     const submit = async (e) => {
         e.preventDefault();
+        if(handleValidation()) {
         createMember({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), 
             membership_date: new Date(membership_date), phone_number, alt_phone_number, 
             status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
+        }
     }
         return (
             <div className="">
                 <form onSubmit={submit}>
                     <div className="row mt-5">
                         <div className="col-md-3">
-                            <label className="ks-label">Staff ID</label>
+                            <label className="ks-label">Staff ID {errors && errors.staff_no}</label>
                             <input 
                                 className="ks-form-control form-control" 
                                 placeholder="E.g KASU002"
                                 value={staff_no || ""}
                                 onChange={({ target }) => setStaffNo(target.value)}
                             />
+                         <span style={{color: "red"}}>{errors.staff_no}</span>                            
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Surname</label>
@@ -87,6 +147,7 @@ const CreateMember = () =>  {
                                 value={surname || ""}
                                 onChange={({ target }) => setSurname(target.value)}
                             />
+                            {errors.surname != '' && <span style={{color: "red"}}>{errors.surname}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Others</label>
@@ -94,6 +155,7 @@ const CreateMember = () =>  {
                                 value={other_names || ""}
                                 onChange={({ target }) => setOtherNames(target.value)}
                              />
+                             {errors.other_names != '' && <span style={{color: "red"}}>{errors.other_names}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Rank</label>
@@ -102,6 +164,7 @@ const CreateMember = () =>  {
                                 placeholder="e.g Senior Lecture"
                                 onChange={({ target }) => setRank(target.value)}
                              />
+                             {errors.rank != '' && <span style={{color: "red"}}>{errors.rank}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Department</label>
@@ -110,6 +173,7 @@ const CreateMember = () =>  {
                                 placeholder="e.g Mass Communication"
                                 onChange={({ target }) => setDept(target.value)}
                              />
+                             {errors.dept != '' && <span style={{color: "red"}}>{errors.dept}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Monthly Contribution</label>
@@ -118,6 +182,7 @@ const CreateMember = () =>  {
                                 placeholder="e.g 10000"
                                 onChange={({ target }) => setMonthlyContribution(target.value)}
                              />
+                             {errors.monthly_contribution != '' && <span style={{color: "red"}}>{errors.monthly_contribution}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Current Monthly Income</label>
@@ -126,6 +191,7 @@ const CreateMember = () =>  {
                                 placeholder="e.g 100000"
                                 onChange={({ target }) => setCurrentMonthlyIncome(target.value)}
                              />
+                             {errors.current_monthly_income != '' && <span style={{color: "red"}}>{errors.current_monthly_income}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Date Joined</label>
@@ -143,6 +209,7 @@ const CreateMember = () =>  {
                                 value={dob || ""}
                                 onChange={({ target }) => setDob(target.value)}
                             />
+                            {errors.dob != '' && <span style={{color: "red"}}>{errors.dob}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Email</label>
@@ -151,14 +218,16 @@ const CreateMember = () =>  {
                                 value={email || ""}
                                 onChange={({ target }) => setEmail(target.value)}
                              />
+                             {errors.email != '' && <span style={{color: "red"}}>{errors.email}</span>}
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-3">    
                             <label className="ks-label">Phone Number</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g 09080009000"
                                 value={phone_number || ""}
                                 onChange={({ target }) => setPhoneNumber(target.value)}
                              />
+                             {errors.phone_number != '' && <span style={{color: "red"}}>{errors.phone_number}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Alt Phone Number</label>
@@ -167,6 +236,7 @@ const CreateMember = () =>  {
                                 value={alt_phone_number || ""}
                                 onChange={({ target }) => setAltPhoneNumber(target.value)}
                              />
+                             {errors.alt_phone_number != '' && <span style={{color: "red"}}>{errors.alt_phone_number}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Gender</label>
@@ -178,6 +248,7 @@ const CreateMember = () =>  {
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
+                            {errors.gender != '' && <span style={{color: "red"}}>{errors.gender}</span>}
                         </div>
                         <div className="col-md-3">
                             <label className="ks-label">Account Status</label>
@@ -190,6 +261,7 @@ const CreateMember = () =>  {
                                 <option value="0">Inactive</option>
                                 <option value="2">Closed</option>
                             </select>
+                            {errors.status != '' && <span style={{color: "red"}}>{errors.status}</span>}
                         </div>
                         <div className="col-12">
                             <button disabled={loading}  className="btn float-right mt-5 " type="submit">
