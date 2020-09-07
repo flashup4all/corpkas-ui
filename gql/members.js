@@ -1,5 +1,40 @@
 import { gql } from '@apollo/client';
 
+
+export const GET_PAGINATE_MEMBERS = gql`
+query ($page: Int){
+  paginateMembers(page: $page) {
+    entries {
+      id
+      email
+      surname
+      other_names
+      user_id
+      altPhoneNumber
+      current_balance
+      avatar
+      monthly_contribution
+      current_monthly_income
+      dept
+      details
+      dob
+      email
+      faculty
+      gender
+      phone_number
+      rank
+      role
+      insertedAt
+      updatedAt
+      status
+        }
+      pageSize
+    pageNumber
+    totalPages
+    totalEntries
+  }
+}
+`;
 export const GET_MEMBERS = gql`
 query {
     members {
@@ -29,6 +64,16 @@ query {
 }
 `;
 
+export const GET_MEMBER_TOTALS = gql`
+query {
+  memberTotals {
+      total
+    active
+    inactive
+    closed
+  }
+}
+`;
 export const CREATE_MEMBER = gql`
   mutation createMember(
       $staff_no: String!, $surname: String!, 

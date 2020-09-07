@@ -166,14 +166,6 @@
 
 
 
-.sidebar-navigation {
-	top: 0;
-	left: 0;
-  width: 240px;
-	height: 100vh;
-	background: #0747a6;
-	z-index: 10;
-}
 
 .sidebar-navigation {
 
@@ -347,7 +339,7 @@ input.mini-search:focus {
 }
 table{
 	border-top: hidden;
-	border-bottom: 1px solid grey;
+	border-bottom: 1px solid #DFE1E6;
 }
 .table thead th {
 	font-style: normal;
@@ -365,10 +357,10 @@ table{
 	color: #172B4D;
 }
 thead {
-	border-bottom: 1px solid grey;
+	border-bottom: 1px solid #DFE1E6;
 }
  tr{
-	border: hidden;
+	/* border: hidden; */
 }
 
 .ks-menu-dropdown{

@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import Pagination from '@atlaskit/pagination';
 import Dropdown from 'react-bootstrap/Dropdown'
-import { GET_STAFFS } from '../../gql/staff';
+import { GET_PAGINATE_STAFF } from '../../gql/staff';
 import { createApolloClient } from '../../lib/apolloClient'
 import { CustomToggle, Status } from '../../layouts/extras'
 import EmptyData from '../../layouts/empty'
+import { page_range } from '../shared/utils'
+
 class ListOfStaff extends Component {
 
     constructor(props) {
@@ -13,7 +15,17 @@ class ListOfStaff extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             staffList: [],
-            setMode: 0
+            sorted: [],
+            staffTotals: {},
+            pageNumber: 1,
+            pageSize: 0,
+            totalEntries: 0,
+            totalPages: 0,
+            setMode: 0,
+            filter: {
+                gender:'',
+                status: '',
+            }
         }
     }
 
@@ -22,32 +34,82 @@ class ListOfStaff extends Component {
         this.getstaffList()
     }
 
-    getstaffList(page = 0)
+    getstaffList(page = 1)
     {
         createApolloClient.query({
-            query: GET_STAFFS
+            query: GET_PAGINATE_STAFF,
+            variables: {page: page}
           }).then(response => {
-              this.setState({staffList: response.data.staff})
+            const result = response.data.paginateStaff
+            this.setState({
+                staffList: result.entries, 
+                sorted: result.entries,
+                totalEntries: result.totalEntries,
+                totalPages: result.totalPages,
+                pageNumber: result.pageNumber,
+                pageSize: result.pageSize,
+
+              })
             }, error => console.log(error))
     }
     
     paginate = (e, page, analyticsEvent) => {
-        console.log(page)
+        this.getstaffList(page)
       }
 
     render() {
 
-        const {staffList, setMode} = this.state
+        const {staffList, sorted, setMode, totalPages, staffTotals, filter} = this.state
         return (
             <div className="">
                 {setMode === 0 &&
-             <div >
-             <div className="col-md-4">
-                <div className="search-con mb-4">
-                    <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                    <button type="button" className="btn" onClick={()=> this.setState({setMode: 1})}>Search</button>
-                </div>
-             </div>
+             <div>
+                 <div className="p-2">
+                    <div className="row mt-5">
+                        <div className="col-md-2">
+                            <select className="ks-form-control form-control" 
+                                value={filter.gender || ""}
+                                onChange={({ target }) => this.setState({gender: target.value})}
+                                >
+                                <option value="">Filter by Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            </div>
+                            <div className="col-md-2">
+                                <select className="ks-form-control form-control" 
+                                    value={filter.status || ""}
+                                    onChange={({ target }) => this.setState({status: target.value})}
+                                    >
+                                    <option value="">Filter by Status</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                    <option value="2">Closed</option>
+                                </select>
+                            </div>
+                            <div className="col-md-2">
+                                <select className="ks-form-control form-control" 
+                                    value={filter.status || ""}
+                                    onChange={({ target }) => this.setState({status: target.value})}
+                                    >
+                                    <option value="">Filter by Role</option>
+                                    <option value="admin">Admin</option>
+                                <option value="manager">Manager</option>
+                                <option value="staff">Staff</option>
+                                </select>
+                            </div>
+                            <div className="col-md-4">
+
+                                    <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
+                                    <button type="button" className="btn" onClick={()=> this.setState({setMode: 1})}>Search</button>
+
+                            </div>
+                        </div>
+                 </div>
+                 
+                 
+             
+             
              <div className="table-responsive p-2">
                  { staffList.length > 0 &&
                  <div>
@@ -65,7 +127,7 @@ class ListOfStaff extends Component {
                  </tr>
                  </thead>
                  <tbody>
-                 { staffList.map((staff, index) => (
+                 { sorted.map((staff, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
                      <td>{staff.surname} {staff.other_names}</td>
@@ -98,14 +160,14 @@ class ListOfStaff extends Component {
                  </tbody>
              </table>
                 <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} />
+                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
                 </div>
              </div>
                  }
-                 { staffList && !staffList.length && 
+                 { sorted && !sorted.length && 
                      <EmptyData title="No Staff Data" text="No Available Staff Data"/>
                  } 
-                 { !staffList
+                 { !sorted
                      &&
                     <Loader />
                  }
