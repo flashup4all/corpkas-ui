@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
-
+import { useRouter} from 'next/router';
 import Tabs from '@atlaskit/tabs';
+import {GET_MEMBER} from '../../gql/members'
+import { useQuery } from '@apollo/client';
+
 import AdminMainLayout from '../../layouts/main/main';
 import ProfileSetting from '../../components/members/profile-setting';
 import Transactions from '../../components/members/transactions';
@@ -17,11 +20,28 @@ const tabs = [
 
 ];
 
-const LoanSettings = () => {
+const MemberProfile = (props) => {
+  const router = useRouter()
+  const {member_id} = router.query
+  const memberData = {id: member_id, name: "john doe"}
+  console.log(member_id)
+
+  const {loading, error, getMember} = useQuery( GET_MEMBER, {
+          onError: (error) => {
+              console.log(error)
+          },
+          onCompleted: (getMember) =>{
+              console.log(updateProfile)
+          }
+      })
+  
+
+
   const [seletedTab, setSeletedTab] = useState(0)
   const selectTab = (selected, selectedIndex) => {
     setSeletedTab(selectedIndex)
   }
+  
   return (
     <div>
       <div className="bg-grey ks-tabs">
@@ -30,7 +50,7 @@ const LoanSettings = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <ProfileSetting />
+          <ProfileSetting memberData={memberData}/>
         }
         { seletedTab === 1 &&
           <Transactions />
@@ -49,5 +69,5 @@ const LoanSettings = () => {
     )
   }
 
-export default LoanSettings;
-LoanSettings.layout = AdminMainLayout;
+export default MemberProfile;
+MemberProfile.layout = AdminMainLayout;

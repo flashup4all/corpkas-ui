@@ -46,12 +46,13 @@ const LoanRequests = () =>  {
     
         return (
             <div className="grey-container">
-                <p className="loan-request">Loan Requests</p>
+                <p className="">Loan Requests</p>
                 <form onSubmit={submit}>
-                    {/* <div className="row">
-                     <p className="ks-request-text">Loan request for </p>
-                    </div> */}
+                    
                     <div className="row mt-5 white">
+                    <div className="loan-request-row">
+                     <p className="ks-request-text">Loan request for ₦1,800,000.00</p>
+                    </div>
                         <div className="col-md-3 mt-5">
                             <label className="ks-label">Type of Loan</label>
                             <input 

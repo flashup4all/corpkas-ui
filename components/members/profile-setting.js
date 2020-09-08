@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-// import {CREATE_MEMBER} from '../../gql/members'
+import {CREATE_MEMBER} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
 import { useToasts } from 'react-toast-notifications'
 
-const ProfileSetting = () =>  {
+const ProfileSetting = (props) =>  {
     const { addToast } = useToasts()
-
+    console.log(props.memberData)
+    const memberData = props.memberData
     const [staff_no, setStaffNo] = useState()
-    const [staff_name, setStaffName] = useState()
+    const [staff_name, setStaffName] = useState(memberData.name)
     const [rank, setRank] = useState()
     const [dept, setDept] = useState()
     const [monthly_contribution, setMonthlyContribution] = useState()
