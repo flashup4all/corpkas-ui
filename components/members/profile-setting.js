@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import {CREATE_MEMBER} from '../../gql/members'
+// import {CREATE_MEMBER} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
 import { useToasts } from 'react-toast-notifications'
 
@@ -19,42 +19,42 @@ const ProfileSetting = () =>  {
     
 
     //create staff mutation
-    const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
-        onError: () => {
-            // console.log(e.graphQLErrors[0].message)
-            console.log(error)
-            addToast("Validation Error", {
-                appearance: 'warning',
-                autoDismiss: true,
-              })
-        },
-        onCompleted: (updateProfile) =>{
-            console.log(updateProfile)
-            addToast("Profile Updated", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-              resetForm()
-        }
-    })
-    const resetForm = () => {
-        setStaffNo('')
-        setStaffName('')
-        setRank('')
-        setDepartment('')
-        setMonthlyContribution('')
-        setDateJoined('')
-        setEmail('')
-        setPhoneNumber('')
-        setAltPhoneNumber('')
-    }
+    // const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
+    //     onError: () => {
+    //         // console.log(e.graphQLErrors[0].message)
+    //         console.log(error)
+    //         addToast("Validation Error", {
+    //             appearance: 'warning',
+    //             autoDismiss: true,
+    //           })
+    //     },
+    //     onCompleted: (updateProfile) =>{
+    //         console.log(updateProfile)
+    //         addToast("Profile Updated", {
+    //             appearance: 'success',
+    //             autoDismiss: true,
+    //           })
+    //           resetForm()
+    //     }
+    // })
+     const resetForm = () => {
+         setStaffNo('')
+         setStaffName('')
+         setRank('')
+         setDepartment('')
+         setMonthlyContribution('')
+         setDateJoined('')
+         setEmail('')
+         setPhoneNumber('')
+         setAltPhoneNumber('')
+     }
 
-    const submit = async (e) => {
-        e.preventDefault();
-        updateProfile({variables:{staff_no, staff_name, rank, dept, monthly_contribution, 
-            date_joined: new Date(date_joined), 
-            email, phone_number, alt_phone_number }})
-        }
+     const submit = async (e) => {
+         e.preventDefault();
+         updateProfile({variables:{staff_no, staff_name, rank, dept, monthly_contribution, 
+             date_joined: new Date(date_joined), 
+             email, phone_number, alt_phone_number }})
+         }
 
         return (
             <div className="grey-container">
@@ -136,11 +136,12 @@ const ProfileSetting = () =>  {
                              />
                         </div>
                         <div className="col-12">
-                            <button disabled={loading}  className="btn float-right mt-5 " type="submit">
+                            <button className="btn float-right mt-5 " type="submit">
+                            {/* disabled={loading} 
                             {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
-                            }
+                            } */}
                             EDIT PROFILE</button>
                         </div>
                     </div>

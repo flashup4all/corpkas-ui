@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import {CREATE_MEMBER} from '../../gql/members'
+// import {CREATE_MEMBER} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 const LoanRequests = () =>  {
@@ -15,24 +15,24 @@ const LoanRequests = () =>  {
    
 
     //create staff mutation
-    const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
-        onError: (e) => {
-            // console.log(e.graphQLErrors[0].message)
-            console.log(error)
-            addToast("Validation Error", {
-                appearance: 'warning',
-                autoDismiss: true,
-              })
-        },
-        onCompleted: (sendFollowUpMessage) =>{
-            console.log(sendFollowUpMessage)
-            addToast("Message Sent", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-              resetForm()
-        }
-    })
+    // const  [createMember, {loading, error}] = useMutation( CREATE_MEMBER, {
+    //     onError: (e) => {
+    //         // console.log(e.graphQLErrors[0].message)
+    //         console.log(error)
+    //         addToast("Validation Error", {
+    //             appearance: 'warning',
+    //             autoDismiss: true,
+    //           })
+    //     },
+    //     onCompleted: (sendFollowUpMessage) =>{
+    //         console.log(sendFollowUpMessage)
+    //         addToast("Message Sent", {
+    //             appearance: 'success',
+    //             autoDismiss: true,
+    //           })
+    //           resetForm()
+    //     }
+    // })
     const resetForm = () => {
         setLoanType('')
         setRepaymentPeriod('')
@@ -48,7 +48,7 @@ const LoanRequests = () =>  {
     
         return (
             <div className="grey-container">
-                
+                <p className="active-loan">Active Loans</p>
                 <form onSubmit={submit}>
                     {/* <div className="row">
                      <p className="ks-request-text">Loan request for </p>

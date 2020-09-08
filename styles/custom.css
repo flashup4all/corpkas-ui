@@ -171,10 +171,6 @@
   }
 }
 
-
-
-
-
 .sidebar-navigation {
 
 	width: 240px;
@@ -580,7 +576,7 @@ thead {
 }
 
 .transaction-header {
-	padding: 20px;
+	padding: 30px 0 0 30px;
 }
 
 .grey-container {

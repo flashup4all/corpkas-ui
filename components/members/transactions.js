@@ -12,7 +12,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+// import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
 import { CustomToggle, Status } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 
@@ -33,69 +33,69 @@ class Transactions extends Component {
         }
     }
 
-    componentDidMount()
-    {
-        this.getMembers()
-        this.getMemberTotals()
-    }
+    // componentDidMount()
+    // {
+    //     this.getMembers()
+    //     this.getMemberTotals()
+    // }
 
-    getMembers(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_PAGINATE_MEMBERS,
-            variables: {page: page}
-          }).then(response => {
-              const result = response.data.paginateMembers
-              this.setState({
-                  members: result.entries, 
-                  sorted: result.entries,
-                  totalEntries: result.totalEntries,
-                  totalPages: result.totalPages,
-                  pageNumber: result.pageNumber,
-                  pageSize: result.pageSize,
+    // getMembers(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_PAGINATE_MEMBERS,
+    //         variables: {page: page}
+    //       }).then(response => {
+    //           const result = response.data.paginateMembers
+    //           this.setState({
+    //               members: result.entries, 
+    //               sorted: result.entries,
+    //               totalEntries: result.totalEntries,
+    //               totalPages: result.totalPages,
+    //               pageNumber: result.pageNumber,
+    //               pageSize: result.pageSize,
 
-                })
-            }, error => console.log(error))
-    }
-    getMemberTotals(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_MEMBER_TOTALS,
-          }).then(response => {
-              this.setState({memberTotals: response.data.memberTotals})
-            }, error => console.log(error))
-    }
+    //             })
+    //         }, error => console.log(error))
+    // }
+    // getMemberTotals(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_MEMBER_TOTALS,
+    //       }).then(response => {
+    //           this.setState({memberTotals: response.data.memberTotals})
+    //         }, error => console.log(error))
+    // }
     
     paginate = (e, page, analyticsEvent) => {
         this.getMembers(page)
       }
     
     render () {
-        const filterMembers = (status = "") => {
-            let membersData = [];
-            this.setState({activeWidget: status, setMode: 0})
-            if(status != "")
-            {
-                membersData = members.filter(x => x.status === status)
-            }else{
-                membersData = members
-            }
-            this.setState({sorted: membersData})
-        }
-    const {members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
+        // const filterMembers = (status = "") => {
+        //     let membersData = [];
+        //     this.setState({activeWidget: status, setMode: 0})
+        //     if(status != "")
+        //     {
+        //         membersData = members.filter(x => x.status === status)
+        //     }else{
+        //         membersData = members
+        //     }
+        //     this.setState({sorted: membersData})
+        // }
+    const { sorted, setMode, activeWidget, totalPages } = this.state
       
     return (
         <div>
             
             <div className="widget-section">
         <div className="bg-grey">
-        <h3 className="ks-header transaction-header">Transaction Details</h3>
+        <p className="transaction-header">Transaction Details</p>
         {setMode === 0 &&
              <div style={{padding:'20px'}}>
                  
                  <div className="row">
                  <div className="col-md-3">
-                            <select className="ks-form-control form-control mt-4" 
+                            <select className="ks-form-control form-control" 
                                 >
                                 <option value="">Filter Date</option>
                                 <option></option>
@@ -103,7 +103,7 @@ class Transactions extends Component {
                             </select>
                         </div>
                     <div className="col-md-8">
-                        <button type="button" className="btn float-right mr-0 mt-4" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
+                        <button type="button" className="btn float-right" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
                     </div>
                  </div>
              
@@ -125,7 +125,7 @@ class Transactions extends Component {
                  </tr>
                  </thead>
                  <tbody>
-                 { sorted.map((member, index) => (
+                 {/* { sorted.map((member, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
                      <td>{member.surname} {member.other_names}</td>
@@ -151,7 +151,7 @@ class Transactions extends Component {
                         </Dropdown>
                      </td>
                  </tr>
-                  ))}
+                  ))} */}
                 
                  </tbody>
              </table>
