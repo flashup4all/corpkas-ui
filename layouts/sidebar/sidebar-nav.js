@@ -65,9 +65,9 @@ class SideBarNav extends React.Component {
                           <Dropdown.Menu className="ks-menu-dropdown bg-menu">
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Cooperative Profile</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('staff')}>Staff Settings</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.replace('staff')}>Staff Settings</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('manage-members')}>Loan Settings</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.replace('/loans/settings')}>Loan Settings</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Transaction Settings</Dropdown.Item>
                             <Dropdown.Divider />

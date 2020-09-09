@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const storeUser = (user) => localStorage.setItem('kutk', JSON.stringify(user))
-export const getUser = () => localStorage.getItem('kutk')
+export const getUser = () => JSON.parse(localStorage.getItem('kutk'))
 export const storeToken = (token) => localStorage.setItem('katk', token)
 export const getToken = () => localStorage.getItem('katk')
 export const storeMember = (member) => localStorage.setItem('kmtk', JSON.stringify(member))

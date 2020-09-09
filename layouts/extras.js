@@ -31,6 +31,16 @@ export const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
     );
   }
 
+  export const Badge = (props) => {
+    return(
+      <div>
+        { props.type == 'success' && <Lozenge appearance="success" isBold>{props.title}</Lozenge> }
+        { props.type == 'moved' && <Lozenge appearance="moved">{props.title}</Lozenge> }
+        { props.type == 'removed' && <Lozenge appearance="removed" isBold>{props.title}</Lozenge> }
+    </div>
+    );
+  }
+
 export default  function ShowAlert(props) {
     const [show, setShow] = useState(true);
   

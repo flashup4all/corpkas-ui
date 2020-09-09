@@ -64,16 +64,12 @@ class ListOfStaff extends Component {
             let variables = {}
             if(filter_role || filter_status)
             {
-                console.log(filter_role)
-                console.log(filter_status)
                 filter_role ? variables.role = filter_role  : null
                 filter_status ? variables.status = filter_status : null
-               console.log('one pass')
                createApolloClient.mutate({
                    mutation: FILTER_STAFF,
                    variables: variables
                }).then(response => {
-                   console.log(response)
                    let result = response.data.filterStaff
                    this.setState({
                         staffList: result, 
