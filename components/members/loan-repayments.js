@@ -12,11 +12,11 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+// import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
 import { CustomToggle, Status } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 
-class LoanRepayments extends Component {
+class Transactions extends Component {
     constructor(props) {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
@@ -33,38 +33,38 @@ class LoanRepayments extends Component {
         }
     }
 
-    componentDidMount()
-    {
-        this.getMembers()
-        this.getMemberTotals()
-    }
+    // componentDidMount()
+    // {
+    //     this.getMembers()
+    //     this.getMemberTotals()
+    // }
 
-    getMembers(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_PAGINATE_MEMBERS,
-            variables: {page: page}
-          }).then(response => {
-              const result = response.data.paginateMembers
-              this.setState({
-                  members: result.entries, 
-                  sorted: result.entries,
-                  totalEntries: result.totalEntries,
-                  totalPages: result.totalPages,
-                  pageNumber: result.pageNumber,
-                  pageSize: result.pageSize,
+    // getMembers(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_PAGINATE_MEMBERS,
+    //         variables: {page: page}
+    //       }).then(response => {
+    //           const result = response.data.paginateMembers
+    //           this.setState({
+    //               members: result.entries, 
+    //               sorted: result.entries,
+    //               totalEntries: result.totalEntries,
+    //               totalPages: result.totalPages,
+    //               pageNumber: result.pageNumber,
+    //               pageSize: result.pageSize,
 
-                })
-            }, error => console.log(error))
-    }
-    getMemberTotals(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_MEMBER_TOTALS,
-          }).then(response => {
-              this.setState({memberTotals: response.data.memberTotals})
-            }, error => console.log(error))
-    }
+    //             })
+    //         }, error => console.log(error))
+    // }
+    // getMemberTotals(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_MEMBER_TOTALS,
+    //       }).then(response => {
+    //           this.setState({memberTotals: response.data.memberTotals})
+    //         }, error => console.log(error))
+    // }
     
     paginate = (e, page, analyticsEvent) => {
         this.getMembers(page)
@@ -86,53 +86,24 @@ class LoanRepayments extends Component {
       
     return (
         <div>
-            <div className="widget-section">
-                <div className="widget-heading d-flex justify-content-between align-items-baseline">
-                     <p>Settings</p><h3 className="page-title bold">| COORPERATIVE PROFILE</h3>
-                </div>
-                {/* <div className="widget-con">
-                    <div onClick={() => filterMembers('')} className={ activeWidget ==='' ? 'widget no-shadow' : 'widget shadow'}>
-                        <div className="widget-icon widget-icon-primary">
-                            <PeopleGroupIcon />
-                        </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.total}</h1>
-                        <p>Total number of members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(1)} className={ activeWidget === 1 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-success">
-                        <PersonWithTickIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.active}</h1>
-                        <p>Total Active Members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(0)} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-danger">
-                        <PeopleIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.inactive}</h1>
-                        <p>Inactive Suspended members</p>
-                    </div>
-                    </div>
-                </div>
-                </div> */}
-        <div className="bg-grey">
             
+            <div className="widget-section">
+        <div className="bg-grey">
+        <p className="transaction-header">Transaction Details</p>
         {setMode === 0 &&
-             <div >
+             <div style={{padding:'20px'}}>
+                 
                  <div className="row">
-                     {/* <div className="col-md-4">
-                        <div className="search-con mb-4">
-                            <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                            <button type="button mr-3" className="btn">Search</button>
+                 <div className="col-md-3">
+                            <select className="ks-form-control form-control" 
+                                >
+                                <option value="">Filter Date</option>
+                                <option></option>
+                                <option></option>
+                            </select>
                         </div>
-                    </div> */}
                     <div className="col-md-8">
-                        <button type="button" className="btn float-right mr-3 mt-4" onClick={()=> this.setState({setMode: 1})}>ADD LOAN TYPE</button>
+                        <button type="button" className="btn float-right" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
                     </div>
                  </div>
              
@@ -143,18 +114,18 @@ class LoanRepayments extends Component {
                  <table className="table table-borderless">
                  <thead>
                  <tr>
-                     <th>&#x23;</th>
-                     <th>Loan Type</th>
-                     <th>Max Duration</th>
-                     <th>Interest</th>
-                     <th>Interest Type</th>
-                     <th>Insurance Rate</th>
-                     <th>Date Created</th>
+                     <th>Transaction ID</th>
+                     <th>Payment Method</th>
+                     <th>Principal Amount</th>
+                     <th>Amount Paid</th>
+                     <th>Current Balance</th>
+                     <th>Date</th>
+                     <th>Loan Status</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
                  <tbody>
-                 { sorted.map((member, index) => (
+                 {/* { sorted.map((member, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
                      <td>{member.surname} {member.other_names}</td>
@@ -181,7 +152,7 @@ class LoanRepayments extends Component {
                      </td>
                  </tr>
                   ))}
-                
+                 */}
                  </tbody>
              </table>
              { totalPages > 1 && 
@@ -206,10 +177,10 @@ class LoanRepayments extends Component {
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Add Loan Type
+                <p className="page-title mt-5">Print Transaction
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
-                <AddLoanType />
+                <span>Print Transaction</span>
             </div>
         }
             {/* <StyledMain> */}
@@ -223,4 +194,4 @@ class LoanRepayments extends Component {
     )
 }};
 
-export default LoanRepayments;
+export default Transactions;

@@ -35,6 +35,34 @@ query ($page: Int){
   }
 }
 `;
+export const GET_MEMBER = gql`
+query ($member_id: Int){
+  findMember(id: $member_id) {
+      id
+      email
+      surname
+      other_names
+      user_id
+      altPhoneNumber
+      current_balance
+      avatar
+      monthly_contribution
+      current_monthly_income
+      dept
+      details
+      dob
+      email
+      faculty
+      gender
+      phone_number
+      rank
+      role
+      insertedAt
+      updatedAt
+      status
+  }
+}
+`;
 export const GET_MEMBERS = gql`
 query {
     members {
