@@ -6,27 +6,25 @@ import Router  from 'next/router';
 import HipchatChevronDownIcon from '@atlaskit/icon/glyph/hipchat/chevron-down';
 import PersonCircleIcon from '@atlaskit/icon/glyph/person-circle';
 import {clearStorage, getVendor, getUser, getStaff, getMember} from '../../components/shared/local'
+import {USER, MEMBER, STAFF} from '../../components/shared/constant'
+
 
 class Adminheader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // vendor: getVendor(),
-      // user: getUser()
+      user: undefined,
+      staff: undefined,
+      member: undefined,
     }
   }
 componentDidMount(){
-  // this.setState({vendor: getVendor()})
-  // console.log(getVendor())
-  // let user = JSON.parse(getUser())
-  // if(user.role === 'member'){
-  //   user = getMember()
-  // }else if(user.role === "admin" || user.role === "staff" || user.role === "manager"){
-  //   user = getStaff()
-  // }
-  this.setState({user: getUser()})
-  console.log(getMember())
-  console.log(this.state)
+  
+  
+}
+componentDidUpdate()
+{
+
 }
   logout(){
     clearStorage()
@@ -35,7 +33,19 @@ componentDidMount(){
 
   render()
   {
-    const {user} = this.state
+    // const { user, member, staff } = this.state
+    // let user = JSON.parse(localStorage.getItem(USER))
+
+    // console.log(user)
+    // let user = getUser()
+
+    // if(user && user.role === 'member'){
+    //   user = JSON.parse(localStorage.getItem(MEMBER))
+    // }else if((user && user.role === "admin") || (user && user.role === "staff") || (user && user.role === "manager")){
+    //   user = JSON.parse(localStorage.getItem(STAFF))
+    // }
+    // console.log(user)
+
     const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
       <a
         href=""

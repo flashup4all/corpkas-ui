@@ -1,20 +1,21 @@
 import React from 'react'
-
-export const storeUser = (user) => localStorage.setItem('kutk', JSON.stringify(user))
-export const getUser = () => JSON.parse(localStorage.getItem('kutk'))
-export const storeToken = (token) => localStorage.setItem('katk', token)
-export const getToken = () => localStorage.getItem('katk')
-export const storeMember = (member) => localStorage.setItem('kmtk', JSON.stringify(member))
-export const getMember = () => JSON.parse(window.localStorage.getItem('kmtk'))
-export const storeStaff = (staff) => localStorage.setItem('kstk', JSON.stringify(staff))
-export const getStaff = () => JSON.parse(window.localStorage.getItem('kstk'))
-export const storeVendor = (vendor) => localStorage.setItem('kvtk', JSON.stringify(vendor))
-export const getVendor = () => JSON.parse(window.localStorage.getItem('kvtk'))
+import {TOKEN, VENDOR, USER, MEMBER, STAFF} from './constant'
+import { ST } from 'next/dist/next-server/lib/utils'
+export const storeUser = (user) => localStorage.setItem(USER, JSON.stringify(user))
+export const getUser = () => JSON.parse(localStorage.getItem(USER))
+export const storeToken = (token) => localStorage.setItem(TOKEN, token)
+export const getToken = () => localStorage.getItem(TOKEN)
+export const storeMember = (member) => localStorage.setItem(MEMBER, JSON.stringify(member))
+export const getMember = () => JSON.parse(window.localStorage.getItem(MEMBER))
+export const storeStaff = (staff) => localStorage.setItem(STAFF, JSON.stringify(staff))
+export const getStaff = () => JSON.parse(window.localStorage.getItem(STAFF))
+export const storeVendor = (vendor) => localStorage.setItem(VENDOR, JSON.stringify(vendor))
+export const getVendor = () => JSON.parse(window.localStorage.getItem(VENDOR))
 
 export const clearStorage = () => {
-    localStorage.removeItem('kutk')
-    localStorage.removeItem('katk')
-    localStorage.removeItem('kvtk')
-    localStorage.removeItem('kmtk')
-    localStorage.removeItem('kstk')
+    localStorage.removeItem(USER)
+    localStorage.removeItem(TOKEN)
+    localStorage.removeItem(VENDOR)
+    localStorage.removeItem(MEMBER)
+    localStorage.removeItem(STAFF)
 }

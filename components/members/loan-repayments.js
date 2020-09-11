@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Router  from 'next/router';
-import Link from 'next/link';
 import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
@@ -14,12 +12,11 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+// import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
 import { CustomToggle, Status } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
-import CreateMember from './create-member'
 
-class ManageMembers extends Component {
+class Transactions extends Component {
     constructor(props) {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
@@ -36,38 +33,38 @@ class ManageMembers extends Component {
         }
     }
 
-    componentDidMount()
-    {
-        this.getMembers()
-        this.getMemberTotals()
-    }
+    // componentDidMount()
+    // {
+    //     this.getMembers()
+    //     this.getMemberTotals()
+    // }
 
-    getMembers(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_PAGINATE_MEMBERS,
-            variables: {page: page}
-          }).then(response => {
-              const result = response.data.paginateMembers
-              this.setState({
-                  members: result.entries, 
-                  sorted: result.entries,
-                  totalEntries: result.totalEntries,
-                  totalPages: result.totalPages,
-                  pageNumber: result.pageNumber,
-                  pageSize: result.pageSize,
+    // getMembers(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_PAGINATE_MEMBERS,
+    //         variables: {page: page}
+    //       }).then(response => {
+    //           const result = response.data.paginateMembers
+    //           this.setState({
+    //               members: result.entries, 
+    //               sorted: result.entries,
+    //               totalEntries: result.totalEntries,
+    //               totalPages: result.totalPages,
+    //               pageNumber: result.pageNumber,
+    //               pageSize: result.pageSize,
 
-                })
-            }, error => console.log(error))
-    }
-    getMemberTotals(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_MEMBER_TOTALS,
-          }).then(response => {
-              this.setState({memberTotals: response.data.memberTotals})
-            }, error => console.log(error))
-    }
+    //             })
+    //         }, error => console.log(error))
+    // }
+    // getMemberTotals(page = 1)
+    // {
+    //     createApolloClient.query({
+    //         query: GET_MEMBER_TOTALS,
+    //       }).then(response => {
+    //           this.setState({memberTotals: response.data.memberTotals})
+    //         }, error => console.log(error))
+    // }
     
     paginate = (e, page, analyticsEvent) => {
         this.getMembers(page)
@@ -89,53 +86,24 @@ class ManageMembers extends Component {
       
     return (
         <div>
-            <div className="widget-section">
-                <div className="widget-heading d-flex justify-content-between align-items-baseline">
-                    <h3 className="page-title bold">manage members</h3>
-                </div>
-                <div className="widget-con">
-                    <div onClick={() => filterMembers('')} className={ activeWidget ==='' ? 'widget no-shadow' : 'widget shadow'}>
-                        <div className="widget-icon widget-icon-primary">
-                            <PeopleGroupIcon />
-                        </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.total}</h1>
-                        <p>Total number of members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(1)} className={ activeWidget === 1 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-success">
-                        <PersonWithTickIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.active}</h1>
-                        <p>Total Active Members</p>
-                    </div>
-                    </div>
-                    <div onClick={() => filterMembers(0)} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
-                    <div className="widget-icon widget-icon-danger">
-                        <PeopleIcon />
-                    </div>
-                    <div>
-                        <h1>{memberTotals && memberTotals.inactive}</h1>
-                        <p>Inactive Suspended members</p>
-                    </div>
-                    </div>
-                </div>
-                </div>
-        <div className="bg-grey">
             
+            <div className="widget-section">
+        <div className="bg-grey">
+        <p className="transaction-header">Transaction Details</p>
         {setMode === 0 &&
-             <div >
+             <div style={{padding:'20px'}}>
+                 
                  <div className="row">
-                     <div className="col-md-4">
-                        <div className="search-con mb-4">
-                            <input type="search" name="search" className="mini-search ks-form-control" placeholder="Search"></input>
-                            <button type="button mr-3" className="btn">Search</button>
+                 <div className="col-md-3">
+                            <select className="ks-form-control form-control" 
+                                >
+                                <option value="">Filter Date</option>
+                                <option></option>
+                                <option></option>
+                            </select>
                         </div>
-                    </div>
                     <div className="col-md-8">
-                        <button type="button" className="btn float-right mr-3 mt-4" onClick={()=> this.setState({setMode: 1})}>CREATE NEW MEMBER</button>
+                        <button type="button" className="btn float-right" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
                     </div>
                  </div>
              
@@ -146,35 +114,27 @@ class ManageMembers extends Component {
                  <table className="table table-borderless">
                  <thead>
                  <tr>
-                     <th>&#x23;</th>
-                     <th>Name</th>
-                     <th>Rank</th>
-                     <th>Gender</th>
-                     <th>Department</th>
-                     <th>Total Balance(₦)</th>
-                     <th>Phone number</th>
-                     <th>Status</th>
+                     <th>Transaction ID</th>
+                     <th>Payment Method</th>
+                     <th>Principal Amount</th>
+                     <th>Amount Paid</th>
+                     <th>Current Balance</th>
+                     <th>Date</th>
+                     <th>Loan Status</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
                  <tbody>
-                 { sorted.map((member, index) => (
+                 {/* { sorted.map((member, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
                      <td>{member.surname} {member.other_names}</td>
                      <td>{member.rank}</td>
                      <td>{member.gender}</td>
                      <td>{member.dept}</td>
-                     <td>{member.current_balance}</td>
                      <td>{member.phone_number}</td>
                      <td className={member.status}> <Status status={member.status} /></td>
-                     <td>
-                     <Link href="members/[member_id]" as={`members/${member.id}`}>
-                        <a className="remove-decoration">
-                        <WatchIcon size="meduim" isBold primaryColor="#0052CC"  /> <span className="view-icon">VIEW</span>
-                        </a>
-                        </Link>
-                         
+                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
@@ -192,7 +152,7 @@ class ManageMembers extends Component {
                      </td>
                  </tr>
                   ))}
-                
+                 */}
                  </tbody>
              </table>
              { totalPages > 1 && 
@@ -217,10 +177,10 @@ class ManageMembers extends Component {
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Create Member Page
+                <p className="page-title mt-5">Print Transaction
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
-                <CreateMember />
+                <span>Print Transaction</span>
             </div>
         }
             {/* <StyledMain> */}
@@ -229,9 +189,9 @@ class ManageMembers extends Component {
             {/* </StyledMain> */}
         </div>
         </div>
+        </div>
 
     )
-}
-};
+}};
 
-export default ManageMembers;
+export default Transactions;

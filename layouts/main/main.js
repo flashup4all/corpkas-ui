@@ -1,9 +1,26 @@
 import Head from 'next/head';
 import Adminheader from '../header/admin_header';
 import SideBarNav from '../sidebar/sidebar-nav';
+import {clearStorage, getVendor, getUser, getStaff, getMember} from '../../components/shared/local'
+import { useState, useEffect, setState, withState } from 'react';
 
-const AdminMainLayout = ({ children }) => (
-  <div className="d-flex" id="wrapper">
+// const user = getUser()
+// const member = getMember()
+// const staff = getStaff()
+// console.log(user)
+
+function AdminMainLayout ({ children }){
+
+  // const [user, setUser] = useState()
+// let user;
+  // useEffect(() => {
+    // setState(state => ({ ...state, user: getUser() }));
+    // setUser(getUser())
+    // console.log(user)
+
+  // }, [getUser()]);
+// console.log(user)
+  return(<div className="d-flex" id="wrapper">
     <Head>
       <title>KASU MPCS</title>
       <link rel="icon" href="/favicon.ico" />
@@ -12,7 +29,7 @@ const AdminMainLayout = ({ children }) => (
     <SideBarNav />
     <div id="page-content-wrapper">
     
-    <Adminheader/>
+    <Adminheader />
     <div className="container-fluid mb-4 ks-pages0container">
       <br></br>
       <div className="content-wrapper layout mt-1 ">{children}</div>
@@ -35,7 +52,7 @@ const AdminMainLayout = ({ children }) => (
      
     `}</style>
   </div>
-  
-);
+  );
+}
 
 export default AdminMainLayout;

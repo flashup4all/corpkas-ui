@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import {CREATE_MEMBER} from '../../gql/members'
+import {CREATE_MEMBER, GET_MEMBERS} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
+import swal from '@sweetalert/with-react'
+
 const CreateMember = () =>  {
     const { addToast } = useToasts()
 
@@ -40,8 +42,12 @@ const CreateMember = () =>  {
                 appearance: 'success',
                 autoDismiss: true,
               })
-              resetForm()
-        }
+            swal("Member has been Created!", {
+                icon: "success",
+            });
+            resetForm()
+        },
+        refetchQueries: [{ query: GET_MEMBERS }]
     })
     const resetForm = () => {
         setStaffNo('')
@@ -120,11 +126,11 @@ const CreateMember = () =>  {
 
     const submit = async (e) => {
         e.preventDefault();
-        if(handleValidation()) {
+        // if(handleValidation()) {
         createMember({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), 
             membership_date: new Date(membership_date), phone_number, alt_phone_number, 
             status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
-        }
+        // }
     }
         return (
             <div className="">

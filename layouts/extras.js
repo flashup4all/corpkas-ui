@@ -33,11 +33,13 @@ export const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
 
   export const Badge = (props) => {
     return(
-      <div>
+      <span>
         { props.type == 'success' && <Lozenge appearance="success" isBold>{props.title}</Lozenge> }
         { props.type == 'moved' && <Lozenge appearance="moved">{props.title}</Lozenge> }
+        { props.type == 'inprogress' && <Lozenge appearance="inprogress" isBold>{props.title}</Lozenge> }
         { props.type == 'removed' && <Lozenge appearance="removed" isBold>{props.title}</Lozenge> }
-    </div>
+        { props.type == 'default' && <Lozenge isBold>{props.title}</Lozenge> }
+    </span>
     );
   }
 

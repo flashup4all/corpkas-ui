@@ -27,11 +27,43 @@ query ($page: Int){
       insertedAt
       updatedAt
       status
+      staff_no
+      membership_date
         }
       pageSize
     pageNumber
     totalPages
     totalEntries
+  }
+}
+`;
+export const GET_MEMBER = gql`
+query ($id: Int!){
+  findMember(id: $id) {
+      id
+      email
+      surname
+      other_names
+      user_id
+      altPhoneNumber
+      current_balance
+      avatar
+      monthly_contribution
+      current_monthly_income
+      dept
+      details
+      dob
+      email
+      faculty
+      gender
+      phone_number
+      rank
+      role
+      insertedAt
+      updatedAt
+      status
+      staff_no
+      membership_date
   }
 }
 `;
@@ -60,6 +92,8 @@ query {
       insertedAt
       updatedAt
       status
+      staff_no
+      membership_date
 }
 }
 `;
@@ -118,10 +152,102 @@ export const CREATE_MEMBER = gql`
         role
         status
         userId
+        staff_no
         inserted_at
         updated_at
+        membership_date
            
         
       }
   }
+`;
+
+export const UPDATE_MEMBER = gql`
+  mutation updateMember(
+      $staff_no: String, $surname: String, 
+      $other_names: String, $role: String,
+      $dob: String!,$gender: String, 
+      $status: String,$email: String, 
+      $alt_phone_number: String,
+      $dept: String,
+      $monthly_contribution: String,
+      $current_monthly_income: String,
+      $membership_date: String,
+      $rank: String,
+      $phone_number: String, $id: Int!) {
+        updateMember(member: {
+        email: $email,
+        status: $status,
+        role: $role,
+        surname: $surname,
+        other_names: $other_names,
+        phone_number: $phone_number,
+        alt_phone_number: $alt_phone_number,
+        staff_no: $staff_no,
+        dob: $dob,
+        gender: $gender,
+        rank: $rank,
+        dept: $dept,
+        monthly_contribution: $monthly_contribution,
+        current_monthly_income: $current_monthly_income,
+        membership_date: $membership_date
+      }, id: $id){
+        
+        id
+        surname
+        other_names
+        email
+        phone_number
+        alt_phone_number
+        gender
+        avatar
+        dob
+        avatar
+        role
+        status
+        userId
+        staff_no
+        inserted_at
+        updated_at
+        membership_date
+           
+        
+      }
+  }
+`;
+
+
+//loans
+export const GET_MEMBER_LOANS = gql`
+query ($member_id: Int!, $status: Int){
+  memberLoans(member_id: $member_id, status: $status) {
+    id
+    actual_amount
+    amount_payable
+    approved_date
+    detail
+    due_date
+    insurance_amount
+    insurance_percent
+    interest_amount
+    interest_percent
+    is_insured
+    duration
+    loan_amount
+    status
+    monthly_deduction
+    total_deduction
+    total_loan
+    total_paid
+    upfront_deduction
+    loan_type_id
+    member_id
+    user_id
+    due_date
+    approved_date
+    inserted_at
+    updated_at
+
+  }
+}
 `;

@@ -213,3 +213,89 @@ mutation updateLoanSetting(
     
   }
 }`;
+
+
+//loans
+
+export const CREATE_LOAN = gql`
+  mutation createLoan(
+    $loan_amount: String!,
+    $member_id: Int!,
+    $user_id: Int!,
+    $loan_type_id: Int!
+  ) {
+      createLoan(loan: {
+      loan_amount: $loan_amount,
+      member_id: $member_id,
+      user_id: $user_id,
+      loan_type_id: $loan_type_id
+    }){
+        
+      actual_amount
+      amount_payable
+      approved_date
+      reason
+      detail
+      due_date
+      insurance_amount
+      insurance_percent
+      interest_amount
+      interest_percent
+      is_insured
+      loan_amount
+      status
+      total_deduction
+      total_loan
+      total_paid
+      upfront_deduction
+      monthly_deduction
+      duration
+      loan_type_id
+      member_id
+      inserted_at
+      updated_at
+      }
+  }
+`;
+
+export const FILTER_LOANS = gql`
+  mutation filterLoans(
+    $loan_amount: String,
+    $member_id: Int,
+    $loan_type_id: Int
+    $status: Int
+    $upfront_deduction: Int
+  ) {
+    filterLoans(loan: {
+      loan_amount: $loan_amount,
+      member_id: $member_id,
+      loan_type_id: $loan_type_id
+      status: $status
+    }){
+        
+      actual_amount
+      amount_payable
+      approved_date
+      reason
+      detail
+      due_date
+      insurance_amount
+      insurance_percent
+      interest_amount
+      interest_percent
+      is_insured
+      loan_amount
+      status
+      total_deduction
+      total_loan
+      total_paid
+      upfront_deduction
+      monthly_deduction
+      duration
+      loan_type_id
+      member_id
+      inserted_at
+      updated_at
+      }
+  }
+`;
