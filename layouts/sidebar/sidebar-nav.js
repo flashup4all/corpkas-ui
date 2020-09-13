@@ -52,8 +52,8 @@ class SideBarNav extends React.Component {
             <div className="sidebar-navigation">
                 <ul>
                 <li className='link'><Link href="/"><a><HomeIcon /> <span className="ml-2">Dashboard</span></a></Link></li>
-                       <li className='link'><Link href="/members"><a><PeopleIcon />  <span className="ml-2">Manage Members</span></a></Link></li>
-                        <li className='link'><Link href="/users"><a><CreditcardIcon /> <span className="ml-2">manage transactions</span></a></Link></li>
+                       <li className='link'><Link href="/manage-members"><a><PeopleIcon />  <span className="ml-2">Manage Members</span></a></Link></li>
+                        <li className='link'><Link href="/transactions"><a><CreditcardIcon /> <span className="ml-2">manage transactions</span></a></Link></li>
                         <li className='link'><Link href="#"><a><DetailViewIcon /> <span className="ml-2">contribution history</span></a></Link></li>
                         <li className='link'><Link href="/loans"><a><TrayIcon />  <span className="ml-2">Manage Loans</span></a></Link></li>
                         <li className='link'>
