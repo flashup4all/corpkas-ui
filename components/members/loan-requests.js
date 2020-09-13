@@ -113,6 +113,7 @@ const LoanRequests = ({memberData}) =>  {
         })
     const [loan_type_id, setLoanTypeId] = useState()
     const [loan_amount, setLoanAmount] = useState()
+    const [monthly_deduction, setMonthlyDeduction] = useState()
     const [reason, setReason] = useState()
 
     // update loan state
@@ -167,9 +168,16 @@ const LoanRequests = ({memberData}) =>  {
                         memberLoans.map(loan => {
                             return(
                             <form key={loan.id} onSubmit={submit}>
-                                <div className="row mt-5 bg-white">
+                                <div className="row mt-5 pb-5 bg-white">
+                                    <div className="col-md-6 mt-3">
+                                        <p className="ks-request-text">Loan request for ₦ {loan.actual_amount}</p>
+                                        <p className="">Loan Requests</p>
+                                    </div>
+                                    <div className="col-md-6 mt-3">
+                                    <p className="ks-request-text float-right">Loan request for ₦ {loan.actual_amount}</p>
+                                    <p className="float-right">Loan Requests</p>
+                                    </div>
                                 <div className="loan-request-row">
-                            <p className="ks-request-text">Loan request for ₦ {loan.actual_amount}</p>
                                 </div>
                                     <div className="col-md-3">
                                         <label className="ks-label">Type of Loan</label>
@@ -194,7 +202,15 @@ const LoanRequests = ({memberData}) =>  {
                                         <label className="ks-label">Loan Amount</label>
                                         <input className="ks-form-control form-control"
                                         placeholder="Access Diamond"
-                                            value={loan_amount || ""}
+                                            value={loan.loan_amount || ""}
+                                            onChange={({ target }) => setLoanAmount(target.value)}
+                                        />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="ks-label">Monthly Deduction</label>
+                                        <input className="ks-form-control form-control"
+                                        placeholder="Access Diamond"
+                                            value={loan.monthly_deduction || ""}
                                             onChange={({ target }) => setLoanAmount(target.value)}
                                         />
                                     </div>
@@ -207,6 +223,18 @@ const LoanRequests = ({memberData}) =>  {
                                         />
                                     </div> */}
                                 
+                                
+                                </div>
+                                <div className="row d-flex justify-content-center">
+                                    <div className="col-md-4">
+                                        <img src="/images/loan.svg" className="img-responsive" alt="Some picture" width="410" height="307"></img>
+
+                                        </div>
+                                    <div className="col-md-4">
+                                        <p className="text mt-5">We are currently working on your loan and we will get back to you soon with an offer. If you think this is taking longer than it should, feel free to leave us a follow up messgae.</p>
+                                    </div>
+                                </div>
+                                <div className="row d-flex justify-content-center">  
                                 
                                 </div>
                                 <div className="col-12">
@@ -263,7 +291,7 @@ const LoanRequests = ({memberData}) =>  {
                                     <input className="ks-form-control form-control"
                                     placeholder="E.g 500000 "
                                         value={loan_amount || ""}
-                                        onChange={({ target }) => setLoanAmount(target.value)}
+                                        onChange={({ target }) => setMonthlyDeduction(target.value)}
                                     />
                                 </div>
                                 <div className="col-md-4">
