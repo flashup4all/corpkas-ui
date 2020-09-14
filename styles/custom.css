@@ -466,6 +466,9 @@ thead {
 	color: #ffffff;
 	font-size: 16px;
 }
+.btn-danger{
+	background: #dc3545!important;
+}
 .btn:hover{
 	background: #0065FF;
 	border-radius: 3px;
