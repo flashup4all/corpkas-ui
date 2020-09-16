@@ -12,7 +12,7 @@ const tabs = [
   { label: 'Loan Request', components: null },
   { label: 'Active Loans', components: null },
   { label: 'Overdue Loans', components: null },
-  { label: 'Apply FOr Loan', components: null },
+  { label: 'Apply For Loan', components: null },
 
 ];
 
@@ -40,10 +40,13 @@ const LoanSettings = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <Loans />
+          <Loans status="" />
         }
         { seletedTab === 1 &&
           <Loans  status="0" />
+        }
+        { seletedTab === 2 &&
+          <Loans  status="1" />
         }
       </div>
     </div>

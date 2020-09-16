@@ -151,7 +151,7 @@ class ManageMembers extends Component {
                      <th>Rank</th>
                      <th>Gender</th>
                      <th>Department</th>
-                     <th>Total Balance(₦)</th>
+                     <th>&#8358; Total Balance</th>
                      <th>Phone number</th>
                      <th>Status</th>
                      <th>Actions</th>
@@ -165,7 +165,7 @@ class ManageMembers extends Component {
                      <td>{member.rank}</td>
                      <td>{member.gender}</td>
                      <td>{member.dept}</td>
-                     <td>{member.current_balance}</td>
+                     <td>&#8358; {member.current_balance}</td>
                      <td>{member.phone_number}</td>
                      <td className={member.status}> <Status status={member.status} /></td>
                      <td>

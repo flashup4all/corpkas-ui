@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.1.4",
+    "@atlaskit/avatar-group": "^8.0.7",
     "@atlaskit/banner": "^11.0.3",
     "@atlaskit/checkbox": "^11.0.5",
     "@atlaskit/dropdown-menu": "^10.0.3",

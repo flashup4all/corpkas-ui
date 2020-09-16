@@ -260,17 +260,20 @@ export const CREATE_LOAN = gql`
 
 export const FILTER_LOANS = gql`
   mutation filterLoans(
-    $loan_amount: String,
     $member_id: Int,
     $loan_type_id: Int
     $status: Int
-    $upfront_deduction: Int
+    $from: String
+    $to: String
+    $overdue: String
   ) {
-    filterLoans(loan: {
-      loan_amount: $loan_amount,
+    filterLoans(filter: {
       member_id: $member_id,
       loan_type_id: $loan_type_id
       status: $status
+      from: $from
+      to: $to
+      overdue: $overdue
     }){
         
       actual_amount
@@ -296,6 +299,16 @@ export const FILTER_LOANS = gql`
       member_id
       inserted_at
       updated_at
+      member{
+        id
+        surname
+        other_names
+      }
+      loan_type{
+        id
+        name
+        interest
+      }
       }
   }
 `;

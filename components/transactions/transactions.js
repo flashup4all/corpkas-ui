@@ -207,7 +207,7 @@ class Transactions extends Component {
                      <th>Member</th>
                      {/* <th>Posted by</th> */}
                      <th>Transaction Type</th>
-                     <th>Amount</th>
+                     <th>&#8358; Amount</th>
                      <th>Status</th>
                      <th>Actions</th>
                  </tr>
@@ -222,7 +222,7 @@ class Transactions extends Component {
                      <td>
                         {txn.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
                     </td>
-                     <td>{txn.amount}</td>
+                     <td>&#8358; {txn.amount}</td>
                      <td className={txn.status}>
                         {txn.status == 1 ? <Badge type='success' title='POSTED'/> : <Badge type='moved' title='PRE-POST'/>}
                           {/* <Status status={txn.status} /> */}

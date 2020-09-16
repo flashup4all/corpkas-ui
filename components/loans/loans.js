@@ -11,6 +11,16 @@ import Pagination from '@atlaskit/pagination';
 import { FILTER_LOANS, GET_LOANS } from '../../gql/loans';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
+import AvatarGroup from '@atlaskit/avatar-group';
+
+const RANDOM_USERS = [
+    {id: 1, name: "john"},
+    {id: 2, name: "john"},
+    {id: 3, name: "john"},
+    {id: 4, name: "john"},
+    {id: 5, name: "john"},
+    {id: 6, name: "john"},
+]
 
 class Transactions extends Component {
     constructor(props) {
@@ -30,15 +40,18 @@ class Transactions extends Component {
             filter_from: '',
             filter_to: '',
             filter_txn_id: '',
-            filter_txn_type: ''
+            filter_txn_type: '',
+            guarantors : RANDOM_USERS.map(d => ({
+                name: d.name,
+              }))
         }
     }
 
     componentDidMount()
     {
-        if(this.props.status == "0")
+        if(this.props.status)
         {
-            this.filterTransactions({status: 1})
+            this.filterLoans({status: parseInt(this.props.status)})
         }else{
             this.getTransactions()
         }
@@ -53,6 +66,7 @@ class Transactions extends Component {
             variables: {page}
           }).then(response => {
               const { data: {paginateLoans}} = response
+              console.log(paginateLoans)
               this.setState({
                   loans: paginateLoans.entries, 
                   sorted: paginateLoans.entries,
@@ -64,16 +78,16 @@ class Transactions extends Component {
             }, error => console.log(error))
     }
 
-    filterTransactions(variables)
+    filterLoans(variables)
     {
         createApolloClient.mutate({
             mutation: FILTER_LOANS,
             variables: variables
           }).then(response => {
-              const { data: {filterTransactions}} = response
+              const { data: {filterLoans}} = response
               this.setState({
-                    transactions: filterTransactions, 
-                  sorted: filterTransactions,
+                    loans: filterLoans, 
+                  sorted: filterLoans,
                   totalEntries: 0,
                   totalPages: 0,
                   pageNumber: 0,
@@ -107,7 +121,7 @@ class Transactions extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {loans, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
+    const {loans, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type, guarantors } = this.state
     
     const filter_form = () => {
 
@@ -119,7 +133,7 @@ class Transactions extends Component {
             filter_txn_type ? variables.txn_type = parseInt(filter_txn_type) : null
             filter_status ? variables.status = parseInt(filter_status) : null
             // variables.member_id =  this.state.memberData.id
-            this.filterTransactions(variables)
+            this.filterLoans(variables)
         }
     }
 
@@ -133,18 +147,9 @@ class Transactions extends Component {
             
         {setMode === 0 &&
              <div >
-                 {this.props.status !== "0" && 
+                 {this.props.status == "" && 
                     <div style={{padding:'20px'}}>
                         <div className="row">
-                        <div className="col-md-3 ks-col">
-                                <label>Txn ID</label>
-                                <input type="text" name="search" 
-                                className="form-control ks-form-control" 
-                                placeholder="TransactionID"
-                                value={filter_txn_id || ""}
-                                onChange={({ target }) => this.setState({filter_txn_id: target.value})}
-                                ></input>
-                            </div>
                             <div className="col-md-3 ks-col">
                                 <label>From Date</label>
                                 <input type="date" name="search" 
@@ -164,7 +169,7 @@ class Transactions extends Component {
                                 ></input>
                             </div>
                             <div className="col-md-3 ks-col">
-                                <label>Txn Type</label>
+                                <label>Loan Type</label>
                                 <select className="ks-form-control form-control" 
                                     value={filter_txn_type || ""}
                                     onChange={({ target }) => this.setState({filter_txn_type: target.value})}
@@ -207,7 +212,7 @@ class Transactions extends Component {
                      <th>Member</th>
                      {/* <th>Posted by</th> */}
                      <th>Loan Type</th>
-                     <th>Amount</th>
+                     <th>&#8358; Amount</th>
                      <th>Interest Rate</th>
                      <th>Date Applied</th>
                      <th>Guarantors</th>
@@ -221,27 +226,21 @@ class Transactions extends Component {
                      <td>{index + 1}</td>
                      {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
                      {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
-                     <td>{ loan.member.surname } { txn.member.other_names }</td>
+                     <td>{ loan.member.surname } { loan.member.other_names }</td>
+                     <td>{loan.loan_type.name}</td>
+                     <td>&#8358; {loan.loan_amount}</td>
+                     <td>{loan.loan_type.interest}</td>
+                     <td>{loan.inserted_at}</td>
                      <td>
-                        {loan.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
-                    </td>
-                     <td>{loan.amount}</td>
-                     <td className={txn.status}>
-                        {loan.status == 1 ? <Badge type='success' title='POSTED'/> : <Badge type='moved' title='PRE-POST'/>}
+                     <AvatarGroup appearance="stack" data={guarantors} />
+                     </td>
+                     <td className={loan.status}>
+                     {loan.status == 1 && <Badge type='success' title='APPROVED'/>}
+                     {loan.status == 0 && <Badge type='moved' title='PENDING'/>}
+                        {loan.status == 2 && <Badge type='inprogress' title='DECLINED'/>}
                           {/* <Status status={txn.status} /> */}
                     </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
-                     <Dropdown className="drop-link">
-                        <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu className="ks-menu-dropdown bg-menu">
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => viewTxn(loan)}>View Txn</Dropdown.Item>
-                            <Dropdown.Divider />
-                            {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(loan)}>Approve</Dropdown.Item>}
-                        </Dropdown.Menu>
-                        </Dropdown>
-                     </td>
+                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td>
                  </tr>
                   ))}
                 
