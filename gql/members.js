@@ -251,3 +251,90 @@ query ($member_id: Int!, $status: Int){
   }
 }
 `;
+
+// txns
+
+export const GET_MEMBER_TXNS = gql`
+query ($member_id: Int!, $page: Int){
+  memberTransactions(member_id: $member_id, page: $page) {
+    entries{
+      id
+      member_id
+      amount
+      current_balance
+      previous_balance
+      posted_by
+      approved_by
+      payment_channel
+      txn_id
+      txn_type
+      naration
+      status
+      inserted_at
+      updated_at
+      members{
+        id
+        surname
+        other_names
+      }
+      posted{
+        id
+        surname
+        other_names
+      }
+      approved{
+        id
+        surname
+        other_names
+      }
+    }
+    page_size
+    page_number
+    total_pages
+    total_entries
+
+  }
+}
+`;
+
+export const FILTER_MEMBERS = gql`
+  mutation filterMembers(
+      $status: Int,
+      $from: String,
+      $to: String, 
+      $member_id: Int 
+    ) {
+      filterMembers(filter: {
+        from: $from,
+        status: $status,
+        id: $member_id,
+        to: $to,
+      }){
+        id
+        email
+        surname
+        other_names
+        user_id
+        altPhoneNumber
+        current_balance
+        avatar
+        monthly_contribution
+        current_monthly_income
+        dept
+        details
+        dob
+        email
+        faculty
+        gender
+        phone_number
+        rank
+        role
+        insertedAt
+        updatedAt
+        status
+        staff_no
+        membership_date
+        
+    }
+  }
+`;

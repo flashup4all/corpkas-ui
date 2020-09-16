@@ -2,16 +2,18 @@ import React, {useState} from 'react';
 
 import Tabs from '@atlaskit/tabs';
 import AdminMainLayout from '../../layouts/main/main';
-import Savings from '../../components/transactions/savings';
+import Transactions from '../../components/transactions/transactions';
+import TransactionSchedule from '../../components/transactions/transaction-schedule';
 import Withdrawals from '../../components/transactions/withdrawals';
 
 const tabs = [
-  { label: 'Savings', components: () => null },
-  { label: 'Withdrawals', components: null },
+  { label: 'Pending', components: () => null },
+  { label: 'All', components: () => null },
+  { label: 'Schedule', components: null },
 
 ];
 
-const Managestaff = () => {
+const ManageTransactions = () => {
   const [seletedTab, setSeletedTab] = useState(0)
   const selectTab = (selected, selectedIndex) => {
     setSeletedTab(selectedIndex)
@@ -24,15 +26,18 @@ const Managestaff = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <Savings />
+          <Transactions status="0" />
         }
         { seletedTab === 1 &&
-          <Withdrawals />
+          <Transactions />
+        }
+        { seletedTab === 2 &&
+          <TransactionSchedule />
         }
       </div>
     </div>
     )
   }
 
-export default Managestaff;
-Managestaff.layout = AdminMainLayout;
+export default ManageTransactions;
+ManageTransactions.layout = AdminMainLayout;

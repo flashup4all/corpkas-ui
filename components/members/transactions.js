@@ -2,26 +2,26 @@ import React, { Component } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
-import EditorMoreIcon from '@atlaskit/icon/glyph/editor/more';
-import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
-import PersonWithTickIcon from '@atlaskit/icon/glyph/person-with-tick';
-import PeopleIcon from '@atlaskit/icon/glyph/people';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 
 import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-// import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
-import { CustomToggle, Status } from '../../layouts/extras'
+import { GET_MEMBER_TXNS, GET_MEMBER } from '../../gql/members';
+import { FILTER_TRANSACTION, APPROVE_TRANSACTION } from '../../gql/transactions';
+import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
+import { getStaff } from '../shared/local'
+import swal from '@sweetalert/with-react'
 
 class Transactions extends Component {
     constructor(props) {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
-            members: [],
+            memberData: this.props.memberData,
+            transactions: [],
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
@@ -29,34 +29,40 @@ class Transactions extends Component {
             totalPages: 0,
             sorted: [],
             setMode: 0,
-            activeWidget: ''
+            activeWidget: '',
+            filter_status: '',
+            filter_from: '',
+            filter_to: '',
+            filter_txn_id: ''
+
         }
     }
 
-    // componentDidMount()
-    // {
-    //     this.getMembers()
-    //     this.getMemberTotals()
-    // }
+    componentDidMount()
+    {
 
-    // getMembers(page = 1)
-    // {
-    //     createApolloClient.query({
-    //         query: GET_PAGINATE_MEMBERS,
-    //         variables: {page: page}
-    //       }).then(response => {
-    //           const result = response.data.paginateMembers
-    //           this.setState({
-    //               members: result.entries, 
-    //               sorted: result.entries,
-    //               totalEntries: result.totalEntries,
-    //               totalPages: result.totalPages,
-    //               pageNumber: result.pageNumber,
-    //               pageSize: result.pageSize,
+        this.getMemberTxn()
+        // this.getMemberTotals()
+    }
 
-    //             })
-    //         }, error => console.log(error))
-    // }
+    getMemberTxn(page = 1)
+    {
+        createApolloClient.query({
+            query: GET_MEMBER_TXNS,
+            variables: {member_id: this.state.memberData.id, page}
+          }).then(response => {
+            const {data: {memberTransactions}} = response
+              this.setState({
+                  transactions: memberTransactions.entries, 
+                  sorted: memberTransactions.entries,
+                  totalEntries: memberTransactions.total_entries,
+                  totalPages: memberTransactions.total_pages,
+                  pageNumber: memberTransactions.page_number,
+                  pageSize: memberTransactions.page_size,
+
+                })
+            }, error => console.log(error))
+    }
     // getMemberTotals(page = 1)
     // {
     //     createApolloClient.query({
@@ -67,22 +73,69 @@ class Transactions extends Component {
     // }
     
     paginate = (e, page, analyticsEvent) => {
-        this.getMembers(page)
-      }
+        this.getMemberTxn(page)
+    }
+    
+    approveTransaction(txn){
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this  file!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+                createApolloClient.mutate({
+                    mutation: APPROVE_TRANSACTION,
+                    variables: {id: txn.id, status: 1, approved_by: parseInt(getStaff().id)},
+                    refetchQueries:[{query: GET_MEMBER_TXNS, variables:{member_id: this.state.memberData.id, page:1}}, {query:GET_MEMBER, variables:{id: this.state.memberData.id}}]
+                }).then(response => {
+                    const {data: {approveTransactions}} = response
+                    console.log(approveTransactions)
+                    this.props.handleClick
+                    swal("Transaction Processed", {
+                        icon: "success",
+                    });
+                    }, error => console.log(error))
+              
+            } else {
+              return;
+            }
+          });
+    }
     
     render () {
-        // const filterMembers = (status = "") => {
-        //     let membersData = [];
-        //     this.setState({activeWidget: status, setMode: 0})
-        //     if(status != "")
-        //     {
-        //         membersData = members.filter(x => x.status === status)
-        //     }else{
-        //         membersData = members
-        //     }
-        //     this.setState({sorted: membersData})
-        // }
-    const { sorted, setMode, activeWidget, totalPages } = this.state
+        const { transactions, sorted, setMode, activeWidget, totalPages, filter_from, filter_to, filter_status, filter_txn_id } = this.state
+
+        const filter_form = () => {
+
+            let variables = {}
+            if(filter_from || filter_status)
+            {
+                filter_from ? variables.from = new Date(filter_from)  : null
+                filter_to ? variables.to = new Date(filter_to)  : null
+                filter_status ? variables.status = parseInt(filter_status) : null
+                variables.member_id =  this.state.memberData.id
+               createApolloClient.mutate({
+                   mutation: FILTER_TRANSACTION,
+                   variables: variables
+               }).then(response => {
+                   const { data: {filterTransactions}} =  response
+                   console.log(filterTransactions)
+                //    let result = response.data.filterStaff
+                   this.setState({
+                        transactions: filterTransactions, 
+                        sorted: filterTransactions,
+                        totalEntries: 0,
+                        totalPages: 0,
+                        pageNumber: 0,
+                        pageSize: 0,
+        
+                    })
+               }, (error)=> console.log(error)) 
+            }
+        }
       
     return (
         <div>
@@ -94,16 +147,46 @@ class Transactions extends Component {
              <div style={{padding:'20px'}}>
                  
                  <div className="row">
-                 <div className="col-md-3">
-                            <select className="ks-form-control form-control" 
-                                >
-                                <option value="">Filter Date</option>
-                                <option></option>
-                                <option></option>
-                            </select>
-                        </div>
-                    <div className="col-md-8">
-                        <button type="button" className="btn float-right" onClick={()=> this.setState({setMode: 1})}>Print Transaction</button>
+                 <div className="col-md-2 ks-col">
+                        <label>Txn ID</label>
+                        <input type="text" name="search" 
+                        className="mini-search form-control ks-form-control" 
+                        placeholder="TransactionID"
+                        value={filter_txn_id || ""}
+                        onChange={({ target }) => this.setState({filter_txn_id: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-3 ks-col">
+                        <label>From Date</label>
+                        <input type="date" name="search" 
+                        className="mini-search form-control ks-form-control" 
+                        placeholder="Search"
+                        value={filter_from || ""}
+                        onChange={({ target }) => this.setState({filter_from: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-3 ks-col">
+                        <label>To Date</label>
+                        <input type="date" name="search" 
+                        className="mini-search form-control ks-form-control" 
+                        placeholder="Search"
+                        value={filter_to || ""}
+                        onChange={({ target }) => this.setState({filter_to: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-2">
+                        <label>Status</label>
+                        <select className="ks-form-control form-control" 
+                            value={filter_status || ""}
+                            onChange={({ target }) => this.setState({filter_status: target.value})}
+                            >
+                            <option value="">Status</option>
+                            <option value="1">Approved</option>
+                            <option value="0">Pending</option>
+                        </select>
+                    </div>
+                    <div className="col-md-2">
+                        <button type="button" className="btn float-right mt-4" onClick={()=> filter_form()}>Filter</button>
                     </div>
                  </div>
              
@@ -116,42 +199,42 @@ class Transactions extends Component {
                  <tr>
                      <th>&#x23;</th>
                      <th>Approved by</th>
-                     <th>Rank</th>
+                     {/* <th>Rank</th> */}
                      <th>Posted by</th>
                      <th>Transaction Type</th>
-                     <th>Total balance</th>
+                     <th>Amount</th>
                      <th>Status</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
                  <tbody>
-                 {/* { sorted.map((member, index) => (
+                 { sorted.map((txn, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
-                     <td>{member.surname} {member.other_names}</td>
-                     <td>{member.rank}</td>
-                     <td>{member.gender}</td>
-                     <td>{member.dept}</td>
-                     <td>{member.phone_number}</td>
-                     <td className={member.status}> <Status status={member.status} /></td>
+                     <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td>
+                     {/* <td>{txn.rank}</td> */}
+                     <td>{ txn.posted.surname } { txn.posted.other_names }</td>
+                     <td>
+                        {txn.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
+                    </td>
+                     <td>{txn.amount}</td>
+                     <td className={txn.status}>
+                          <Status status={txn.status} />
+                    </td>
                      <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="ks-menu-dropdown bg-menu">
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Manage</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>View Txn</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>Reset Login Details</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('manage-members')}>Send Statement</Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Deactivate</Dropdown.Item>
+                            {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Approve</Dropdown.Item>}
                         </Dropdown.Menu>
                         </Dropdown>
                      </td>
                  </tr>
-                  ))} */}
+                  ))}
                 
                  </tbody>
              </table>
@@ -164,7 +247,7 @@ class Transactions extends Component {
              </div>
                  }
                  { sorted && !sorted.length && 
-                     <EmptyData title="Empty Members" text="No Available Members Data"/>
+                     <EmptyData title="Empty Transaction" text="No Available Transaction"/>
                  } 
                  { !sorted
                      &&

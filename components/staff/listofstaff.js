@@ -64,8 +64,8 @@ class ListOfStaff extends Component {
             let variables = {}
             if(filter_role || filter_status)
             {
-                filter_role ? variables.role = filter_role  : null
-                filter_status ? variables.status = filter_status : null
+                filter_role ? variables.role = filter_role  : ''
+                filter_status ? variables.status = filter_status : ''
                createApolloClient.mutate({
                    mutation: FILTER_STAFF,
                    variables: variables

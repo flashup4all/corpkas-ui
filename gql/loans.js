@@ -299,3 +299,52 @@ export const FILTER_LOANS = gql`
       }
   }
 `;
+
+export const GET_LOANS = gql`
+query ($page: Int!){
+  paginateLoans(page: $page) {
+    entries{
+      id
+      actual_amount
+      amount_payable
+      approved_date
+      detail
+      due_date
+      insurance_amount
+      insurance_percent
+      interest_amount
+      interest_percent
+      is_insured
+      duration
+      loan_amount
+      status
+      monthly_deduction
+      total_deduction
+      total_loan
+      total_paid
+      upfront_deduction
+      loan_type_id
+      member_id
+      user_id
+      due_date
+      approved_date
+      inserted_at
+      updated_at
+      member{
+        id
+        surname
+        other_names
+      }
+      loan_type{
+        id
+        name
+        interest
+      }
+    }
+    page_size
+    page_number
+    total_pages
+    total_entries
+  }
+}
+`;

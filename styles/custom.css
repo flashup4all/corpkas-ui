@@ -506,6 +506,23 @@ thead {
 	display: flex;
 	flex-wrap: wrap;
 }
+.dash-widget {
+	display: flex;
+	flex-direction: column;
+	/* align-items: center; */
+	/* justify-content: space-evenly; */
+	flex: 1 1 200px;
+	background: #fff;
+	box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31);
+	border-radius: 3px;
+	height: 133px;
+	padding: 0 1em;
+	margin-right: .8em;
+	position: relative;
+	margin-top: 8px;
+    margin-bottom: 8px;
+}
+
 .widget {
 	display: flex;
 	flex-direction: row;
@@ -560,8 +577,38 @@ thead {
 	line-height: 16px;
 	letter-spacing: 0.01em;
 }
+
+.widget-p-dark {
+	color: #253858;
+	font-size: 14px;
+	line-height: 16px;
+	margin-top: 8px;
+}
+.widget-p-light {
+	color: #6b778c;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.teal-span {
+	background: #b3f5ff;
+}
+.red-span {
+	background: #ffbdad;
+}
+.widget-span {
+	width: 53px;
+	height: 22px;
+	padding: 4px;
+	border-radius: 3px;
+}
+
 .no-shadow {
 	box-shadow: 0px 0px 1px rgba(9, 30, 66, 0.31);
+	border-radius: 3px;
+}
+.ks-shadow {
+	box-shadow: 0px 8px 12px rgba(9, 30, 66, 0.15), 0px 0px 1px rgba(9, 30, 66, 0.31);
 	border-radius: 3px;
 }
 .shadow {
@@ -643,4 +690,57 @@ thead {
 	border-radius: 3px;
 	font-size: 11px;
 	line-height: 16px;
+}
+
+/* sheets */
+.sheets {
+	border: 1px solid #dfe0eb;
+	box-sizing: border-box;
+	border-radius: 8px;
+	margin-bottom: 3.125em;
+}
+.graph-con {
+	padding: 2em 2.625em 0.71875em 2em;
+}
+.graph {
+	margin-top: 3.5em;
+	padding: 5.0625em 0 0;
+}
+.graph-heading p {
+	font-size: 12px;
+	line-height: 16px;
+	letter-spacing: 0.1px;
+	color: #8993a4;
+}
+.graph-heading h1 {
+	font-weight: bold;
+	font-size: 16px;
+	line-height: 18px;
+	letter-spacing: 0.4px;
+	color: #253858;
+}
+
+.additional-info {
+	border-left: solid 1px #dfe0eb;
+}
+.additional-info-border-bottom{
+	border-bottom: 1px solid #DFE0EB;
+}
+.additional-info h2 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 22px;
+	text-align: center;
+	letter-spacing: 0.3px;
+	color: #97a0af;
+	padding: 2em 0 0;
+}
+.additional-info h1 {
+	font-size: 24px;
+	line-height: 28px;
+	text-align: center;
+	letter-spacing: 0.3px;
+	color: #253858;
+	padding: 0 0 1.5625em;
 }

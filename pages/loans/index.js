@@ -4,7 +4,7 @@ import Tabs from '@atlaskit/tabs';
 import AdminMainLayout from '../../layouts/main/main';
 import LoanTypes from '../../components/loans/loan-types';
 import AddLoanType from '../../components/loans/add-loan-type';
-import LoanSetting from '../../components/loans/loan-settings';
+import Loans from '../../components/loans/loans';
 import { LOAN_SETTING } from '../../gql/loans'
 
 const tabs = [
@@ -40,10 +40,10 @@ const LoanSettings = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <LoanTypes />
+          <Loans />
         }
         { seletedTab === 1 &&
-          <LoanSetting  loanSettingData={loanSetting} />
+          <Loans  status="0" />
         }
       </div>
     </div>

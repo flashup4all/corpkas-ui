@@ -33,8 +33,8 @@ const LoginForm = ({ setError, setToken }) =>{
           // }, 500);
       }
       setTimeout(() => {
-          router.push('/posts')
-      }, 500);
+          router.push('/dashboard')
+      }, 200);
     }
 
   })

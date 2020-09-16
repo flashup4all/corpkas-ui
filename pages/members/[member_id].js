@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import { useRouter} from 'next/router';
 import Tabs from '@atlaskit/tabs';
 import {GET_MEMBER} from '../../gql/members'
@@ -27,6 +27,7 @@ const MemberProfile = () => {
   const router = useRouter()
   const {member_id} = router.query
   const [memberData, setMemberData] = useState();
+  const forceUpdate = useCallback(() => setMemberData({}), []);
   // const memberData = {id: member_id, name: "john doe"
 
   const {loading, error, getMember} = useQuery( GET_MEMBER,
@@ -82,7 +83,7 @@ const MemberProfile = () => {
             <ProfileSetting memberData={memberData}/>
           }
           { seletedTab === 1 &&
-            <Transactions memberData={memberData} />
+            <Transactions handleClick={() => forceUpdate()} memberData={memberData} />
           }
           { seletedTab === 2 &&
             <LoanRequests memberData={memberData} />
