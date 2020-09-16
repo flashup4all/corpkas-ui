@@ -147,7 +147,7 @@ class Transactions extends Component {
             
         {setMode === 0 &&
              <div >
-                 {this.props.status == "" && 
+                 {this.props.showSearch && 
                     <div style={{padding:'20px'}}>
                         <div className="row">
                             <div className="col-md-3 ks-col">
@@ -200,7 +200,7 @@ class Transactions extends Component {
                  }
                  
                 
-
+            <h1 className="title"> Loans</h1>
              <div className="table-responsive p-3">
                  { sorted.length > 0 &&
                  <div>

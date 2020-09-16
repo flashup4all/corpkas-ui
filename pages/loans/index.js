@@ -40,7 +40,7 @@ const LoanSettings = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <Loans status="" />
+          <Loans status="" showSearch={true}/>
         }
         { seletedTab === 1 &&
           <Loans  status="0" />
