@@ -133,7 +133,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
             <div style={{padding: '20px 0 20px 0'}}>
                 
                 <form>
-                <h5 style={{marginBottom:'-50px'}}>Enter Loan Details</h5>
+                <h5 style={{marginBottom:'-50px'}}>Enter Guarantor(s) Details</h5>
                     <div className="row mt-5">
                     <div className="col-md-3">
                         <label className="ks-label">Staff No</label>
@@ -378,6 +378,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
         return (
             <div className="" style={{padding:'20px'}}>
                 <form onSubmit={(e) => submit(e)}>
+                <h5 style={{marginBottom:'-65px', paddingTop:'20px'}}>Enter Loan Details</h5>
                 <div className="row mt-5">
                     <div className="col-md-3">
                             <label className="ks-label">Staff ID</label>
