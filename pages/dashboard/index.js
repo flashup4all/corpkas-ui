@@ -112,19 +112,19 @@ class Dashboard extends Component {
                         </div>
 
                         <div  className="additional-info-border-bottom ">
-                            <h2>New members</h2>
+                            <h2>Active members</h2>
                             <h1>419</h1>
                         </div>
                         
                         <div  className="additional-info-border-bottom ">
-                            <h2>New members</h2>
+                            <h2>Inactive members</h2>
                             <h1>419</h1>
                         </div>
                         
-                        <div className="additional-info-border-bottom ">
+                        {/* <div className="additional-info-border-bottom ">
                             <h2>New members</h2>
                             <h1>419</h1>
-                        </div>
+                        </div> */}
                         <div >
                             <h2>New members</h2>
                             <h1>419</h1>
@@ -135,11 +135,11 @@ class Dashboard extends Component {
                         </div>
 
                     </div>
-                    <p className="page-title"> Loans</p>
+                    <p className="component-title mb-4"> Loans</p>
 
-                <div className="">
+
                 <Loans showSearch={false} />
-                </div>
+
             </div>
 
         )

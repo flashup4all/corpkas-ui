@@ -89,7 +89,7 @@ class Transactions extends Component {
             
             <div className="widget-section">
         <div className="bg-grey">
-        <p className="transaction-header">Transaction Details</p>
+        <p className="transaction-header">Loan Transaction Details</p>
         {setMode === 0 &&
              <div style={{padding:'20px'}}>
                  
