@@ -400,9 +400,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 onChange={({ target }) => setMemberId(target.value)}
                              />
                     </div>
-                    </div>
-                    <div className="row mt-5">
-                        <div className="col-md-3">
+                    <div className="col-md-3">
                             <label className="ks-label">Loan Amount</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g 10000"
@@ -428,6 +426,11 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 onChange={({ target }) => setLoanTypeId(target.value)}
                              />
                         </div>
+                    </div>
+                    <div className="row mt-5">
+                       
+                       
+                        
                         {/* <div className="col-md-3">
                             <label className="ks-label">Select Your Bank</label>
                             <select className="ks-form-control form-control"
@@ -440,8 +443,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             </select>
                         </div> */}
                        
-                        <div className="col-3">
-                            <button className="btn float-right mt-5 " onClick={() => {setShowGuarantorsForm(true)}} type="submit">
+                        <div className="col-12">
+                            <button className="btn float-right mt-1 " onClick={() => {setShowGuarantorsForm(true)}} type="submit">
                                 Next Step
                             {/* {
                                  disabled={loading}
