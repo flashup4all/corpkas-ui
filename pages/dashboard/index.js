@@ -12,6 +12,7 @@ import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../../components/shared/utils'
 import AdminMainLayout from '../../layouts/main/main';
+import Loans from '../../components/loans/loans';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -137,7 +138,7 @@ class Dashboard extends Component {
 
                 <div className="bg-grey">
                     
-                
+                <Loans status="" />
                 </div>
             </div>
 
