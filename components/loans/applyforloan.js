@@ -388,13 +388,12 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
         return (
             <div className="Ks-createloan">
                 <form onSubmit={(e) => submit(e)}>
-                <h5 style={{marginBottom:'-65px', paddingTop:'20px'}}>Enter Loan Details</h5>
+                <h5 className="ks-guarantorform-header">Enter Loan Details</h5>
                 <div className="row mt-5">
                     <div className="col-md-3">
                             <label className="ks-label">Staff ID</label>
                             <input className="ks-form-control form-control"
                                 placeholder="e.g KASU001"
-                                type="number"
                                 value={member_id || ""}
                                 onChange={({ target }) => setMemberId(target.value)}
                              />
@@ -403,6 +402,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             <label className="ks-label">Loan Amount</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g 10000"
+                                type="number"
                                 value={loan_amount || ""}
                                 onChange={({ target }) => setLoanAmount(target.value)}
                             />
@@ -410,7 +410,6 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                         <div className="col-md-3">
                             <label className="ks-label">User ID</label>
                             <input className="ks-form-control form-control"
-                                type="number"
                                 value={user_id || ""}
                                 placeholder="e.g KASU001"
                                 onChange={({ target }) => setUserid(target.value)}
