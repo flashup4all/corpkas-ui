@@ -199,8 +199,6 @@ class Transactions extends Component {
                     </div>
                  }
                  
-                
-            <h1 className="title"> Loans</h1>
              <div className="table-responsive p-3">
                  { sorted.length > 0 &&
                  <div>
