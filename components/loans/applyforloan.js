@@ -428,21 +428,6 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                         </div>
                     </div>
                     <div className="row mt-5">
-                       
-                       
-                        
-                        {/* <div className="col-md-3">
-                            <label className="ks-label">Select Your Bank</label>
-                            <select className="ks-form-control form-control"
-                                value={status || ""}
-                                onChange={({ target }) => setStatus(target.value)} 
-                            >
-                                <option value="">Options</option>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                        </div> */}
-                       
                         <div className="col-12">
                             <button className="btn float-right mt-1 " onClick={() => {setShowGuarantorsForm(true)}} type="submit">
                                 Next Step
