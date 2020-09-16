@@ -130,10 +130,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
 
     const Guarantorsform = () => {
         return(
-            <div style={{padding: '20px 0 20px 0'}}>
-                
+            <div className="ks-guarantorform">
                 <form>
-                <h5 style={{marginBottom:'-50px'}}>Enter Guarantor(s) Details</h5>
+                <h5 className="ks-guarantordetail">Enter Guarantor(s) Details</h5>
                     <div className="row mt-5">
                     <div className="col-md-3">
                         <label className="ks-label">Staff No</label>
@@ -243,9 +242,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                     </div>
                 </form> <br></br>
                 <form>
-                    <div style={{marginBottom:'-65px', paddingTop:'20px'}}>
+                    <div className="ks-guarantorform-header">
                         <h5>Enter Guarantor(s) Details</h5>
-                        <h6 style={{color:'#a4a4a4'}}>First Guarantor</h6>
+                        <h6 className="ks-label">First Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -284,8 +283,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             //     onChange={({ target }) => setMemberId(target.value)}
                             />
                     </div>
-                    </div><div style={{marginBottom:'-65px', paddingTop:'20px'}}>
-                        <h6 style={{color:'#a4a4a4'}}>Second Guarantor</h6>
+                    </div><div className="ks-guarantorform-header">
+                        <h6 className="ks-label">Second Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -325,8 +324,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             />
                     </div>
                     </div>
-                    <div style={{marginBottom:'-65px', paddingTop:'20px'}}>
-                        <h6 style={{color:'#a4a4a4'}}>Third Guarantor</h6>
+                    <div className="ks-guarantorform-header">
+                        <h6 className="ks-label">Third Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -387,7 +386,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
     }
 
         return (
-            <div className="" style={{padding:'20px'}}>
+            <div className="Ks-createloan">
                 <form onSubmit={(e) => submit(e)}>
                 <h5 style={{marginBottom:'-65px', paddingTop:'20px'}}>Enter Loan Details</h5>
                 <div className="row mt-5">

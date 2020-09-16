@@ -414,6 +414,10 @@ thead {
 	margin-top: 24px;
 }
 
+.Ks-createloan {
+	padding:20px;
+}
+
 .ks-form-control{
 	background: #FAFBFC;
 	border: 2px solid #DFE1E6;
@@ -424,6 +428,23 @@ thead {
 .ks-form-control:focus{
 	border: 2px solid #4C9AFF;
 	box-shadow: none;
+}
+
+.ks-guarantorform {
+	padding:20px 0 20px 0;
+}
+
+.ks-guarantorform-header {
+	margin-bottom:-65px; 
+	padding-top:20px;
+}
+
+.ks-label {
+	color:#a4a4a4;
+}
+
+.ks-guarantordetail {
+	margin-bottom: -50px;
 }
 
 .ks-request-text {
