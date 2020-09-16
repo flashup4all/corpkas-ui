@@ -35,9 +35,9 @@ const LoginForm = ({ setError, setToken }) =>{
           const staff = authenticate.staff
           storeStaff(staff)
       }
-      setTimeout(() => {
-          router.push('/posts')
-      }, 500);
+      // setTimeout(() => {
+      router.push('/dashboard')
+      // }, 500);
     }
 
   })
@@ -66,24 +66,23 @@ const LoginForm = ({ setError, setToken }) =>{
               <h5 className="card-title text-center">Sign In</h5>
               <form className="form-signin" onSubmit={submit}>
                   <div className="form-label-group">
+                  <label htmlFor="inputEmail">Email</label>
                     <input
                       className="form-control"
                       type="email"
                       value={email || ""}
                       onChange={({ target }) => setEmail(target.value)}
                     />
-                    <label htmlFor="inputEmail">Email</label>
                   </div>
                   <div>
+                    <label htmlFor="inputEmail">Password</label>
                     <input
                       className="form-control"
                       type='password'
                       value={password || ""}
                       onChange={({ target }) => setPassword(target.value)}
                     />
-    
-                    <label htmlFor="inputEmail" onClick={()=> router.push('/posts')}>Password</label>
-                  </div>
+                      </div>
                   <button disabled={loading} className="btn btn-md btn-primary btn-block text-uppercase" type='submit'>
                       {
                         loading &&

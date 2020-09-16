@@ -135,10 +135,10 @@ class Dashboard extends Component {
                         </div>
 
                     </div>
+                    <p className="page-title"> Loans</p>
 
-                <div className="bg-grey">
-                    
-                <Loans status="" />
+                <div className="">
+                <Loans showSearch={false} />
                 </div>
             </div>
 
