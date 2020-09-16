@@ -365,8 +365,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             //     onChange={({ target }) => setMemberId(target.value)}
                             />
                     </div>
-                    <div className="col-3">
-                            <button className="btn float-right mt-5 " type="submit">
+                    <div className="col-12">
+                            <button className="btn float-right mt-5 " style={{float:'right'}} type="submit">
                                 Apply for Loan
                             {/* {
                                  disabled={loading}
