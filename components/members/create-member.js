@@ -126,11 +126,11 @@ const CreateMember = () =>  {
 
     const submit = async (e) => {
         e.preventDefault();
-        // if(handleValidation()) {
+        if(handleValidation()) {
         createMember({variables:{staff_no, surname, other_names, gender, dob: new Date(dob), 
             membership_date: new Date(membership_date), phone_number, alt_phone_number, 
             status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
-        // }
+        }
     }
         return (
             <div className="">

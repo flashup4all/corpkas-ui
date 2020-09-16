@@ -5,6 +5,7 @@ import AdminMainLayout from '../../layouts/main/main';
 import LoanTypes from '../../components/loans/loan-types';
 import AddLoanType from '../../components/loans/add-loan-type';
 import Loans from '../../components/loans/loans';
+import CreateLoan from '../../components/loans/applyforloan'; 
 import { LOAN_SETTING } from '../../gql/loans'
 
 const tabs = [
@@ -47,6 +48,12 @@ const LoanSettings = () => {
         }
         { seletedTab === 2 &&
           <Loans  status="1" />
+        }
+        { seletedTab === 3 &&
+          <Loans  status="1" />
+        }
+        { seletedTab === 4 &&
+          <CreateLoan  status="1" />
         }
       </div>
     </div>

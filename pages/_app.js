@@ -8,8 +8,9 @@ import '../styles/globals.css'
 // const createApolloClient = new ApolloClient({
 //     // uri: 'http://localhost:4000/api/graphql',
 //     uri: 'https://stimulating-grandiose-asiaticlesserfreshwaterclam.gigalixirapp.com/api/graphql',
-//     cache: new InMemoryCache()
-//   });
+  //     uri: 'http://testapi.kasumpcs.com/api/graphql',
+  //   cache: new InMemoryCache()
+  // });
 
 
 function MyApp({ Component, pageProps }) {
