@@ -226,9 +226,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Option 1 </option>
-                                <option value="1">Option 2</option>
-                                <option value="0">Option 3</option>
+                                <option value="">Access Bank </option>
+                                <option value="1">UBA</option>
+                                <option value="0">Zenith Bank</option>
                             </select>
                         </div>
                         <div className="col-md-3">
@@ -270,9 +270,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Option 1 </option>
-                                <option value="1">Option 2</option>
-                                <option value="0">Option 3</option>
+                                <option value="">Access Bank</option>
+                                <option value="1">UBA</option>
+                                <option value="0">Zenith Bank</option>
                             </select>
                         </div>
                     <div className="col-md-3">
@@ -310,9 +310,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Option 1 </option>
-                                <option value="1">Option 2</option>
-                                <option value="0">Option 3</option>
+                                <option value="">Access Bank</option>
+                                <option value="1">UBA</option>
+                                <option value="0">Zenith Bank</option>
                             </select>
                         </div>
                     <div className="col-md-3">
@@ -351,9 +351,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Option 1 </option>
-                                <option value="1">Option 2</option>
-                                <option value="0">Option 3</option>
+                                <option value="">Access Bank</option>
+                                <option value="1">UBA</option>
+                                <option value="0">Zenith Bank</option>
                             </select>
                         </div>
                     <div className="col-md-3">
