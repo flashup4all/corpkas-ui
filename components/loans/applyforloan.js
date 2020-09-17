@@ -2,37 +2,26 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { CREATE_LOAN } from '../../gql/loans'
 import { getUser } from '../../components/shared/local'
+import { Radio } from '@atlaskit/radio';
 import Spinner from '@atlaskit/spinner';
 import {  useToasts } from 'react-toast-notifications'
+import Autosuggest from 'react-autosuggest';
 import { Checkbox } from '@atlaskit/checkbox';
-
 import swal from '@sweetalert/with-react'
+
 
 const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
     console.log(getUser())
-    // const editLoanType = selectedLoanType
     const { addToast } = useToasts()
     const [buttonName, setButtonName] = useState('Create')
     const [showGuarantorsForm, setShowGuarantorsForm] = useState(false)
-    // const [name, setName] = useState(editLoanType == null ? '' : editLoanType.name)
-    // const [duration, setDuration] = useState(editLoanType == null ? '' : editLoanType.duration)
-    // const [interest, setInterest] = useState(editLoanType == null ? '' : editLoanType.interest)
-    // const [interest_type, setInterestType] = useState(editLoanType == null ? 1 : editLoanType.interest_type)
-    // const [is_insured, setInsurance] = useState(editLoanType == null ? false : editLoanType.is_insured)
-    // const [insurance_percent_charge, setInsurancePercentCharge] = useState(editLoanType == null ? 0.0 : editLoanType.insurance_percent_charge)
-    // const [upfront_deduction, setUpfrontDeduction] = useState(editLoanType == null ? false : editLoanType.upfront_deduction)
-    // const [compare_with_income, setCompareWithIncome] = useState(editLoanType == null ? false : editLoanType.compare_with_income)
-    // const [minimum_amount, setMinimumAmount] = useState(editLoanType == null ? 0.0 : editLoanType.minimum_amount)
-    // const [maximum_amount, setMaximumAmount] = useState(editLoanType == null ? 0.0 : editLoanType.maximum_amount)
-    // const [description, setDescription] = useState(editLoanType == null ? '' : editLoanType.description)
-    // const [requirements, setRequirements] = useState(editLoanType == null ? '' : editLoanType.requirements)
-    // const [status, setStatus] = useState(editLoanType == null ? '' : editLoanType.status)
     const [loan_amount, setLoanAmount] = useState()
     const [member_id, setMemberId] = useState()
     const [user_id, setUserid] = useState()
     const [loan_type_id, setLoanTypeId] = useState()
+    const setMode = useState(0)
 
-    //create staff mutation
+    //create loan mutation
     const  [createLoan, {loading, error}] = useMutation( CREATE_LOAN, {
         onError: (e) => {
             console.log(e)
@@ -131,8 +120,14 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
     const Guarantorsform = () => {
         return(
             <div className="ks-guarantorform">
+                 {
+            setMode === 1 &&
+            <div className="p-4">
+                    <span onClick={() => setState({setMode: 1})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+            </div>
+        }
                 <form>
-                <h5 className="ks-guarantordetail">Enter Guarantor(s) Details</h5>
+                <h5 className="ks-guarantordetail">Enter Loan Details</h5>
                     <div className="row mt-5">
                     <div className="col-md-3">
                         <label className="ks-label">Staff No</label>
@@ -244,7 +239,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                 <form>
                     <div className="ks-guarantorform-header">
                         <h5>Enter Guarantor(s) Details</h5>
-                        <h6 className="ks-label">First Guarantor</h6>
+                        <p className="ks-subheader">You are almost there...just provide us a few more information</p>
+                        <h6 className="ks-guarantor-label">First Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -269,7 +265,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Access Bank</option>
+                                <option>Select your bank</option>
+                                <option value="2">Access Bank</option>
                                 <option value="1">UBA</option>
                                 <option value="0">Zenith Bank</option>
                             </select>
@@ -284,7 +281,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             />
                     </div>
                     </div><div className="ks-guarantorform-header">
-                        <h6 className="ks-label">Second Guarantor</h6>
+                        <h6 className="ks-guarantor-label">Second Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -309,7 +306,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Access Bank</option>
+                                <option>Select your bank</option>
+                                <option value="2">Access Bank</option>
                                 <option value="1">UBA</option>
                                 <option value="0">Zenith Bank</option>
                             </select>
@@ -325,7 +323,7 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                     </div>
                     </div>
                     <div className="ks-guarantorform-header">
-                        <h6 className="ks-label">Third Guarantor</h6>
+                        <h6 className="ks-guarantor-label">Third Guarantor</h6>
                     </div>
                     <div className="row mt-5">
                     <div className="col-md-3">
@@ -350,7 +348,8 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 // value={status || ""}
                                 // onChange={({ target }) => setStatus(target.value)} 
                             >
-                                <option value="">Access Bank</option>
+                                <option>Select your bank</option>
+                                <option value="2">Access Bank</option>
                                 <option value="1">UBA</option>
                                 <option value="0">Zenith Bank</option>
                             </select>
@@ -363,6 +362,28 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             // value={member_id || ""}
                             //     onChange={({ target }) => setMemberId(target.value)}
                             />
+                    </div>
+                    <div className="col-md-3 ks-guarantor-radio">
+                        <Radio
+                            value="default radio"
+                            // label="Accept Applicant's Undertaking"
+                            name="radio-default"
+                            testId="radio-default"
+                            isChecked={true}
+                            onChange={() => {}}
+                            />
+                            <p className="ks-guarantor-radio-text">Accept Applicant's Undertaking</p>
+                    </div>
+                    <div className="col-md-3 ks-guarantor-radio">
+                        <Radio
+                            value="default radio"
+                            // label="Accept Insurance Guarantee"
+                            name="radio-default"
+                            testId="radio-default"
+                            isChecked={false}
+                            onChange={() => {}}
+                            />
+                            <p className="ks-guarantor-radio-text">Accept Insurance Guarantee</p>
                     </div>
                     <div className="col-12">
                             <button className="btn float-right mt-5" type="submit">
@@ -386,7 +407,9 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
     }
 
         return (
+            
             <div className="Ks-createloan">
+                {/* {setMode === 1 && */}
                 <form onSubmit={(e) => submit(e)}>
                 <h5 className="ks-guarantorform-header">Enter Loan Details</h5>
                 <div className="row mt-5">
@@ -438,10 +461,13 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                         </div>
                     </div>
                 </form>
+                {/* } */}
                 { showGuarantorsForm && 
                     <Guarantorsform />
                 }
+            
             </div>
+           
         )
 }
 

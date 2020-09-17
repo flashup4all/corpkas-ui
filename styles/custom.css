@@ -409,9 +409,32 @@ thead {
 	font-weight: 600;
 	font-size: 12px;
 	line-height: 16px;
-	color: #6B778C;
+	color: #808080;
 	margin-bottom: 0;
 	margin-top: 24px;
+}
+
+.ks-guarantor-label {
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 16px;
+	color: #808080;
+	margin-bottom: 0;
+	margin-top: 24px;
+}
+
+.ks-guarantor-radio {
+	margin-top: 40px;
+	display: flex;
+	flex-direction: row;
+}
+
+.ks-guarantor-radio-text {
+	font-size: 14px;
+}
+
+.ks-subheader {
+	color: #808080;
 }
 
 .Ks-createloan {
