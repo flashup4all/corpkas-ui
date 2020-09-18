@@ -19,7 +19,7 @@ const RANDOM_USERS = [
     {id: 3, name: "john"}
 ]
 
-class Transactions extends Component {
+class RepaymentSchedule extends Component {
     constructor(props) {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
@@ -176,6 +176,8 @@ class Transactions extends Component {
                                     <option value="2">Debit</option>
                                 </select>
                             </div>
+                        </div>
+                        <div className="row mt-3">
                             <div className="col-md-3 ks-col">
                                 <label>Status</label>
                                 <select className="ks-form-control form-control" 
@@ -187,11 +189,8 @@ class Transactions extends Component {
                                     <option value="0">Pending</option>
                                 </select>
                             </div>
-                        </div>
-                        <div className="row mt-3">
-                            
                             <div className="col-md-2 ks-col">
-                                <button type="button" className="btn" onClick={()=> filter_form()}>Filter</button>
+                                <button type="button" className="btn" style={{ marginTop: '32px'}} onClick={()=> filter_form()}>Filter</button>
                             </div>
                         </div>
                     </div>
@@ -208,12 +207,12 @@ class Transactions extends Component {
                      <th>Member</th>
                      {/* <th>Posted by</th> */}
                      <th>Loan Type</th>
-                     <th>&#8358; Amount</th>
                      <th>Interest Rate</th>
-                     <th>Date Applied</th>
+                     <th>&#8358; Amount</th>
+                     {/* <th>Date Applied</th>
                      <th>Guarantors</th>
                      <th>Status</th>
-                     <th>Actions</th>
+                     <th>Actions</th> */}
                  </tr>
                  </thead>
                  <tbody>
@@ -224,9 +223,11 @@ class Transactions extends Component {
                      {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
                      <td>{ loan.member.surname } { loan.member.other_names }</td>
                      <td>{loan.loan_type.name}</td>
-                     <td>&#8358; {loan.loan_amount}</td>
                      <td>{loan.loan_type.interest}</td>
-                     <td>{loan.inserted_at}</td>
+                     <td>
+                        {loan.monthly_deduction}
+                         </td>
+                     {/* <td>{loan.inserted_at}</td>
                      <td>
                      <AvatarGroup appearance="stack" data={guarantors} />
                      </td>
@@ -234,9 +235,8 @@ class Transactions extends Component {
                      {loan.status == 1 && <Badge type='success' title='APPROVED'/>}
                      {loan.status == 0 && <Badge type='moved' title='PENDING'/>}
                         {loan.status == 2 && <Badge type='inprogress' title='DECLINED'/>}
-                          {/* <Status status={txn.status} /> */}
                     </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td>
+                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td> */}
                  </tr>
                   ))}
                 
@@ -277,4 +277,4 @@ class Transactions extends Component {
 }
 };
 
-export default Transactions;
+export default RepaymentSchedule;

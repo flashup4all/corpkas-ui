@@ -12,6 +12,7 @@ import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../../components/shared/utils'
 import AdminMainLayout from '../../layouts/main/main';
+import Loans from '../../components/loans/loans';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -111,19 +112,19 @@ class Dashboard extends Component {
                         </div>
 
                         <div  className="additional-info-border-bottom ">
-                            <h2>New members</h2>
+                            <h2>Active members</h2>
                             <h1>419</h1>
                         </div>
                         
                         <div  className="additional-info-border-bottom ">
-                            <h2>New members</h2>
+                            <h2>Inactive members</h2>
                             <h1>419</h1>
                         </div>
                         
-                        <div className="additional-info-border-bottom ">
+                        {/* <div className="additional-info-border-bottom ">
                             <h2>New members</h2>
                             <h1>419</h1>
-                        </div>
+                        </div> */}
                         <div >
                             <h2>New members</h2>
                             <h1>419</h1>
@@ -134,11 +135,11 @@ class Dashboard extends Component {
                         </div>
 
                     </div>
+                    <p className="component-title mb-4"> Loans</p>
 
-                <div className="bg-grey">
-                    
-                
-                </div>
+
+                <Loans showSearch={false} />
+
             </div>
 
         )

@@ -3,7 +3,8 @@ import { useQuery } from '@apollo/client';
 import Tabs from '@atlaskit/tabs';
 import AdminMainLayout from '../../layouts/main/main';
 import LoanTypes from '../../components/loans/loan-types';
-import AddLoanType from '../../components/loans/add-loan-type';
+import LoanBankSchedule from '../../components/loans/loan-bank-schedule';
+import RepaymentSchedule from '../../components/loans/repayment-schedule';
 import Loans from '../../components/loans/loans';
 import CreateLoan from '../../components/loans/applyforloan'; 
 import { LOAN_SETTING } from '../../gql/loans'
@@ -14,6 +15,8 @@ const tabs = [
   { label: 'Active Loans', components: null },
   { label: 'Overdue Loans', components: null },
   { label: 'Apply For Loan', components: null },
+  { label: 'Bank Schedule', components: null },
+  { label: 'Repayment Schedule', components: null },
 
 ];
 
@@ -41,7 +44,7 @@ const LoanSettings = () => {
 
       <div className="bg-grey mt-5">
         { seletedTab === 0 &&
-          <Loans status="" />
+          <Loans status="" showSearch={true}/>
         }
         { seletedTab === 1 &&
           <Loans  status="0" />
@@ -54,6 +57,15 @@ const LoanSettings = () => {
         }
         { seletedTab === 4 &&
           <CreateLoan  status="1" />
+        }
+        { seletedTab === 5 &&
+          <LoanBankSchedule status="0" />
+        }
+        { seletedTab === 5 &&
+          <LoanBankSchedule status="0" />
+        }
+        { seletedTab === 6 &&
+          <RepaymentSchedule status="0" />
         }
       </div>
     </div>

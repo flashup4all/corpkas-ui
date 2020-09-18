@@ -303,14 +303,14 @@ const LoanRequests = ({memberData}) =>  {
                                             loading &&
                                             <Spinner appearance="invert" size="medium"/>
                                         } */}
-                                        Cancel</button>
+                                        REJECT LOAN</button>
                                         <button className="btn float-right mt-5 " type="submit">
                                         {/* disabled={loading} */}
                                         {/* {
                                             loading &&
                                             <Spinner appearance="invert" size="medium"/>
                                         } */}
-                                        APPjLY</button>
+                                        APPROVE LOAN</button>
                                     </div>
                                 </div>
                                 
@@ -361,7 +361,7 @@ const LoanRequests = ({memberData}) =>  {
                                     <label className="ks-label">Loan Amount</label>
                                     <input className="ks-form-control form-control"
                                     placeholder="E.g 500000 "
-                                        value={loan_amount || ""}
+                                        value={monthly_deduction || ""}
                                         onChange={({ target }) => setMonthlyDeduction(target.value)}
                                     />
                                 </div>
