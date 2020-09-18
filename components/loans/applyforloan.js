@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import React, { Component, useState } from 'react';
+import { createApolloClient } from '../../lib/apolloClient'
+
 import { CREATE_LOAN } from '../../gql/loans'
 import { getUser } from '../../components/shared/local'
 import { Radio } from '@atlaskit/radio';
@@ -7,132 +8,302 @@ import Spinner from '@atlaskit/spinner';
 import {  useToasts } from 'react-toast-notifications'
 import Autosuggest from 'react-autosuggest';
 import { Checkbox } from '@atlaskit/checkbox';
+import { SEARCH_MEMBERS } from '../../gql/members'
+
 import swal from '@sweetalert/with-react'
 
-
-const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
-    console.log(getUser())
-    const { addToast } = useToasts()
-    const [buttonName, setButtonName] = useState('Create')
-    const [showGuarantorsForm, setShowGuarantorsForm] = useState(false)
-    const [loan_amount, setLoanAmount] = useState()
-    const [member_id, setMemberId] = useState()
-    const [user_id, setUserid] = useState()
-    const [loan_type_id, setLoanTypeId] = useState()
-    const setMode = useState(0)
-
-    //create loan mutation
-    const  [createLoan, {loading, error}] = useMutation( CREATE_LOAN, {
-        onError: (e) => {
-            console.log(e)
-            addToast("Validation Error", {
-                appearance: 'warning',
-                autoDismiss: true,
-              })
-        },
-        onCompleted: (createLoan) =>{
-            addToast("Loan Type Created", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-              swal("Data has been Created!", {
-                icon: "success",
-            });
-              resetForm()
-        },
-        // refetchQueries: [{ query: LOAN_TYPES }]
-    })
-    const  [ {createLoanLoading, createError}] = useMutation( CREATE_LOAN, {
-        onError: (e) => {
-            // console.log(e.graphQLErrors[0].message)
-            console.log(e)
-            addToast("Validation Error", {
-                appearance: 'warning',
-                autoDismiss: true,
-              })
-        },
-        onCompleted: (updateLoanType) =>{
-            addToast("Loan Type Updated", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-              swal("Data has been Created!", {
-                    icon: "success",
-                });
-              resetForm()
-        },
-        // refetchQueries: [{ query: LOAN_TYPES}],
-        // update: (cache, {data: {updateLoanType}}) => {
-        //     try {
-        //         let { loanTypes } = cache.readQuery({ query: LOAN_TYPES });
-        //         var foundIndex = loanTypes.findIndex(x => x.id == data.id);
-        //         loanTypes[foundIndex] = data;
-        //         cache.writeQuery({
-        //           query: LOAN_TYPES,
-        //           data: {
-        //               'loanTypes': loanTypes
-        //           }
-        //         });
-        //         LoanSettings.selectTab(0,0)
-        //       } catch (e) {
-        //           console.log(e)
-        //       }
-        // }
-    })
-    const resetForm = () => {
-        // setName('')
-        // setDuration('')
-        // setInterest('')
-        // setInterestType('')
-        // setInsurance(false)
-        // setUpfrontDeduction(false)
-        // setCompareWithIncome(false)
-        // // setMinimumAmount('')
-        // setMaximumAmount('')
-        // setDescription('')
-        // setRequirements('')
-        // setStatus('')
-        // setInsurancePercentCharge('')
+class CreateLoan extends Component {
+    constructor(props) {
+        super(props);
+        // setMode 0 = default, 1- create, 2- update 
+        this.state = {
+            createLoan: null,
+            buttonName: '',
+            showGuarantorsForm: false,
+            loan_amount: 0.0,
+            member_id: '',
+            user_id: '',
+            loan_type_id: '',
+            setMode: 0,
+        }
+    }
+    componentDidMount()
+    {
+        // this.getMembers()
+        // this.getMemberTotals()
     }
 
-    let errors = { loan_amount: '', member_id: '', user_id: '', loan_type_id:''};
+    createLoan()
+    {
+        // const  [createLoan, {loading, error}] = useMutation( CREATE_LOAN, {
+        //     onError: (e) => {
+        //         console.log(e)
+        //         addToast("Validation Error", {
+        //             appearance: 'warning',
+        //             autoDismiss: true,
+        //           })
+        //     },
+        //     onCompleted: (createLoan) =>{
+        //         addToast("Loan Type Created", {
+        //             appearance: 'success',
+        //             autoDismiss: true,
+        //           })
+        //           swal("Data has been Created!", {
+        //             icon: "success",
+        //         });
+        //           resetForm()
+        //     },
+        //     // refetchQueries: [{ query: LOAN_TYPES }]
+        // })
+    }
 
-
-    const submit = async (e) => {
+    submit = async (e) => {
         e.preventDefault();
-        if(createLoan == null)
-        {
-            createLoan({variables:{ loan_amount: parseFloat(loan_amount),
-                member_id: parseInt(getUser().id) , user_id: parseInt(getUser().id), 
-                loan_type_id: parseInt(loan_type_id),
-               }})
-        }
-        // else{
-        //     updateLoanType({variables:{ id: editLoanType.id, name, duration: parseInt(duration), interest: parseFloat(interest), 
-        //         is_insured, insurance_percent_charge: parseFloat(insurance_percent_charge), 
-        //         upfront_deduction, status: parseInt(status), minimum_amount: parseFloat(minimum_amount), 
-        //         maximum_amount: parseFloat(maximum_amount), description, requirements, user_id: parseInt(getUser().id), 
-        //         compare_with_income}})
+        // if(createLoan == null)
+        // {
+        //     createLoan({variables:{ loan_amount: parseFloat(loan_amount),
+        //         member_id: parseInt(getUser().id) , user_id: parseInt(getUser().id), 
+        //         loan_type_id: parseInt(loan_type_id),
+        //        }})
         // }
         
     }
+    
+    
+    onSearchChange = (value) => {
+        console.log(value)
 
-    const Guarantorsform = () => {
-        return(
-            <div className="ks-guarantorform">
-                 {
-            setMode === 1 &&
-            <div className="p-4">
-                    <span onClick={() => setState({setMode: 1})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
-            </div>
+    if (value.length > 1) {
+        createApolloClient.query({
+            query: SEARCH_MEMBERS,
+            variables: {searchTerm: value}
+          }).then(response => {
+              let {data: {searchMember}} = response
+              console.log(searchMember)
+            //   const result = response.data.paginateMembers
+            //   this.setState({
+            //       members: result.entries, 
+            //       sorted: result.entries,
+            //       totalEntries: result.totalEntries,
+            //       totalPages: result.totalPages,
+            //       pageNumber: result.pageNumber,
+            //       pageSize: result.pageSize,
+
+            //     })
+            }, error => console.log(error))
+        // const {loading, error, members} = useQuery(SEARCH_MEMBERS, 
+        //     {
+        //         variables: {searchTerm: value},
+        //         onError: (error) => {
+        //             console.log(error)
+        //         },
+        //         onCompleted: ({searchMember}) =>{
+        //             console.log(searchMember)
+        //             // setLoanTypes(loanTypes)
+    
+        //         },
+                
+        //     })
+        // const { data } = await client.query({
+        //     query: USERS_QUERY,
+        //     variables: { query: value, boardId: this.props.boardId }
+        // });
+        // this.setState({
+        //     dataSource: data ? data.users : []
+        // });
         }
-                <form>
-                <h5 className="ks-guarantordetail">Enter Loan Details</h5>
-                    <div className="row mt-5">
+    }
+    render(){
+
+        const {showGuarantorsForm, createLoan, setMode} = this.state
+        const Guarantorsform = () => {
+            return(
+                <div className="bg-grey mt-5 Ks-createloan">
+                     {/* {
+                setMode === 1 &&
+                <div className="p-4">
+                        <span onClick={() => this.setState({setMode: 1})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                </div>
+            } */}
+                    <form>
+                        <div className="ks-guarantorform-header">
+                            <h5>Enter Guarantor(s) Details</h5>
+                            <p className="ks-subheader">You are almost there...just provide us a few more information</p>
+                            <h6 className="ks-guarantor-label">First Guarantor</h6>
+                        </div>
+                        <div className="row mt-5">
+                        <div className="col-md-3">
+                            <label className="ks-label">Staff No</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="KW459CS12"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Full Name</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="Kwatmi Tyrone"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                                <label className="ks-label">Select your bank</label>
+                                <select className="ks-form-control form-control"
+                                    // value={status || ""}
+                                    // onChange={({ target }) => setStatus(target.value)} 
+                                >
+                                    <option>Select your bank</option>
+                                    <option value="2">Access Bank</option>
+                                    <option value="1">UBA</option>
+                                    <option value="0">Zenith Bank</option>
+                                </select>
+                            </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Account Number</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="00130000000"
+                                type="number"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        </div><div className="ks-guarantorform-header">
+                            <h6 className="ks-guarantor-label">Second Guarantor</h6>
+                        </div>
+                        <div className="row mt-5">
+                        <div className="col-md-3">
+                            <label className="ks-label">Staff No</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="KW459CS12"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Full Name</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="Kwatmi Tyrone"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                                <label className="ks-label">Select your bank</label>
+                                <select className="ks-form-control form-control"
+                                    // value={status || ""}
+                                    // onChange={({ target }) => setStatus(target.value)} 
+                                >
+                                    <option>Select your bank</option>
+                                    <option value="2">Access Bank</option>
+                                    <option value="1">UBA</option>
+                                    <option value="0">Zenith Bank</option>
+                                </select>
+                            </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Account Number</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="00130000000"
+                                type="number"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        </div>
+                        <div className="ks-guarantorform-header">
+                            <h6 className="ks-guarantor-label">Third Guarantor</h6>
+                        </div>
+                        <div className="row mt-5">
+                        <div className="col-md-3">
+                            <label className="ks-label">Staff No</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="KW459CS12"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Full Name</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="Kwatmi Tyrone"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-3">
+                                <label className="ks-label">Select your bank</label>
+                                <select className="ks-form-control form-control"
+                                    // value={status || ""}
+                                    // onChange={({ target }) => setStatus(target.value)} 
+                                >
+                                    <option>Select your bank</option>
+                                    <option value="2">Access Bank</option>
+                                    <option value="1">UBA</option>
+                                    <option value="0">Zenith Bank</option>
+                                </select>
+                            </div>
+                        <div className="col-md-3">
+                            <label className="ks-label">Account Number</label>
+                            <input className="ks-form-control form-control"
+                                placeholder="00130000000"
+                                type="number"
+                                // value={member_id || ""}
+                                //     onChange={({ target }) => setMemberId(target.value)}
+                                />
+                        </div>
+                        <div className="col-md-4 ks-guarantor-radio">
+                            <Radio
+                                value="default radio"
+                                // label="Accept Applicant's Undertaking"
+                                name="radio-default"
+                                testId="radio-default"
+                                isChecked={true}
+                                onChange={() => {}}
+                                />
+                                <p className="ks-guarantor-radio-text">Accept Applicant's Undertaking</p>
+                        </div>
+                        <div className="col-md-4 ks-guarantor-radio">
+                            <Radio
+                                value="default radio"
+                                // label="Accept Insurance Guarantee"
+                                name="radio-default"
+                                testId="radio-default"
+                                isChecked={false}
+                                onChange={() => {}}
+                                />
+                                <p className="ks-guarantor-radio-text">Accept Insurance Guarantee</p>
+                        </div>
+                        <div className="col-12">
+                                <button className="btn float-right mt-5" type="submit">
+                                    Apply for Loan
+                                {/* {
+                                     disabled={loading}
+                                    loading &&
+                                    <Spinner appearance="invert" size="medium"/>
+                                } */}
+                                {/* {createLoan == null ? "Create" : ""} */}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            )
+        }
+
+        return (
+            <div>
+            <div className="bg-grey Ks-createloan">
+                {/* {setMode === 1 && */}
+                <form onSubmit={(e) => submit(e)}>
+                <h5 className="ks-guarantorform-header">Enter Loan Details</h5>
+                <div className="row mt-5">
                     <div className="col-md-3">
                         <label className="ks-label">Staff No</label>
                         <input className="ks-form-control form-control"
                             placeholder="Pu459CS12 "
+                            onChange={({target}) => this.onSearchChange(target.value)}
+                            // onKeyDown={onSearchKeyDown}
                             // value={member_id || ""}
                             //     onChange={({ target }) => setMemberId(target.value)}
                             />
@@ -235,222 +406,10 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                             />
                     </div>
                     </div>
-                </form> <br></br>
-                <form>
-                    <div className="ks-guarantorform-header">
-                        <h5>Enter Guarantor(s) Details</h5>
-                        <p className="ks-subheader">You are almost there...just provide us a few more information</p>
-                        <h6 className="ks-guarantor-label">First Guarantor</h6>
-                    </div>
-                    <div className="row mt-5">
-                    <div className="col-md-3">
-                        <label className="ks-label">Staff No</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="KW459CS12"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Full Name</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="Kwatmi Tyrone"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                            <label className="ks-label">Select your bank</label>
-                            <select className="ks-form-control form-control"
-                                // value={status || ""}
-                                // onChange={({ target }) => setStatus(target.value)} 
-                            >
-                                <option>Select your bank</option>
-                                <option value="2">Access Bank</option>
-                                <option value="1">UBA</option>
-                                <option value="0">Zenith Bank</option>
-                            </select>
-                        </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Account Number</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="00130000000"
-                            type="number"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    </div><div className="ks-guarantorform-header">
-                        <h6 className="ks-guarantor-label">Second Guarantor</h6>
-                    </div>
-                    <div className="row mt-5">
-                    <div className="col-md-3">
-                        <label className="ks-label">Staff No</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="KW459CS12"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Full Name</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="Kwatmi Tyrone"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                            <label className="ks-label">Select your bank</label>
-                            <select className="ks-form-control form-control"
-                                // value={status || ""}
-                                // onChange={({ target }) => setStatus(target.value)} 
-                            >
-                                <option>Select your bank</option>
-                                <option value="2">Access Bank</option>
-                                <option value="1">UBA</option>
-                                <option value="0">Zenith Bank</option>
-                            </select>
-                        </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Account Number</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="00130000000"
-                            type="number"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    </div>
-                    <div className="ks-guarantorform-header">
-                        <h6 className="ks-guarantor-label">Third Guarantor</h6>
-                    </div>
-                    <div className="row mt-5">
-                    <div className="col-md-3">
-                        <label className="ks-label">Staff No</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="KW459CS12"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Full Name</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="Kwatmi Tyrone"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3">
-                            <label className="ks-label">Select your bank</label>
-                            <select className="ks-form-control form-control"
-                                // value={status || ""}
-                                // onChange={({ target }) => setStatus(target.value)} 
-                            >
-                                <option>Select your bank</option>
-                                <option value="2">Access Bank</option>
-                                <option value="1">UBA</option>
-                                <option value="0">Zenith Bank</option>
-                            </select>
-                        </div>
-                    <div className="col-md-3">
-                        <label className="ks-label">Account Number</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="00130000000"
-                            type="number"
-                            // value={member_id || ""}
-                            //     onChange={({ target }) => setMemberId(target.value)}
-                            />
-                    </div>
-                    <div className="col-md-3 ks-guarantor-radio">
-                        <Radio
-                            value="default radio"
-                            // label="Accept Applicant's Undertaking"
-                            name="radio-default"
-                            testId="radio-default"
-                            isChecked={true}
-                            onChange={() => {}}
-                            />
-                            <p className="ks-guarantor-radio-text">Accept Applicant's Undertaking</p>
-                    </div>
-                    <div className="col-md-3 ks-guarantor-radio">
-                        <Radio
-                            value="default radio"
-                            // label="Accept Insurance Guarantee"
-                            name="radio-default"
-                            testId="radio-default"
-                            isChecked={false}
-                            onChange={() => {}}
-                            />
-                            <p className="ks-guarantor-radio-text">Accept Insurance Guarantee</p>
-                    </div>
-                    <div className="col-12">
-                            <button className="btn float-right mt-5" type="submit">
-                                Apply for Loan
-                            {/* {
-                                 disabled={loading}
-                                loading &&
-                                <Spinner appearance="invert" size="medium"/>
-                            } */}
-                            {/* {createLoan == null ? "Create" : ""} */}
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        )
-    }
-
-    const checkBoxValue = (e,) => {
-        console.log(e)
-    }
-
-        return (
-            
-            <div className="Ks-createloan">
-                {/* {setMode === 1 && */}
-                <form onSubmit={(e) => submit(e)}>
-                <h5 className="ks-guarantorform-header">Enter Loan Details</h5>
-                <div className="row mt-5">
-                    <div className="col-md-3">
-                            <label className="ks-label">Staff ID</label>
-                            <input className="ks-form-control form-control"
-                                placeholder="e.g KASU001"
-                                value={member_id || ""}
-                                onChange={({ target }) => setMemberId(target.value)}
-                             />
-                    </div>
-                    <div className="col-md-3">
-                            <label className="ks-label">Loan Amount</label>
-                            <input className="ks-form-control form-control" 
-                                placeholder="e.g 10000"
-                                type="number"
-                                value={loan_amount || ""}
-                                onChange={({ target }) => setLoanAmount(target.value)}
-                            />
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">User ID</label>
-                            <input className="ks-form-control form-control"
-                                value={user_id || ""}
-                                placeholder="e.g KASU001"
-                                onChange={({ target }) => setUserid(target.value)}
-                             />
-                        </div>
-                        <div className="col-md-3">
-                            <label className="ks-label">Loan Type ID</label>
-                            <input className="ks-form-control form-control"
-                                type="number"
-                                value={loan_type_id || ""}
-                                placeholder="e.g 1"
-                                onChange={({ target }) => setLoanTypeId(target.value)}
-                             />
-                        </div>
-                    </div>
                     <div className="row mt-5">
                         <div className="col-12">
-                            <button className="btn float-right mt-1 " onClick={() => {setShowGuarantorsForm(true)}} type="submit">
+                            { !showGuarantorsForm &&
+                            <button className="btn float-right mt-1" onClick={() => this.setState({showGuarantorsForm: true})}  type="button">
                                 Next Step
                             {/* {
                                  disabled={loading}
@@ -458,17 +417,19 @@ const CreateLoan = ({ handleClick, selectedLoanType }) =>  {
                                 <Spinner appearance="invert" size="medium"/>
                             } */}
                             {createLoan == null ? "Create" : ""}</button>
+                            }
                         </div>
                     </div>
                 </form>
-                {/* } */}
+            </div>
+            
                 { showGuarantorsForm && 
                     <Guarantorsform />
                 }
-            
             </div>
            
         )
+    }
 }
 
 export default CreateLoan;

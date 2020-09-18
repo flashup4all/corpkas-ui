@@ -42,7 +42,7 @@ const LoanSettings = () => {
         <Tabs onSelect={(selected, selectedIndex) => selectTab(selected, selectedIndex)} tabs={tabs} />
       </div>
 
-      <div className="bg-grey mt-5">
+      <div className="mt-5">
         { seletedTab === 0 &&
           <Loans status="" showSearch={true}/>
         }

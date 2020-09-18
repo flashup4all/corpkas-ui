@@ -193,7 +193,7 @@ const ProfileSetting = ({memberData}) =>  {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
                             } */}
-                            EDIT PROFILE</button>
+                            UPDATE PROFILE</button>
                         </div>
                     </div>
                 </form>

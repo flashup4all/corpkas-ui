@@ -216,6 +216,31 @@ export const UPDATE_MEMBER = gql`
   }
 `;
 
+export const SEARCH_MEMBERS = gql`
+query ($searchTerm: String!){
+  searchMember(searchTerm: $searchTerm) {
+    
+    id
+    surname
+    other_names
+    email
+    phone_number
+    alt_phone_number
+    gender
+    avatar
+    dob
+    avatar
+    role
+    status
+    userId
+    staff_no
+    inserted_at
+    updated_at
+    membership_date
+  }
+}
+`;
+
 
 //loans
 export const GET_MEMBER_LOANS = gql`
