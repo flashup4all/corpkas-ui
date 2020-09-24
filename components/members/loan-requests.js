@@ -3,7 +3,7 @@ import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 
 import { GET_MEMBER_LOANS} from '../../gql/members'
-import { CREATE_LOAN, CREAT_LOANS_GUARANTOR, CREAT_LOAN_GUARANTOR } from '../../gql/loans'
+import { CREATE_LOAN, GET_LOAN_GUARANTORS, CREAT_LOAN_GUARANTOR } from '../../gql/loans'
 import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 import EmptyData from '../../layouts/empty';
@@ -90,6 +90,7 @@ class LoanRequests extends Component {
             appliedLoanGuarantors: [],
 
             payslip: null,
+            applied_payslip:'',
             loan_type_id: '',
             approved_amount: 0.0,
             loan_amount:0.0,
@@ -148,7 +149,8 @@ class LoanRequests extends Component {
                     insurance_charge: firstLoan.insurance_amount,
                     duration: firstLoan.duration,
                     reason: firstLoan.reason,
-                    total_deduction: firstLoan.total_deduction
+                    total_deduction: firstLoan.total_deduction,
+                    applied_payslip: firstLoan.payslip_url
                 })
                 this.getAppliedLoanGuarantors(firstLoan.id)
               }
@@ -258,7 +260,7 @@ class LoanRequests extends Component {
         const {appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
                 loan_type_id, reason, monthly_deduction, duration, loan_amount, is_insured, 
                 upfront_deduction, insurance_charge, upfront_deduction_charge, approved_amount, total_deduction,
-                monthly_net_income, loanGuarantors, payslip,
+                monthly_net_income, loanGuarantors, applied_payslip, payslip,
                 apply_loan_type_id, apply_loan_amount, apply_monthly_net_income, apply_reason, apply_loader
             } = this.state
         const approveLoan = (e) => {
@@ -424,6 +426,21 @@ class LoanRequests extends Component {
                                             <p className="text mt-5">We are currently working on your loan and we will get back to you soon with an offer. If you think this is taking longer than it should, feel free to leave us a follow up messgae.</p>
                                         </div>
                                     </div> */}
+                                    { applied_payslip !== null  && 
+                                        <div  className="col-md-3 ks-col">
+                                        <div className="d-flex form-card">
+                                            <div>
+                                            <img src={applied_payslip} style={{width: "50px",height: "56px"}}/>
+                                            </div>
+                                            <div className="form-card-p-con">
+                                                <p>
+                                                Payslip
+                                                </p>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                    }
                                     <div className="row justify-content-md-center mt-4 mb-4 col-md-12">
                                         { appliedLoanGuarantors &&
                                             appliedLoanGuarantors.map(guarantors => 
