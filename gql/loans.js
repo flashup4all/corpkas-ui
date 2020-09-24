@@ -219,18 +219,23 @@ mutation updateLoanSetting(
 
 export const CREATE_LOAN = gql`
   mutation createLoan(
+    $monthly_net_income: String!,
     $loan_amount: String!,
     $member_id: Int!,
     $user_id: Int!,
     $loan_type_id: Int!
+    $payslip_image: Upload!
   ) {
       createLoan(loan: {
+        payslip_image: $payslip_image,
       loan_amount: $loan_amount,
       member_id: $member_id,
       user_id: $user_id,
-      loan_type_id: $loan_type_id
+      loan_type_id: $loan_type_id,
+      monthly_net_income: $monthly_net_income
     }){
-        
+      id
+      payslip_url
       actual_amount
       amount_payable
       approved_date
@@ -364,6 +369,36 @@ query ($page: Int!){
 `;
 
 //loan guarantors
+export const CREAT_LOAN_GUARANTOR = gql`
+mutation createLoanGuarantor(
+  $member_id: Int!,
+  $loan_id: Int!,
+  $status: Int!
+){
+  createLoanGuarantor(loanGuarantor: {
+    status: $status
+		loan_id: $loan_id
+    member_id: $member_id
+  }){
+  
+    
+      id
+      status
+    	loan{
+        id
+      }
+    	member{
+        id
+      }
+    	member_id
+    loan_id
+  
+    	
+    	
+    
+  }
+}
+`
 export const GET_LOAN_GUARANTORS = gql`
 query ($loan_id: Int!){
   loanGuarantors(loan_id: $loan_id) {

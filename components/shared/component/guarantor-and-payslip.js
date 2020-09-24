@@ -31,13 +31,11 @@ class GuarantorAndPayslip extends Component {
 
     onSearchGuarantor = (value) => {
         if (value.length > 1) {
-        console.log(value)
             createApolloClient.query({
             query: SEARCH_MEMBERS,
             variables: {searchTerm: value}
           }).then(response => {
               let {data: {searchMember}} = response
-              console.log(searchMember)
               this.setState({ guarantorSuggestions: searchMember })
             }, error => console.log(error))
         }
@@ -47,7 +45,7 @@ class GuarantorAndPayslip extends Component {
         this.setState({
             payslip: URL.createObjectURL(files[0])
         })
-        this.props.onSelecPayslip(URL.createObjectURL(files[0])); 
+        this.props.onSelecPayslip(files[0]); 
     }
     
     
@@ -70,7 +68,6 @@ class GuarantorAndPayslip extends Component {
           this.setState({memberSuggestions: [], selectedMember: member, searchForMember: member.staff_no})
       }
       const selectGuarantor = (member) =>{
-          console.log(member)
         this.setState({guarantorSuggestions: [], selectedGuarantor: member, searchGuarantor: member.staff_no})
     }
       
@@ -106,7 +103,7 @@ class GuarantorAndPayslip extends Component {
              let list = loanGuarantors
              let gaurantor = selectedGuarantor
              list.push(gaurantor)
-             this.setState({loanGuarantors: list, selectedGuarantor: { surname: '', other_names: '', staff_no: '', searchGuarantor: ''}})
+             this.setState({loanGuarantors: list, selectedGuarantor: { surname: '', other_names: '', staff_no: '', searchGuarantor: null}})
              this.props.onSelectGuarantors(loanGuarantors); 
              return;
          }

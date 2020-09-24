@@ -30,7 +30,7 @@ class SingleUpload extends Component {
             <div className="mt-2">
                 { file == null &&
                     <div className="col">
-                        <label className="ks-label">Pay Slip</label>
+                        <label className="ks-label">Passport</label>
                         <input type="file" ref="file" onChange={({target}) => this.handleFileChange(target.files)}/>
                     </div>
                 }

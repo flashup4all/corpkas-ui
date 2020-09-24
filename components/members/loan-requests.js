@@ -3,7 +3,7 @@ import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 
 import { GET_MEMBER_LOANS} from '../../gql/members'
-import { CREATE_LOAN, GET_LOAN_GUARANTORS } from '../../gql/loans'
+import { CREATE_LOAN, CREAT_LOANS_GUARANTOR, CREAT_LOAN_GUARANTOR } from '../../gql/loans'
 import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 import EmptyData from '../../layouts/empty';
@@ -89,11 +89,12 @@ class LoanRequests extends Component {
             loanGuarantors: [],
             appliedLoanGuarantors: [],
 
-            payslip: '',
+            payslip: null,
             loan_type_id: '',
             approved_amount: 0.0,
             loan_amount:0.0,
             monthly_deduction: '',
+            
             upfront_deduction: null,
             upfront_deduction_charge:'',
             is_insured:'',
@@ -101,9 +102,15 @@ class LoanRequests extends Component {
             duration: '',
             reason: '',
             total_deduction: 0.0,
-            memberData: this.props.memberData
+            memberData: this.props.memberData,
+            apply_loan_type_id: '',
+            apply_loan_amount:0.0,
+            apply_reason: '',
+            apply_monthly_net_income: 0.0,
+            apply_loader: false,
+            apply_guarantors: []
+
         }
-        console.log(this.state.memberData)
         this.handleGuarantorList = this.handleGuarantorList.bind(this);
         this.handlePayslip = this.handlePayslip.bind(this);
         
@@ -124,11 +131,9 @@ class LoanRequests extends Component {
             fetchPolicy: 'no-cache'
           }).then(response => {
               let {data: {memberLoans}} = response
-              console.log(memberLoans)
               let firstLoan= memberLoans[0]
               if(firstLoan)
               {
-
                 this.setState({
                     memberLoans: memberLoans, 
                     sorted: memberLoans, 
@@ -168,9 +173,6 @@ class LoanRequests extends Component {
             variables: {loan_id: parseInt(id)}
           }).then(response => {
               let {data: {loanGuarantors}} = response
-              console.log(response)
-              console.log(loanGuarantors)
-
               this.setState({
                 appliedLoanGuarantors: loanGuarantors, 
                 })
@@ -178,29 +180,74 @@ class LoanRequests extends Component {
     }
 
 
-    resetForm = () => {
-        setLoanTypeId('')
-        setLoanAmount('')
-        setReason('')
-    }
-
-
     submit = async (e) => {
+        this.setState({apply_loader: true})
         e.preventDefault();
-        const { loanGuarantors, payslip} = this.state
+        const { loanGuarantors, payslip, apply_guarantors} = this.state
         if(payslip == null){
             swal("You must upload payslip", {icon:'error'})
         }
-        console.log(getUser())
-        console.log(loanGuarantors)
-        console.log(payslip)
-        // this.createLoan({variables:{loan_type_id: parseInt(loan_type_id), loan_amount, member_id: memberData.id, user_id: parseInt(getUser().id), reason }})
+        if(loanGuarantors.length == 0){
+            swal("You must provide 2  guarantors", {icon:'error'})
         }
+        const {apply_monthly_net_income, apply_loan_amount, apply_loan_type_id, apply_reason, memberData} = this.state
+        createApolloClient.mutate({
+            mutation: CREATE_LOAN,
+            variables:{
+                loan_type_id: parseInt(apply_loan_type_id), 
+                monthly_net_income: apply_monthly_net_income,
+                loan_amount: apply_loan_amount, member_id: memberData.id, 
+                user_id: parseInt(getUser().id),
+                reason: apply_reason,
+                payslip_image: payslip,
+            }
+        }).then(response => {
+            let {data: {createLoan}} = response
+            loanGuarantors.map(x => {
+                createApolloClient.mutate({
+                    mutation: CREAT_LOAN_GUARANTOR,
+                    variables: {loan_id: parseInt(createLoan.id), member_id: parseInt(x.id), status: 0}
+                }).then(res => {
+                    let {data: {createLoanGuarantor}} = res
+                    console.log(createLoanGuarantor)
+
+                }, error => console.log(error))
+            })
+            swal("Loan Application Successful! awaiting approval", {
+                icon: "success",
+            });
+            this.resetApplyForm()
+            this.setState({apply_loader: false})
+
+          }, error => { 
+            this.setState({apply_loader: false})
+            console.log(error)
+          })
+    }
+
+    resetApplyForm()
+    {
+        this.setState({
+            apply_loan_type_id: '',
+            apply_loan_amount:0.0,
+            apply_reason: '',
+            apply_monthly_net_income: 0.0,
+            apply_loader: false,
+            apply_guarantors: [],
+            loanGuarantors: [],
+            payslip: null
+        })
+    }
     
     handleGuarantorList(list)
     {
-        console.log(list)
-        this.setState({loanGuarantors: list})
+        
+        const { memberData} = this.state
+        let newList = list
+        let validList = []
+        list.map(x => validList.push({member_id: x.id, status: 0}))
+        console.log(validList)
+        this.setState({loanGuarantors: list, apply_guarantors: validList})
 
     }
     handlePayslip(payslip){
@@ -210,7 +257,10 @@ class LoanRequests extends Component {
     render(){
         const {appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
                 loan_type_id, reason, monthly_deduction, duration, loan_amount, is_insured, 
-                upfront_deduction, insurance_charge, upfront_deduction_charge, approved_amount, total_deduction} = this.state
+                upfront_deduction, insurance_charge, upfront_deduction_charge, approved_amount, total_deduction,
+                monthly_net_income, loanGuarantors, payslip,
+                apply_loan_type_id, apply_loan_amount, apply_monthly_net_income, apply_reason, apply_loader
+            } = this.state
         const approveLoan = (e) => {
             e.preventDefault();
             console.log(getUser())
@@ -218,6 +268,11 @@ class LoanRequests extends Component {
             console.log(upfront_deduction)
             console.log(is_insured)
             console.log(insurance_charge)
+        }
+
+        const checkValidApplication = () => {
+
+            return (apply_monthly_net_income && loanGuarantors.length > 0 && apply_loan_type_id && apply_loan_amount && payslip)
         }
 
         const declineLoan = () =>{
@@ -408,7 +463,6 @@ class LoanRequests extends Component {
                                             onChange={({ target }) => setLoanAmount(target.value)}
                                         />
                                     </div> */}
-
                                     <div className="col-12">
                                     <button className="btn float-left mt-5 btn-danger " type="button" onClick={() => declineLoan()}>
                                         {/* disabled={loading} */}
@@ -455,12 +509,12 @@ class LoanRequests extends Component {
                         </p>
                     
                         <form onSubmit={this.submit}>
-                            <div className="row mt-5 white">
+                            <div className="row mt-5">
                                 <div className="col-md-3">
                                     <label className="ks-label">Type of Loan</label>
                                     <select className="ks-form-control form-control" 
-                                        value={loan_type_id || ""}
-                                        onChange={({ target }) => this.setState({ loan_type_id :target.value})}
+                                        value={apply_loan_type_id || ""}
+                                        onChange={({ target }) => this.setState({ apply_loan_type_id :target.value})}
                                         >
                                         <option value="">Options</option>
                                         {
@@ -474,28 +528,43 @@ class LoanRequests extends Component {
                                     <label className="ks-label">Loan Amount</label>
                                     <input className="ks-form-control form-control"
                                     placeholder="E.g 500000 "
-                                        value={monthly_deduction || ""}
-                                        onChange={({ target }) => this.setState({monthly_deduction: target.value})}
+                                        value={apply_loan_amount || ""}
+                                        onChange={({ target }) => this.setState({apply_loan_amount: target.value})}
                                     />
                                 </div>
-                                <div className="col-md-4">
+                                <div className="col-md-3">
+                                    <label className="ks-label">Current Monthly Salary</label>
+                                    <input className="ks-form-control form-control"
+                                    placeholder="E.g 500000 "
+                                        value={apply_monthly_net_income || ""}
+                                        onChange={({ target }) => this.setState({apply_monthly_net_income: target.value})}
+                                    />
+                                </div>
+                                <div className="col-md-3">
                                     <label className="ks-label">Reason</label>
                                     <input className="ks-form-control form-control"
-                                        value={reason || ""}
+                                        value={apply_reason || ""}
                                         placeholder="Reason for Application"
-                                        onChange={({ target }) => this.setState({ reason: target.value})}
+                                        onChange={({ target }) => this.setState({ apply_reason: target.value})}
                                     />
                                 </div>
-                                <div className="col-md-2">
-                                    <button className="btn float-right mt-5 " type="submit">APPLY</button>
-                                </div>
+                                <div className="col-md-12">
+                                {
+                                    memberData &&
+                                    <GuarantorAndPayslip selectedMember={memberData} onSelectGuarantors={this.handleGuarantorList} onSelecPayslip={this.handlePayslip}/>
+                                }
+                                   
+                                </div>  
+                                <div className="col-md-12">
+                                        <button disabled={!checkValidApplication() || apply_loader} className="btn float-right mt-5 " type="submit">
+                                            {
+                                                apply_loader &&
+                                                <Spinner appearance="invert" size="medium"/>
+                                            }
+                                        APPLY</button>
+                                    </div>
                             </div>
-                            <div className="">
-                            {
-                                memberData &&
-                                <GuarantorAndPayslip selectedMember={memberData} onSelectGuarantors={this.handleGuarantorList} onSelecPayslip={this.handlePayslip}/>
-                            }
-                            </div>
+                            
                         </form>
                     </div>
                 }

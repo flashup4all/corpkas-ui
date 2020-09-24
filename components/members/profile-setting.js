@@ -248,12 +248,12 @@ const ProfileSetting = ({memberData}) =>  {
                         }
                         
                         <div className="col-12">
-                            <button className="btn float-right mt-5 " type="submit">
-                            {/* disabled={loading} 
+                            <button className="btn float-right mt-5 "  disabled={loading}  type="submit">
+                            
                             {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
-                            } */}
+                            }
                             UPDATE PROFILE</button>
                         </div>
                     </div>
