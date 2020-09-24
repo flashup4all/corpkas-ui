@@ -13,6 +13,7 @@ query ($page: Int){
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -48,6 +49,7 @@ query ($id: Int!){
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -78,6 +80,7 @@ query {
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -148,7 +151,7 @@ export const CREATE_MEMBER = gql`
         gender
         avatar
         dob
-        avatar
+        avatar_url
         role
         status
         userId
@@ -166,7 +169,7 @@ export const UPDATE_MEMBER = gql`
   mutation updateMember(
       $staff_no: String, $surname: String, 
       $other_names: String, $role: String,
-      $dob: String!,$gender: String, 
+      $dob: String, $gender: String, 
       $status: String,$email: String, 
       $alt_phone_number: String,
       $dept: String,
@@ -174,6 +177,7 @@ export const UPDATE_MEMBER = gql`
       $current_monthly_income: String,
       $membership_date: String,
       $rank: String,
+      $image: Upload!,
       $phone_number: String, $id: Int!) {
         updateMember(member: {
         email: $email,
@@ -188,6 +192,7 @@ export const UPDATE_MEMBER = gql`
         gender: $gender,
         rank: $rank,
         dept: $dept,
+        image: $image,
         monthly_contribution: $monthly_contribution,
         current_monthly_income: $current_monthly_income,
         membership_date: $membership_date
@@ -200,9 +205,35 @@ export const UPDATE_MEMBER = gql`
         phone_number
         alt_phone_number
         gender
-        avatar
         dob
         avatar
+        avatar_url
+        role
+        status
+        userId
+        staff_no
+        inserted_at
+        updated_at
+        membership_date
+           
+        
+      }
+  }
+`;
+export const UPDATE_MEMBER_AVATAR = gql`
+  mutation uploadMemberAvatar($image: Upload!, $id: Int!) {
+        uploadMemberAvatar(image: $image, id: $id){
+        
+        id
+        surname
+        other_names
+        email
+        phone_number
+        alt_phone_number
+        gender
+        dob
+        avatar
+        avatar_url
         role
         status
         userId
@@ -229,7 +260,8 @@ query ($searchTerm: String!){
     gender
     avatar
     dob
-    avatar
+    dept
+    avatar_url
     role
     status
     userId
@@ -269,6 +301,7 @@ query ($member_id: Int!, $status: Int){
     member_id
     user_id
     due_date
+    reason
     approved_date
     inserted_at
     updated_at
@@ -343,6 +376,7 @@ export const FILTER_MEMBERS = gql`
         altPhoneNumber
         current_balance
         avatar
+        avatar_url
         monthly_contribution
         current_monthly_income
         dept

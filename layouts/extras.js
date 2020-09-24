@@ -38,6 +38,7 @@ export const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
         { props.type == 'moved' && <Lozenge appearance="moved">{props.title}</Lozenge> }
         { props.type == 'inprogress' && <Lozenge appearance="inprogress" isBold>{props.title}</Lozenge> }
         { props.type == 'removed' && <Lozenge appearance="removed" isBold>{props.title}</Lozenge> }
+        { props.type == '_removed' && <Lozenge appearance="removed">{props.title}</Lozenge> }
         { props.type == 'default' && <Lozenge isBold>{props.title}</Lozenge> }
     </span>
     );

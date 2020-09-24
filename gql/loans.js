@@ -258,6 +258,7 @@ export const CREATE_LOAN = gql`
   }
 `;
 
+
 export const FILTER_LOANS = gql`
   mutation filterLoans(
     $member_id: Int,
@@ -359,5 +360,31 @@ query ($page: Int!){
     total_pages
     total_entries
   }
+}
+`;
+
+//loan guarantors
+export const GET_LOAN_GUARANTORS = gql`
+query ($loan_id: Int!){
+  loanGuarantors(loan_id: $loan_id) {
+    id
+    loan {
+      id
+      loanAmount
+    }
+    member{
+      id
+      surname
+      otherNames
+      avatar
+      avatar_url
+      staff_no
+    }
+    memberId
+      loanId
+    comment
+    status
+
+    }
 }
 `;

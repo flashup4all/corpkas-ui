@@ -794,3 +794,37 @@ thead {
 	color: #253858;
 	padding: 0 0 1.5625em;
 }
+
+.form-card {
+	background: #ffffff;
+	border: 1px solid #deebff;
+	box-sizing: border-box;
+	border-radius: 3px;
+	/* width: 480px; */
+	padding: 8px;
+}
+.form-card-p-con{
+	width: 100%;
+}
+.form-card-p-con p{
+	margin: 0 8px;
+	
+}
+
+.form-card-img{
+	border-radius: 50%;
+}
+
+.btn-col{
+	margin-top: 42px;
+}
+
+.control-div{
+	background: #e9ecef;
+    border: 2px solid #DFE1E6;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 3px;
+	height: calc(1.5em + .75rem + 2px);
+	padding: 4px;
+}

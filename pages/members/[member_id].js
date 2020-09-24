@@ -53,7 +53,11 @@ const MemberProfile = () => {
       <div>
         <div className="individual-card d-flex mb-5">
           <div className="individual-card_img">
-            <img src="/cards-icons/avata.png" alt=""></img>
+            { memberData.avatar ?
+              <img src={memberData.avatar_url} alt="" style={{width:'160px', height:'160px', borderRadius: '50%'}}></img>
+            :
+              <img src="/cards-icons/avata.png" alt=""></img>
+            }
           </div>
           <div className="individual-card_des">
             <p>Available Balance</p>
