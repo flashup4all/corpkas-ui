@@ -426,22 +426,23 @@ class LoanRequests extends Component {
                                             <p className="text mt-5">We are currently working on your loan and we will get back to you soon with an offer. If you think this is taking longer than it should, feel free to leave us a follow up messgae.</p>
                                         </div>
                                     </div> */}
-                                    { applied_payslip !== null  && 
-                                        <div  className="col-md-3 ks-col">
-                                        <div className="d-flex form-card">
-                                            <div>
-                                            <img src={applied_payslip} style={{width: "50px",height: "56px"}}/>
-                                            </div>
-                                            <div className="form-card-p-con">
-                                                <p>
-                                                Payslip
-                                                </p>
-                                            </div>
-                                            
-                                        </div>
-                                    </div>
-                                    }
+                                    
                                     <div className="row justify-content-md-center mt-4 mb-4 col-md-12">
+                                        { applied_payslip !== null  && 
+                                            <div  className="col-md-3 ks-col">
+                                            <div className="d-flex form-card">
+                                                <div>
+                                                <img src={applied_payslip} style={{width: "50px",height: "56px"}}/>
+                                                </div>
+                                                <div className="form-card-p-con">
+                                                    <p>
+                                                    Payslip
+                                                    </p>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        }
                                         { appliedLoanGuarantors &&
                                             appliedLoanGuarantors.map(guarantors => 
                                                 <div key={guarantors.id} className="col-md-3 ks-col">
