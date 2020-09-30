@@ -1,7 +1,7 @@
 import React, { Component, useState } from 'react';
 import { createApolloClient } from '../../lib/apolloClient'
 
-import { CREATE_LOAN, LOAN_TYPES } from '../../gql/loans'
+import { CREATE_LOAN, LOAN_TYPES, CREAT_LOAN_GUARANTOR } from '../../gql/loans'
 import { getUser } from '../../components/shared/local'
 import { Radio } from '@atlaskit/radio';
 import Spinner from '@atlaskit/spinner';
@@ -10,6 +10,8 @@ import Autosuggest from 'react-autosuggest';
 import { Checkbox } from '@atlaskit/checkbox';
 import { SEARCH_MEMBERS } from '../../gql/members'
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+import GuarantorAndPayslip from '../../components/shared/component/guarantor-and-payslip';
+import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
 
 import swal from '@sweetalert/with-react'
 
@@ -33,6 +35,8 @@ class CreateLoan extends Component {
             guarantorBankId: '',
             loanAmount:'',
             loanTypeId: '',
+            monthlyNet: '',
+            reason: '',
             selectedMember: null,
             searchForMember:'',
             searchGuarantor:'',
@@ -47,7 +51,10 @@ class CreateLoan extends Component {
             setMode: 0,
             loanTypes:[],
             selectedLoanType:{},
+            apply_loader: false
         }
+        this.handleGuarantorList = this.handleGuarantorList.bind(this);
+        this.handlePayslip = this.handlePayslip.bind(this);
     }
     componentDidMount()
     {
@@ -119,22 +126,27 @@ class CreateLoan extends Component {
         }
     }
 
-    onSearchGuarantor = (value) => {
-        if (value.length > 1) {
-        console.log(value)
-            createApolloClient.query({
-            query: SEARCH_MEMBERS,
-            variables: {searchTerm: value}
-          }).then(response => {
-              let {data: {searchMember}} = response
-              console.log(searchMember)
-              this.setState({ guarantorSuggestions: searchMember })
-            }, error => console.log(error))
-        }
+    handleGuarantorList(list)
+    {
+        let validList = []
+        list.map(x => validList.push({member_id: x.id, status: 0}))
+        this.setState({loanGuarantors: list})
+
     }
-    handleFileChange(files) {
+    handlePayslip(payslip){
+        this.setState({payslip: payslip})
+    }
+    resetApplyForm()
+    {
         this.setState({
-            payslip: URL.createObjectURL(files[0])
+            loanTypeId: null,
+            monthlyNet:0.0,
+            loanAmount: '',
+            reason: false,
+            payslip: null,
+            loanGuarantors: [],
+            payslip: null,
+            selectedMember: null
         })
     }
 
@@ -150,7 +162,7 @@ class CreateLoan extends Component {
             guarantorAccountNo, guarantorBankId, loanGuarantors, showGuarantorsForm, 
             createLoan, setMode, memberSuggestions, selectedMember, member_staff_no, 
             searchForMember,searchGuarantor, guarantorSuggestions, selectedGuarantor, 
-            loanTypes, selectedLoanType, loanAmount, loanTypeId, payslip} 
+            loanTypes, selectedLoanType, loanAmount, loanTypeId,reason, monthlyNet, payslip, apply_loader} 
             = this.state
 
     const selectMember = (member) =>{
@@ -169,43 +181,7 @@ class CreateLoan extends Component {
         return (staff_no && surname && other_names && id)
       }
     const checkValidApplication = () => {
-        const { staff_no, surname, other_names, id} = selectedGuarantor
-        return (loanGuarantors.length > 0 && loanTypeId && loanAmount)
-    }
-    const addGuarantor = () =>
-    {
-        if(selectedMember==null)
-        {
-            swal("Please fill the loan details form above!", {
-                icon: "error",
-            });
-            return;
-        }
-        if(selectedGuarantor.id == selectedMember.id)
-        {
-            swal("You cannot guarantee yourself!", {
-                icon: "error",
-            });
-            return;
-        }
-        if(loanGuarantors.length < 2)
-        {
-            if(loanGuarantors.find(g => g.id == selectedGuarantor.id))
-            {
-                swal("This Guarantor has been already been added!", {
-                    icon: "error",
-                });
-                return
-            }
-             let list = loanGuarantors
-             let gaurantor = selectedGuarantor
-             list.push(gaurantor)
-             this.setState({loanGuarantors: list, selectedGuarantor: { surname: '', other_names: '', staff_no: '', searchGuarantor: ''}})
-             return;
-         }
-         swal("2 Guarantors is ok!", {
-             icon: "error",
-         });
+        return (loanGuarantors.length > 0 && loanTypeId && loanAmount && monthlyNet && payslip && selectedMember)
     }
     const applyForLoan = () => {
         if(loanGuarantors.length < 2){
@@ -218,14 +194,60 @@ class CreateLoan extends Component {
         console.log(loanAmount)
         console.log(loanTypeId)
         console.log(payslip)
+
+        if(payslip == null){
+            swal("You must upload payslip", {icon:'error'})
+        }
+        if(loanGuarantors.length == 0){
+            swal("You must provide 2  guarantors", {icon:'error'})
+        }
+        swal({
+            title: "Are you sure?",
+            text: "Application cannot be undone!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((yes) => {
+            if (yes) {
+                this.setState({apply_loader: true})
+                createApolloClient.mutate({
+                    mutation: CREATE_LOAN,
+                    variables:{
+                        loan_type_id: parseInt(loanTypeId), 
+                        monthly_net_income: monthlyNet,
+                        loan_amount: loanAmount, member_id: selectedMember.id, 
+                        user_id: parseInt(getUser().id),
+                        reason: reason,
+                        payslip_image: payslip,
+                    }
+                }).then(response => {
+                    let {data: {createLoan}} = response
+                    loanGuarantors.map(x => {
+                        createApolloClient.mutate({
+                            mutation: CREAT_LOAN_GUARANTOR,
+                            variables: {loan_id: parseInt(createLoan.id), member_id: parseInt(x.id), status: 0}
+                        }).then(res => {
+                            let {data: {createLoanGuarantor}} = res
+        
+                        }, error => console.log(error))
+                    })
+                    swal("Loan Application Successful! awaiting approval", {
+                        icon: "success",
+                    });
+                    this.resetApplyForm()
+                    this.setState({apply_loader: false})
+        
+                  }, error => { 
+                    this.setState({apply_loader: false})
+                  })
+            } else {
+              swal("Your imaginary file is safe!");
+            }
+          });
     }
     
-
-        // const Guarantorsform = () => {
-        //     return(
-                
-        //     )
-        // }
+    
 
         return (
             <div>
@@ -274,6 +296,23 @@ class CreateLoan extends Component {
                             />
                     </div>
                     <div className="col-md-3">
+                        <label className="ks-label">Monthly Net Income</label>
+                        <input className="ks-form-control form-control"
+                            placeholder="120,000"
+                            type="number"
+                            value={monthlyNet || ""}
+                                onChange={({ target }) => this.setState({monthlyNet: target.value})}
+                            />
+                    </div>
+                    <div className="col-md-3">
+                        <label className="ks-label">Reason</label>
+                        <input className="ks-form-control form-control"
+                            placeholder=""
+                            value={reason || ""}
+                                onChange={({ target }) => this.setState({reason: target.value})}
+                            />
+                    </div>
+                    <div className="col-md-3">
                         <label className="ks-label">Period of Payment (months)</label>
                         <div className="control-div">
                             {selectedLoanType.duration} 
@@ -286,64 +325,26 @@ class CreateLoan extends Component {
                             <div className="col-md-3">
                                 <label className="ks-label">Staff No.</label>
                                 <div className="control-div">{selectedMember.staff_no} </div>
-                                {/* <input className="ks-form-control form-control"
-                                    placeholder="09000000000"
-                                    disabled
-                                    type="number"
-                                    value={selectedMember.phone_number || ""}
-                                    /> */}
                             </div>
                             <div className="col-md-3">
                                 <label className="ks-label">Full name</label>
                                 <div className="control-div">{selectedMember.surname} {selectedMember.other_names} </div>
-                                {/* <input className="ks-form-control form-control"
-                                    placeholder="Agada Purest"
-                                    disabled
-                                    defaultValue={selectedMember.surname|| ""}
-                                    /> */}
                             </div>
                             <div className="col-md-3">
                                 <label className="ks-label">Department</label>
                                 <div className="control-div">{selectedMember.dept} </div>
-                                {/* <input className="ks-form-control form-control"
-                                    placeholder="Agada Purest"
-                                    disabled
-                                    defaultValue={selectedMember.dept || ""}
-                                    /> */}
                             </div>
                             <div className="col-md-3">
                                 <label className="ks-label">Membership Number</label>
-                                <div className="control-div">{selectedMember.membership_date} </div>
-                                {/* <input className="ks-form-control form-control"
-                                    placeholder="Agada Purest"
-                                    disabled
-                                    defaultValue={selectedMember.membership_date || ""}
-                                    /> */}
+                                <div className="control-div">{ selectedMember.membership_date && ShortDate(selectedMember.membership_date)} </div>
                             </div>
                         </>
                     }
-                    
-                    {/* <div className="col-md-3">
-                            <label className="ks-label">Select your bank</label>
-                            <select className="ks-form-control form-control"
-                            >
-                                <option value="">Access Bank </option>
-                                <option value="1">UBA</option>
-                                <option value="0">Zenith Bank</option>
-                            </select>
-                        </div>
-                        <div className="col-md-3">
-                        <label className="ks-label">Account Number</label>
-                        <input className="ks-form-control form-control"
-                            placeholder="18 months"
-                            type="number"
-                            />
-                    </div> */}
                     </div>
                     <div className="row mt-5">
                         <div className="col-12">
                             { !showGuarantorsForm &&
-                            <button className="btn float-right mt-1" onClick={() => this.setState({showGuarantorsForm: true})}  type="button">
+                            <button className="btn float-right mt-1" disabled={!selectedMember} onClick={() => this.setState({showGuarantorsForm: true})}  type="button">
                                 Next Step
                             {/* {
                                  disabled={loading}
@@ -358,15 +359,13 @@ class CreateLoan extends Component {
             </div>
             
                 { showGuarantorsForm && 
-                    <div className="bg-grey mt-5 Ks-createloan">
-                    {/* {
-               setMode === 1 &&
-               <div className="p-4">
-                       <span onClick={() => this.setState({setMode: 1})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
-               </div>
-           } */}
-                   <form>
-                       <div className="ks-guarantorform-header">
+                    <>
+                    {
+                        selectedMember &&
+                        <GuarantorAndPayslip selectedMember={selectedMember} onSelectGuarantors={this.handleGuarantorList} onSelecPayslip={this.handlePayslip}/>
+                    }
+
+                       {/* <div className="ks-guarantorform-header">
                            <h5>Enter Guarantor(s) Details</h5>
                            <p className="ks-subheader">You are almost there...just provide us a few more information</p>
                            <h6 className="ks-guarantor-label">Guarantor</h6>
@@ -378,7 +377,6 @@ class CreateLoan extends Component {
                            placeholder="Pu459CS12 "
                            defaultValue={searchGuarantor || ""}
                            onChange={({target}) => this.onSearchGuarantor(target.value)}
-                           // onKeyDown={onSearchKeyDown}
                            />
                            
                            <ul>
@@ -394,32 +392,7 @@ class CreateLoan extends Component {
                        <div className="col-md-3 ks-col">
                            <label className="ks-label">Full Name</label>
                         <div className="control-div">{selectedGuarantor.surname}  {selectGuarantor.other_names}</div>
-                           {/* <input className="ks-form-control form-control" disabled
-                               placeholder=""
-                               defaultValue={selectedGuarantor.surname+' '+ selectedGuarantor.other_names || ""}
-                               /> */}
                        </div>
-                       {/* <div className="col-md-3">
-                               <label className="ks-label">Select your bank</label>
-                               <select className="ks-form-control form-control"
-                                   value={guarantorBankId || ""}
-                                   onChange={({ target }) => this.setState({guarantorBankId: target.value})} 
-                               >
-                                   <option>Select your bank</option>
-                                   <option value="2">Access Bank</option>
-                                   <option value="1">UBA</option>
-                                   <option value="0">Zenith Bank</option>
-                               </select>
-                           </div>
-                       <div className="col-md-3">
-                           <label className="ks-label">Account Number</label>
-                           <input className="ks-form-control form-control"
-                               placeholder="00130000000"
-                               type="text"
-                               value={guarantorAccountNo || ""}
-                               onChange={({ target }) => this.setState({guarantorAccountNo: target.value})} 
-                               />
-                       </div> */}
                        <div className="col-md-3 ks-col">
                            <button  disabled={!checkValidGuarantors(selectedGuarantor)} className="btn btn-col" onClick={() => addGuarantor()} 
                                 type="button">
@@ -430,18 +403,10 @@ class CreateLoan extends Component {
                             <div className="col-md-3">
                                 <label className="ks-label">Pay Slip</label>
                                 <input type="file" ref="file" onChange={({target}) => this.handleFileChange(target.files)}/>
-                                {/* <input
-                                    id="files"
-                                    type="file"
-                                    multiple
-                                    required
-                                    onChange={({target: {validity, files}}) =>
-                                    validity.valid && this.uploadFile({variables: {files}})
-                                    }/> */}
                             
                             </div>
-                       </div>
-                       <div className="row justify-content-md-center mt-4">
+                       </div> */}
+                       {/* <div className="row justify-content-md-center mt-4">
                        { payslip !== null  && 
                             <div  className="col-md-3 ks-col">
                             <div className="d-flex form-card">
@@ -487,107 +452,17 @@ class CreateLoan extends Component {
                            })
                        }
                        
-                       </div>
+                       </div> */}
                        <div className="ks-col">
-                           <button  disabled={!checkValidApplication()} className="btn float-right btn-col" onClick={() => applyForLoan()} type="button">
-                               Apply For Loan</button>
+                           <button  disabled={!checkValidApplication() || apply_loader} className="btn float-right btn-col" onClick={() => applyForLoan()} type="button">
+                            {
+                                apply_loader &&
+                                <Spinner appearance="invert" size="medium"/>
+                            }
+                            APPLY FOR LOAN</button>
                        </div>
-                       {/* <div className="ks-guarantorform-header">
-                           <h6 className="ks-guarantor-label">Second Guarantor</h6>
-                       </div>
-                       <div className="row mt-5">
-                           <div className="col-md-3">
-                               <label className="ks-label">Staff No</label>
-                               <input className="ks-form-control form-control"
-                                   placeholder="KW459CS12"
-                                   />
-                           </div>
-                           <div className="col-md-3">
-                               <label className="ks-label">Full Name</label>
-                               <input className="ks-form-control form-control"
-                                   placeholder="Kwatmi Tyrone"
-                                   />
-                           </div>
-                           <div className="col-md-3">
-                                   <label className="ks-label">Select your bank</label>
-                                   <select className="ks-form-control form-control"
-                                   >
-                                       <option>Select your bank</option>
-                                       <option value="209">Access Bank</option>
-                                       <option value="089">UBA</option>
-                                       <option value="024">Zenith Bank</option>
-                                   </select>
-                               </div>
-                           <div className="col-md-3">
-                               <label className="ks-label">Account Number</label>
-                               <input className="ks-form-control form-control"
-                                   placeholder="00130000000"
-                                   type="number"
-                               
-                                   />
-                           </div>
-                       </div> */}
-                       {/* <div className="ks-guarantorform-header">
-                           <h6 className="ks-guarantor-label">Third Guarantor</h6>
-                       </div>
-                       <div className="row mt-5">
-                       <div className="col-md-3">
-                           <label className="ks-label">Staff No</label>
-                           <input className="ks-form-control form-control"
-                               placeholder="KW459CS12"
-                               />
-                       </div>
-                       <div className="col-md-3">
-                           <label className="ks-label">Full Name</label>
-                           <input className="ks-form-control form-control"
-                               placeholder="Kwatmi Tyrone"
-                               />
-                       </div>
-                       <div className="col-md-3">
-                               <label className="ks-label">Select your bank</label>
-                               <select className="ks-form-control form-control"
-                               >
-                                   <option>Select your bank</option>
-                                   <option value="2">Access Bank</option>
-                                   <option value="1">UBA</option>
-                                   <option value="0">Zenith Bank</option>
-                               </select>
-                           </div>
-                       <div className="col-md-3">
-                           <label className="ks-label">Account Number</label>
-                           <input className="ks-form-control form-control"
-                               placeholder="00130000000"
-                               type="number"
-                               />
-                       </div>
-                       <div className="col-md-4 ks-guarantor-radio">
-                           <Radio
-                               value="default radio"
-                               name="radio-default"
-                               testId="radio-default"
-                               isChecked={true}
-                               onChange={() => {}}
-                               />
-                               <p className="ks-guarantor-radio-text">Accept Applicant's Undertaking</p>
-                       </div>
-                       <div className="col-md-4 ks-guarantor-radio">
-                           <Radio
-                               value="default radio"
-                               name="radio-default"
-                               testId="radio-default"
-                               isChecked={false}
-                               onChange={() => {}}
-                               />
-                               <p className="ks-guarantor-radio-text">Accept Insurance Guarantee</p>
-                       </div>
-                       <div className="col-12">
-                               <button className="btn float-right mt-5" type="submit">
-                                   Apply for Loan
-                               </button>
-                           </div>
-                       </div> */}
-                   </form>
-               </div>
+
+               </>
                 }
             </div>
            

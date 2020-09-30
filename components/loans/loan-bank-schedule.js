@@ -12,6 +12,8 @@ import { FILTER_LOANS, GET_LOANS } from '../../gql/loans';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 import AvatarGroup from '@atlaskit/avatar-group';
+import { ShortDate, FormatCurrency } from '../../components/shared/utils';
+import swal from 'sweetalert';
 
 const RANDOM_USERS = [
     {id: 1, name: "john"},
@@ -25,6 +27,7 @@ class LoanBankSchedule extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             loans: [],
+            scheduleForm: [{member_id: '', loan_id: '', new_amount_payable: ''}],
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
@@ -46,12 +49,12 @@ class LoanBankSchedule extends Component {
 
     componentDidMount()
     {
-        if(this.props.status)
-        {
-            this.filterLoans({status: parseInt(this.props.status)})
-        }else{
-            this.getTransactions()
-        }
+        // if(this.props.status)
+        // {
+            this.filterLoans({status: 1, loan_payment_status: 0, })
+        // }else{
+        //     this.getTransactions()
+        // }
         
         // this.getMemberTotals()
     }
@@ -93,15 +96,21 @@ class LoanBankSchedule extends Component {
                 })
             }, error => console.log(error))
     }
-    getMemberTotals(page = 1)
-    {
-        createApolloClient.query({
-            query: GET_MEMBER_TOTALS,
-          }).then(response => {
-              this.setState({memberTotals: response.data.memberTotals})
-            }, error => console.log(error))
-    }
-    
+    handleScheduleFormChange = (value,index) => {
+        const newShareholders = this.state.sorted.map((loan, idx) => {
+          if (idx !== index) return loan;
+          if(parseFloat(value) > parseFloat(loan.balance_payable) ){
+            //   swal("Amount cant be more than Amount Payable")
+              console.log(loan.balance_payable)
+              return { ...loan, balance_payable: loan.balance_payable };
+          }else{
+            return { ...loan, new_amount_payable: value };
+          }
+        });
+        console.log(newShareholders)
+        this.setState({ sorted: newShareholders });
+        
+      };
     paginate(e, page, analyticsEvent){
         this.getTransactions(page)
       }
@@ -129,7 +138,6 @@ class LoanBankSchedule extends Component {
             filter_to ? variables.to = new Date(filter_to)  : null
             filter_txn_type ? variables.txn_type = parseInt(filter_txn_type) : null
             filter_status ? variables.status = parseInt(filter_status) : null
-            // variables.member_id =  this.state.memberData.id
             this.filterLoans(variables)
         }
     }
@@ -147,6 +155,7 @@ class LoanBankSchedule extends Component {
                  {this.props.showSearch && 
                     <div style={{padding:'20px'}}>
                         <div className="row">
+
                             <div className="col-md-3 ks-col">
                                 <label>From Date</label>
                                 <input type="date" name="search" 
@@ -197,83 +206,61 @@ class LoanBankSchedule extends Component {
                  }
                  
              <div className="table-responsive p-3">
-                 { sorted.length > 0 &&
-                 <div>
+                { sorted.length > 0 &&
+                 <>
                  <table className="table table-borderless">
-                 <thead>
-                 <tr>
-                     <th>&#x23;</th>
-                     {/* <th>Approved by</th> */}
-                     <th>Member</th>
-                     {/* <th>Posted by</th> */}
-                     <th>Loan Type</th>
-                     <th>Interest Rate</th>
-                     <th>&#8358; Loan Amount</th>
-                     <th>&#8358; Payable</th>
-                     <th>Bank</th>
-                     <th>Account Number</th>
-                     {/* <th>Date Applied</th>
-                     <th>Guarantors</th>
-                     <th>Status</th>
-                     <th>Actions</th> */}
-                 </tr>
-                 </thead>
-                 <tbody>
-                 { sorted.map((loan, index) => (
-                 <tr key={index}>
-                     <td>{index + 1}</td>
-                     {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
-                     {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
-                     <td>{ loan.member.surname } { loan.member.other_names }</td>
-                     <td>{loan.loan_type.name}</td>
-                     <td>{loan.loan_type.interest}</td>
-                     <td>{loan.loan_amount}</td>
-                     <td>{loan.amount_payable}</td>
-                         <td></td>
-                         <td></td>
-                     {/* <td>{loan.inserted_at}</td>
-                     <td>
-                     <AvatarGroup appearance="stack" data={guarantors} />
-                     </td>
-                     <td className={loan.status}>
-                     {loan.status == 1 && <Badge type='success' title='APPROVED'/>}
-                     {loan.status == 0 && <Badge type='moved' title='PENDING'/>}
-                        {loan.status == 2 && <Badge type='inprogress' title='DECLINED'/>}
-                    </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td> */}
-                 </tr>
-                  ))}
-                
-                 </tbody>
-             </table>
-             { totalPages > 1 && 
-                <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
-                </div>
-             }
-                
-             </div>
-                 }
-                 { sorted && !sorted.length && 
+                    <thead>
+                    <tr>
+                        <th>&#x23;</th>
+                        {/* <th>Approved by</th> */}
+                        <th>Member</th>
+                        {/* <th>Posted by</th> */}
+                        <th>Loan Type</th>
+                        <th>Interest Rate</th>
+                        <th>&#8358; Approved Amount</th>
+                        <th>&#8358; Payable</th>
+                        <th>&#8358; Payable</th>
+                        {/* <th>Bank</th> */}
+                        {/* <th>Account Number</th> */}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    { sorted.map((loan, index) => (
+                    <tr key={index}>
+                        <td>{index + 1}</td>
+                        {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
+                        {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
+                        <td>{ loan.member.surname } { loan.member.other_names }</td>
+                        <td>{loan.loan_type.name}</td>
+                        <td>{ FormatCurrency(loan.loan_type.interest)}</td>
+                        <td>{ FormatCurrency(loan.approved_amount) }</td>
+                        <td>{ FormatCurrency(loan.balance_payable) }</td>
+                        <td>
+                            <input className="form-control ks-control"
+                                defaultValue={loan.balance_payable}
+                                onChange={({target}) =>this.handleScheduleFormChange(target.value, index)}
+                            />
+                        </td>
+                            {/* <td></td>
+                            <td></td> */}
+                    </tr>
+                    ))}
+                    
+                    </tbody>
+                </table>
+                </>
+                }
+                 {/* { sorted && !sorted.length && 
                      <EmptyData title="Empty Loans" text="No Available Loans Data"/>
                  } 
                  { !sorted
                      &&
                     <Loader />
-                 }
+                 } */}
              
              </div>
          </div>
-        }
-        {
-            setMode === 1 &&
-            <div className="p-4">
-                <p className="page-title mt-5">Create Member Page
-                    <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
-                </p>
-                <CreateMember />
-            </div>
-        }
+        } 
         </div>
         </div>
 

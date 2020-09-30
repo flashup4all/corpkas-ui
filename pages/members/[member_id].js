@@ -45,6 +45,11 @@ const MemberProfile = () => {
   const selectTab = (selected, selectedIndex) => {
     setSeletedTab(selectedIndex)
   }
+
+  const changeTab = (index) => {
+    console.log(index)
+    setSeletedTab(index)
+  }
   
   return (
     <div>
@@ -90,7 +95,7 @@ const MemberProfile = () => {
             <Transactions handleClick={() => forceUpdate()} memberData={memberData} />
           }
           { seletedTab === 2 &&
-            <LoanRequests memberData={memberData} />
+            <LoanRequests onChangeTab={changeTab} memberData={memberData} />
           }
           { seletedTab === 3 &&
             <ActiveLoans memberData={memberData} />

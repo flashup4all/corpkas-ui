@@ -263,6 +263,33 @@ export const CREATE_LOAN = gql`
   }
 `;
 
+export const APPROVE_LOAN = gql`
+  mutation approveLoan(
+    $loan_amount: String!,
+    $id: Int!,
+    $member_id: Int!,
+    $user_id: Int!,
+    $loan_type_id: Int!
+    $approved_amount: String!
+    $is_insured: Boolean!
+    $upfront_deduction: Boolean!
+
+  ) {
+    approveLoan(loan: {
+      member_id: $member_id,
+      user_id: $user_id,
+      loan_amount: $loan_amount,
+      loan_type_id: $loan_type_id,
+      approved_amount: $approved_amount,
+      is_insured: $is_insured,
+      upfront_deduction: $upfront_deduction,
+    }, id: $id){
+      id
+      payslip_url
+      
+      }
+  }
+`;
 
 export const FILTER_LOANS = gql`
   mutation filterLoans(
@@ -281,9 +308,13 @@ export const FILTER_LOANS = gql`
       to: $to
       overdue: $overdue
     }){
-        
+      id
       actual_amount
+      approved_amount
+      amount_paid
       amount_payable
+      payback_amount
+      balance_payable
       approved_date
       reason
       detail
@@ -315,7 +346,16 @@ export const FILTER_LOANS = gql`
         name
         interest
       }
+      guarantors{
+       
+        member{
+          id
+          surname
+          other_names
+          avatar_url
+        }
       }
+    }
   }
 `;
 
@@ -324,6 +364,10 @@ query ($page: Int!){
   paginateLoans(page: $page) {
     entries{
       id
+      approved_amount
+      amount_paid
+      payback_amount
+      balance_payable
       actual_amount
       amount_payable
       approved_date
@@ -335,8 +379,10 @@ query ($page: Int!){
       interest_percent
       is_insured
       duration
+      reason
       loan_amount
       status
+      payslip_url
       monthly_deduction
       total_deduction
       total_loan
@@ -353,11 +399,23 @@ query ($page: Int!){
         id
         surname
         other_names
+        avatar_url
+        status
+        staff_no
       }
       loan_type{
         id
         name
         interest
+      }
+      guarantors{
+       
+        member{
+          id
+          surname
+          other_names
+          avatar_url
+        }
       }
     }
     page_size

@@ -12,16 +12,19 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-// import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+import { GET_MEMBER_LOANS_TXNS } from '../../gql/members';
 import { CustomToggle, Status } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 
 class Transactions extends Component {
     constructor(props) {
+        console.log(props.memberData)
         super(props);
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
+            loanTxns: [],
+            memberData: props.memberData,
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
@@ -33,30 +36,31 @@ class Transactions extends Component {
         }
     }
 
-    // componentDidMount()
-    // {
-    //     this.getMembers()
-    //     this.getMemberTotals()
-    // }
+    componentDidMount()
+    {
+        this.getMemberLoanTxns(this.state.memberData.id)
+        // this.getMemberTotals()
+    }
 
-    // getMembers(page = 1)
-    // {
-    //     createApolloClient.query({
-    //         query: GET_PAGINATE_MEMBERS,
-    //         variables: {page: page}
-    //       }).then(response => {
-    //           const result = response.data.paginateMembers
-    //           this.setState({
-    //               members: result.entries, 
-    //               sorted: result.entries,
-    //               totalEntries: result.totalEntries,
-    //               totalPages: result.totalPages,
-    //               pageNumber: result.pageNumber,
-    //               pageSize: result.pageSize,
+    getMemberLoanTxns(member_id, page = 1)
+    {
+        createApolloClient.query({
+            query: GET_MEMBER_LOANS_TXNS,
+            variables: {member_id: member_id, page: page}
+          }).then(response => {
+            let {data: {memberLoanTransactions}} =  response
+console.log(memberLoanTransactions)
+//   this.setState({
+            //       members: result.entries, 
+            //       sorted: result.entries,
+            //       totalEntries: result.totalEntries,
+            //       totalPages: result.totalPages,
+            //       pageNumber: result.pageNumber,
+            //       pageSize: result.pageSize,
 
-    //             })
-    //         }, error => console.log(error))
-    // }
+            //     })
+            }, error => console.log(error))
+    }
     // getMemberTotals(page = 1)
     // {
     //     createApolloClient.query({
@@ -164,7 +168,7 @@ class Transactions extends Component {
              </div>
                  }
                  { sorted && !sorted.length && 
-                     <EmptyData title="Empty Members" text="No Available Members Data"/>
+                     <EmptyData title="Empty Loan Payments" text="No Available Repayments Data"/>
                  } 
                  { !sorted
                      &&

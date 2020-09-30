@@ -23,6 +23,7 @@
     "apollo-absinthe-upload-link": "^1.6.0",
     "bootstrap": "^4.5.2",
     "graphql": "^15.3.0",
+    "moment": "^2.29.0",
     "next": "9.5.2",
     "react": "16.13.1",
     "react-autosuggest": "^10.0.2",

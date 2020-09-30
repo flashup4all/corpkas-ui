@@ -282,8 +282,13 @@ query ($member_id: Int!, $status: Int){
     actual_amount
     amount_payable
     approved_date
+    approved_amount
+    payback_amount
+    amount_paid
+balance_payable
     detail
     due_date
+    start_date
     insurance_amount
     insurance_percent
     interest_amount
@@ -302,10 +307,65 @@ query ($member_id: Int!, $status: Int){
     user_id
     due_date
     reason
+    payslip_url
     approved_date
     inserted_at
     updated_at
+    member{
+      id
+      surname
+      other_names
+    }
+    loan_type{
+      id
+      name
+      interest
+    }
 
+  }
+}
+`;
+export const GET_MEMBER_LOANS_TXNS = gql`
+query ($member_id: Int!, $page: Int){
+  memberLoanTransactions(member_id: $member_id, page: $page){
+
+    entries{
+      id
+      status
+      amount
+      postedBy
+      approvedBy
+      paymentType
+      naration
+        loan{
+          id
+          loanAmount
+        }
+        member{
+          id
+          surname
+          otherNames
+          avatar
+        }
+      posted{
+        id
+        surname
+        otherNames
+      }
+      approved{
+        id
+        surname
+        otherNames
+        avatar
+      }
+      
+        memberId
+      loanId
+    }
+    pageSize
+    pageNumber
+    totalPages
+    totalEntries
   }
 }
 `;

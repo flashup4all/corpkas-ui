@@ -3,7 +3,7 @@ import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 
 import { GET_MEMBER_LOANS} from '../../gql/members'
-import { CREATE_LOAN, GET_LOAN_GUARANTORS, CREAT_LOAN_GUARANTOR } from '../../gql/loans'
+import { CREATE_LOAN, GET_LOAN_GUARANTORS, CREAT_LOAN_GUARANTOR, APPROVE_LOAN } from '../../gql/loans'
 import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 import EmptyData from '../../layouts/empty';
@@ -20,6 +20,7 @@ query {
     loanTypes {
       id
       name
+      duration
   }
     }
 `;
@@ -169,7 +170,6 @@ class LoanRequests extends Component {
     }
 
     getAppliedLoanGuarantors(id){
-        console.log(id)
         createApolloClient.query({
             query: GET_LOAN_GUARANTORS,
             variables: {loan_id: parseInt(id)}
@@ -211,7 +211,6 @@ class LoanRequests extends Component {
                     variables: {loan_id: parseInt(createLoan.id), member_id: parseInt(x.id), status: 0}
                 }).then(res => {
                     let {data: {createLoanGuarantor}} = res
-                    console.log(createLoanGuarantor)
 
                 }, error => console.log(error))
             })
@@ -223,7 +222,6 @@ class LoanRequests extends Component {
 
           }, error => { 
             this.setState({apply_loader: false})
-            console.log(error)
           })
     }
 
@@ -248,13 +246,11 @@ class LoanRequests extends Component {
         let newList = list
         let validList = []
         list.map(x => validList.push({member_id: x.id, status: 0}))
-        console.log(validList)
         this.setState({loanGuarantors: list, apply_guarantors: validList})
 
     }
     handlePayslip(payslip){
         this.setState({payslip: payslip})
-        console.log(payslip)
     }
     render(){
         const {appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
@@ -263,13 +259,39 @@ class LoanRequests extends Component {
                 monthly_net_income, loanGuarantors, applied_payslip, payslip,
                 apply_loan_type_id, apply_loan_amount, apply_monthly_net_income, apply_reason, apply_loader
             } = this.state
+
         const approveLoan = (e) => {
             e.preventDefault();
-            console.log(getUser())
-            console.log(approved_amount)
-            console.log(upfront_deduction)
-            console.log(is_insured)
-            console.log(insurance_charge)
+            swal({
+                title: "Are you sure?",
+                text: "Approval cannot be undone!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              })
+              .then((yes) => {
+                if (yes) {
+                    createApolloClient.mutate({
+                        mutation: APPROVE_LOAN,
+                        refetchQueries:[{ query: GET_MEMBER_LOANS, variables:{member_id: memberData.id, status: 0}}],
+                        variables: {
+                            approved_amount: parseFloat(approved_amount), 
+                            loan_amount, upfront_deduction, is_insured, 
+                            insurance_charge, user_id: parseInt(getUser().id), 
+                            member_id: parseInt(memberData.id),
+                            loan_type_id: parseInt(loan_type_id),
+                            id: parseInt(firstLoan.id)
+                        }
+                    }).then(response => {
+                        let {data: {approveLoan}} = response
+                        swal("This Loan Approval was successful", {icon:'success'})
+                        this.getMemberLoans(memberData.id)
+                        this.props.onChangeTab(3);
+                      }, error => console.log(error))
+                } else {
+                  swal("Your imaginary file is safe!");
+                }
+              });
         }
 
         const checkValidApplication = () => {
@@ -278,11 +300,30 @@ class LoanRequests extends Component {
         }
 
         const declineLoan = () =>{
-            createApolloClient.mutate({mutation: DECLINE_LOAN, variables:{status: 2, id: parseInt(firstLoan.id)}}).then(response => {
-                let {data: {updateLoan}} = response
-                console.log(response)
-                console.log(updateLoan)
-              }, error => console.log(error))
+            swal({
+                title: "Are you sure?",
+                text: "Decline cannot be undone!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              })
+              .then((yes) => {
+                if (yes) {
+                    createApolloClient.mutate(
+                        {
+                            mutation: DECLINE_LOAN, 
+                            variables:{
+                                status: 2, 
+                                id: parseInt(firstLoan.id)
+                            }
+                        }).then(response => {
+                        let {data: {updateLoan}} = response
+                        swal("This Loan has been Declined", {icon:'success'})
+                      }, error => console.log(error))
+                } else {
+                  swal("Your imaginary file is safe!");
+                }
+              });
         }
         
         return (
@@ -297,9 +338,9 @@ class LoanRequests extends Component {
                                         <p className="ks-request-text">Loan request for ₦ {firstLoan.actual_amount}</p>
                                         <p className="">This Loan is still pending approval <Badge type="_removed" title="PENDING"/></p>
                                     </div>
-                                    <div className="col-md-6 mt-3 justify-content-right">
-                                    <p className="ks-request-text float-right">{firstLoan.inserted_at}</p>
-                                    <p className="">Loan Requests</p>
+                                    <div className="col-md-6 mt-3" style={{ textAlign: "end"}}>
+                                        <h6 className="ks-request-text">{firstLoan.inserted_at}</h6>
+                                        {/* <p className="">9:10am</p> */}
                                     </div>
                                 <div className="loan-request-row">
                                 </div>
@@ -310,7 +351,7 @@ class LoanRequests extends Component {
                                             onChange={({ target }) => this.setState({ loan_type_id :target.value})}
                                             >
                                             <option value="">Options</option>
-                                            { loanTypes && loanTypes.map(type => <option key={type.id} value={type.id}>{type.name}</option>)}
+                                            { loanTypes && loanTypes.map(type => <option key={type.id} value={type.id}>{type.name} - {type.duration}</option>)}
                                         </select>
                                     </div>
                                     <div className="col-md-3">
@@ -335,10 +376,8 @@ class LoanRequests extends Component {
                                         placeholder="Access Diamond"
                                             defaultValue={approved_amount || ""}
                                             onChange={({ target }) => {
-                                                console.log(target.value)
                                                 let calc_monthly_deduction = target.value/duration
                                                 this.setState({ approved_amount :target.value, monthly_deduction: calc_monthly_deduction.toFixed(2)})
-                                                console.log(monthly_deduction)
                                             }
                                         }
                                         />
@@ -418,14 +457,14 @@ class LoanRequests extends Component {
                                             />
                                         </div>
                                     }
-                                    {/* <div className="row d-flex justify-content-center">
+                                    <div className="row d-flex justify-content-center">
                                         <div className="col-md-4">
                                             <img src="/images/loan.svg" className="img-responsive" alt="Some picture" width="410" height="307"></img>
                                             </div>
                                         <div className="col-md-4">
                                             <p className="text mt-5">We are currently working on your loan and we will get back to you soon with an offer. If you think this is taking longer than it should, feel free to leave us a follow up messgae.</p>
                                         </div>
-                                    </div> */}
+                                    </div>
                                     
                                     <div className="row justify-content-md-center mt-4 mb-4 col-md-12">
                                         { applied_payslip !== null  && 
@@ -482,7 +521,7 @@ class LoanRequests extends Component {
                                         />
                                     </div> */}
                                     <div className="col-12">
-                                    <button className="btn float-left mt-5 btn-danger " type="button" onClick={() => declineLoan()}>
+                                    <button className="btn float-right mt-5 btn-danger ml-3 " type="button" onClick={() => declineLoan()}>
                                         {/* disabled={loading} */}
                                         {/* {
                                             loading &&

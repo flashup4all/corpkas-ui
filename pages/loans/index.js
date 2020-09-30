@@ -61,9 +61,6 @@ const LoanSettings = () => {
         { seletedTab === 5 &&
           <LoanBankSchedule status="0" />
         }
-        { seletedTab === 5 &&
-          <LoanBankSchedule status="0" />
-        }
         { seletedTab === 6 &&
           <RepaymentSchedule status="0" />
         }
