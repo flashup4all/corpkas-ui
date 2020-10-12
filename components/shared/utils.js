@@ -14,6 +14,9 @@ export const ShortDate = (date) => {
 export const ShortTime = (date) => {
     return Moment(date).format("hh:mm a");
 }
+export const MonthYear = (date) => {
+    return Moment(date).format("MMM, YYYY");
+}
 
 export const FormatCurrency = (amount) => {
     return new Intl.NumberFormat("en-NG", {

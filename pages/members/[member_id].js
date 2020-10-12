@@ -12,6 +12,7 @@ import ActiveLoans from '../../components/members/active-loans';
 import LoanRepayments from '../../components/members/loan-repayments';
 import Loader from '../../layouts/loader'
 import { Badge } from '../../layouts/extras'
+import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
 
 
 const tabs = [
@@ -30,7 +31,7 @@ const MemberProfile = () => {
   const forceUpdate = useCallback(() => setMemberData({}), []);
   // const memberData = {id: member_id, name: "john doe"
 
-  const {loading, error, getMember} = useQuery( GET_MEMBER,
+  const {loading, error, data, refetch} = useQuery( GET_MEMBER,
     {
       variables:{id : member_id},
       onError: (error) => {
@@ -40,6 +41,9 @@ const MemberProfile = () => {
           setMemberData(findMember)
       }
     })
+    if(!loading){
+      console.log(data)
+    }
 
   const [seletedTab, setSeletedTab] = useState(0)
   const selectTab = (selected, selectedIndex) => {
@@ -49,6 +53,10 @@ const MemberProfile = () => {
   const changeTab = (index) => {
     console.log(index)
     setSeletedTab(index)
+  }
+  const refreshMember = () => {
+    console.log('refetch')
+    refetch().then(({data: {findMember}}) => setMemberData(findMember))
   }
   
   return (
@@ -65,8 +73,8 @@ const MemberProfile = () => {
             }
           </div>
           <div className="individual-card_des">
-            <p>Available Balance</p>
-            <h1>₦ {memberData.current_balance}</h1>
+            <p onClick={() => refreshMember()}>Available Balance</p>
+            <h1>{FormatCurrency(memberData.current_balance)}</h1>
             <p className="mb-3">
               A/C Name: 
               <span className="bold"> {memberData.surname} {memberData.other_names} </span>
@@ -89,10 +97,10 @@ const MemberProfile = () => {
 
         <div className="bg-grey mt-5">
           { seletedTab === 0 &&
-            <ProfileSetting memberData={memberData}/>
+            <ProfileSetting onrefreshMember={() => refreshMember()} memberData={memberData}/>
           }
           { seletedTab === 1 &&
-            <Transactions handleClick={() => forceUpdate()} memberData={memberData} />
+            <Transactions onrefreshMember={() => refreshMember()} memberData={memberData} />
           }
           { seletedTab === 2 &&
             <LoanRequests onChangeTab={changeTab} memberData={memberData} />

@@ -241,8 +241,6 @@ class CreateLoan extends Component {
                   }, error => { 
                     this.setState({apply_loader: false})
                   })
-            } else {
-              swal("Your imaginary file is safe!");
             }
           });
     }

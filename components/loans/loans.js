@@ -38,9 +38,7 @@ class Transactions extends Component {
             filter_to: '',
             filter_txn_id: '',
             filter_txn_type: '',
-            guarantors : RANDOM_USERS.map(d => ({
-                name: d.name,
-              })),
+            guarantors : [],
             selectedLoan: null
         }
 
@@ -71,7 +69,6 @@ class Transactions extends Component {
             variables: {page}
           }).then(response => {
               let { data: {paginateLoans}} = response
-              console.log(paginateLoans)
 
               this.setState({
                   loans: paginateLoans.entries, 
@@ -91,7 +88,6 @@ class Transactions extends Component {
             variables: variables
           }).then(response => {
               const { data: {filterLoans}} = response
-            console.log(filterLoans)
               this.setState({
                     loans: filterLoans, 
                   sorted: filterLoans,

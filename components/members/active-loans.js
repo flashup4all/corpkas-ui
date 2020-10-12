@@ -31,7 +31,6 @@ const LoanRequests = ({ memberData }) =>  {
             
         },
         onCompleted: ({memberLoans}) =>{
-            console.log(FormatCurrency(memberLoans[0].loan_amount))
             setmemberLoans(memberLoans)
             
         }
@@ -86,16 +85,20 @@ const LoanRequests = ({ memberData }) =>  {
                                         <div className="control-div">{FormatCurrency(loan.amount_payable)}</div>
                                     </div>
                                     <div className="col-md-3">
-                                        <label className="ks-label">Amount Paid</label>
+                                        <label className="ks-label">Amount Paid (Payable)</label>
                                         <div className="control-div">{FormatCurrency(loan.amount_paid) || "0.0"}</div>
                                     </div>
                                     <div className="col-md-3">
-                                        <label className="ks-label">Balance Paid</label>
+                                        <label className="ks-label">Balance Payable</label>
                                         <div className="control-div">{FormatCurrency(loan.balance_payable) || "0.0"}</div>
                                     </div>
                                     <div className="col-md-3">
                                         <label className="ks-label">Payback Amount</label>
                                         <div className="control-div">{FormatCurrency(loan.payback_amount)}</div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="ks-label">Total Paid</label>
+                                        <div className="control-div">{FormatCurrency(loan.total_paid)}</div>
                                     </div>
                                     <div className="col-md-3">
                                         <label className="ks-label"> Applied Date</label>

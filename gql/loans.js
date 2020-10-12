@@ -296,11 +296,15 @@ export const FILTER_LOANS = gql`
     $member_id: Int,
     $loan_type_id: Int
     $status: Int
+    $loan_payment_status: Int
+    $loan_repayment_status: Int
     $from: String
     $to: String
     $overdue: String
   ) {
     filterLoans(filter: {
+      loan_payment_status: $loan_payment_status,
+      loan_repayment_status: $loan_repayment_status,
       member_id: $member_id,
       loan_type_id: $loan_type_id
       status: $status
@@ -480,4 +484,111 @@ query ($loan_id: Int!){
 
     }
 }
+`;
+
+export const CREATE_LOANS_TXNS = gql`
+mutation createLoanTransaction(
+    $status: Int
+		$loan_id: Int!
+    $member_id: Int!,
+    $naration: String
+    $txn_type: Int!
+    $payment_type: String
+    $amount: Int!
+    $posted_by: Int!
+  ){
+    createLoanTransaction(
+      loanTransaction: {
+      member_id: $member_id,
+      naration: $naration
+      txn_type: $txn_type
+      payment_type: $payment_type
+      amount: $amount
+      posted_by: $posted_by
+      loan_id: $loan_id
+      status: $status
+      }
+    ){
+
+
+      id
+      status
+      amount
+      postedBy
+      approvedBy
+      paymentType
+      naration
+        loan{
+          id
+          loanAmount
+        }
+        member{
+          id
+          surname
+          otherNames
+          avatar
+        }
+      posted{
+        id
+        surname
+        otherNames
+      }
+      approved{
+        id
+        surname
+        otherNames
+        avatar
+      }
+      
+        memberId
+      loanId
+    }
+}
+`;
+
+export const APPROVE_LOAN_TXN = gql`
+  mutation approveLoanTransaction(
+      $status: Int!,
+      $member_id: Int!,
+      $id: Int!,
+      $loan_id: Int!,
+      $approved_by: Int!,
+    ) {
+      approveLoanTransaction(loanTransaction: {
+        approved_by: $approved_by,
+        status: $status,
+        id: $id
+        member_id: $member_id
+        loan_id: $loan_id
+      }){
+      id
+      approved_by
+      status
+      
+        
+    }
+  }
+`;
+export const CANCEL_LOAN_TXN = gql`
+  mutation cancelLoanTransaction(
+      $status: Int!,
+      $member_id: Int!,
+      $id: Int!,
+      $loan_id: Int!,
+      $approved_by: Int!,
+    ) {
+      cancelLoanTransaction(loanTransaction: {
+        approved_by: $approved_by,
+        status: $status,
+        id: $id
+        member_id: $member_id
+        loan_id: $loan_id
+      }){
+      id
+      approved_by
+      status
+      
+        
+    }
+  }
 `;

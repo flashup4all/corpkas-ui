@@ -7,7 +7,7 @@ import swal from '@sweetalert/with-react'
 import SingleUpload from '../../components/shared/component/single-upload';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 
-const ProfileSetting = ({memberData}) =>  {
+const ProfileSetting = ({memberData, onrefreshMember} = props) =>  {
     const { addToast } = useToasts()
     // console.log(props.memberData)
     // const memberData = props.memberData
@@ -32,7 +32,6 @@ const ProfileSetting = ({memberData}) =>  {
     // update staff mutation
     const  [updateMember, {loading, error}] = useMutation( UPDATE_MEMBER, {
         onError: (error) => {
-            console.log(error.graphQLErrors)
             console.log(error)
             addToast("Validation Error", {
                 appearance: 'warning',
@@ -40,7 +39,6 @@ const ProfileSetting = ({memberData}) =>  {
               })
         },
         onCompleted: (updateMember) =>{
-            console.log(updateMember)
             addToast("Profile Updated", {
                 appearance: 'success',
                 autoDismiss: true,
@@ -48,6 +46,7 @@ const ProfileSetting = ({memberData}) =>  {
             swal("Member has been Updated!", {
                 icon: "success",
             });
+            onrefreshMember();
         },
         refetchQueries:[{query: GET_MEMBER, variables:{id: memberData.id}}]
     })
@@ -55,7 +54,6 @@ const ProfileSetting = ({memberData}) =>  {
     const  [updateMemberAvatar, {imageLoading, imageError}] = useMutation(UPDATE_MEMBER_AVATAR, 
         {
         onError: (error) => {
-            console.log(error.graphQLErrors)
             console.log(error)
             addToast("Validation Error", {
                 appearance: 'warning',
@@ -64,6 +62,7 @@ const ProfileSetting = ({memberData}) =>  {
         },
         onCompleted: (updateMemberAvatar) =>{
             console.log(updateMemberAvatar)
+            onrefreshMember();
             addToast("Profile Image Updated", {
                 appearance: 'success',
                 autoDismiss: true,
@@ -198,6 +197,7 @@ const ProfileSetting = ({memberData}) =>  {
                             <input className="ks-form-control form-control" 
                                 placeholder="E.g samuelvybz@gmail.com"
                                 value={email || ""}
+                                disabled
                                 onChange={({ target }) => setEmail(target.value)}
                              />
                         </div>
@@ -205,6 +205,7 @@ const ProfileSetting = ({memberData}) =>  {
                             <label className="ks-label">Phone Number</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="E.g 09080009000"
+                                disabled
                                 value={phone_number || ""}
                                 onChange={({ target }) => setPhoneNumber(target.value)}
                              />

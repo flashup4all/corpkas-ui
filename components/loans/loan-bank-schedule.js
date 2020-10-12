@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
-import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
-import WatchIcon from '@atlaskit/icon/glyph/watch';
-import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+import Spinner from '@atlaskit/spinner';
 
-import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
-import Loader from '../../layouts/loader';
-import Pagination from '@atlaskit/pagination';
-import { FILTER_LOANS, GET_LOANS } from '../../gql/loans';
-import { CustomToggle, Status, Badge } from '../../layouts/extras'
-import { page_range } from '../shared/utils'
-import AvatarGroup from '@atlaskit/avatar-group';
+import { FILTER_LOANS, GET_LOANS, CREATE_LOANS_TXNS } from '../../gql/loans';
 import { ShortDate, FormatCurrency } from '../../components/shared/utils';
 import swal from 'sweetalert';
+import { getStaff } from '../shared/local'
+import { Checkbox } from '@atlaskit/checkbox';
 
 const RANDOM_USERS = [
     {id: 1, name: "john"},
@@ -28,6 +22,9 @@ class LoanBankSchedule extends Component {
         this.state = {
             loans: [],
             scheduleForm: [{member_id: '', loan_id: '', new_amount_payable: ''}],
+            txn_status: '',
+            narration: '',
+            save_loader: false,
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
@@ -85,6 +82,12 @@ class LoanBankSchedule extends Component {
             variables: variables
           }).then(response => {
               const { data: {filterLoans}} = response
+              console.log(filterLoans)
+              filterLoans.map(loan => {
+                  loan.new_amount_payable = loan.balance_payable
+                  loan.check = true
+                } )
+              console.log(filterLoans)
               this.setState({
                     loans: filterLoans, 
                   sorted: filterLoans,
@@ -96,20 +99,49 @@ class LoanBankSchedule extends Component {
                 })
             }, error => console.log(error))
     }
+    save_loan_txn(variables){
+        createApolloClient.mutate({
+         mutation: CREATE_LOANS_TXNS,
+         variables: variables
+       }).then(response => {
+           const { data: {createLoanTransaction}} = response
+           console.log(createLoanTransaction)
+         //   filterLoans.map(loan => {
+         //       loan.new_amount_payable = loan.balance_payable
+         //     })
+         //   this.setState({
+         //         loans: filterLoans, 
+         //       sorted: filterLoans,
+         //       totalEntries: 0,
+         //       totalPages: 0,
+         //       pageNumber: 0,
+         //       pageSize: 0,
+ 
+         //     })
+         }, error => console.log(error))
+    }
+
     handleScheduleFormChange = (value,index) => {
         const newShareholders = this.state.sorted.map((loan, idx) => {
           if (idx !== index) return loan;
           if(parseFloat(value) > parseFloat(loan.balance_payable) ){
-            //   swal("Amount cant be more than Amount Payable")
-              console.log(loan.balance_payable)
-              return { ...loan, balance_payable: loan.balance_payable };
+              swal("Amount cant be more than Amount Payable")
+              return { ...loan, new_amount_payable: loan.balance_payable };
           }else{
             return { ...loan, new_amount_payable: value };
           }
         });
-        console.log(newShareholders)
         this.setState({ sorted: newShareholders });
         
+      };
+
+      handleScheduleFormCheckBoxChange = (checked,index) => {
+          console.log(checked)
+        let array = this.state.sorted.map((loan, idx) => {
+            if (idx !== index) return loan;
+            return { ...loan, check: checked };
+        });
+        this.setState({ sorted: array });
       };
     paginate(e, page, analyticsEvent){
         this.getTransactions(page)
@@ -127,7 +159,7 @@ class LoanBankSchedule extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {loans, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type, guarantors } = this.state
+    const {txn_status, narration, sorted, setMode, save_loader, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type, guarantors } = this.state
     
     const filter_form = () => {
 
@@ -145,6 +177,50 @@ class LoanBankSchedule extends Component {
     const viewTxn = (txn) => {
         console.log(txn)
     }
+
+    const save_schedule = () => {
+        console.log(sorted) 
+        swal({
+            title: "Are you sure?",
+            text: "Application save this Transactions be undone!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((yes) => {
+            if (yes) {
+                this.setState({save_loader: true})
+                sorted.map((loan) =>{
+                    if(loan.check)
+                    {
+                        let paymentType ='';
+                        if (parseFloat(loan.new_amount_payable) == parseFloat(loan.balance_payable))
+                        { 
+                            paymentType = 'full'
+                        }else{
+                            paymentType = 'part'
+                        }
+                        let variables = {
+                            member_id: loan.member_id,
+                            naration: narration,
+                            txn_type: 1,
+                            payment_type: paymentType,
+                            amount: parseFloat(loan.new_amount_payable),
+                            posted_by: parseInt(getStaff().id),
+                            loan_id: parseInt(loan.id),
+                            status: parseInt(txn_status)
+                        }
+                        this.save_loan_txn(variables)
+                    }
+                })
+                swal("Bulk transaction was successful", {icon:'success'})
+
+                this.setState({save_loader: false})
+            } 
+          });
+
+    }
+    
     return (
         <div>
             
@@ -212,6 +288,7 @@ class LoanBankSchedule extends Component {
                     <thead>
                     <tr>
                         <th>&#x23;</th>
+                        <th>&#x23;</th>
                         {/* <th>Approved by</th> */}
                         <th>Member</th>
                         {/* <th>Posted by</th> */}
@@ -227,6 +304,14 @@ class LoanBankSchedule extends Component {
                     <tbody>
                     { sorted.map((loan, index) => (
                     <tr key={index}>
+                        <td>
+                        <Checkbox
+                            defaultChecked={loan.check}
+                            onChange={({target}) => this.handleScheduleFormCheckBoxChange(target.checked, index)}
+                            name="checkbox-default"
+                            testId="cb-default"
+                        />
+                        </td>
                         <td>{index + 1}</td>
                         {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
                         {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
@@ -234,11 +319,11 @@ class LoanBankSchedule extends Component {
                         <td>{loan.loan_type.name}</td>
                         <td>{ FormatCurrency(loan.loan_type.interest)}</td>
                         <td>{ FormatCurrency(loan.approved_amount) }</td>
-                        <td>{ FormatCurrency(loan.balance_payable) }</td>
+                        <td>{ FormatCurrency(loan.new_amount_payable) }</td>
                         <td>
                             <input className="form-control ks-control"
-                                defaultValue={loan.balance_payable}
-                                onChange={({target}) =>this.handleScheduleFormChange(target.value, index)}
+                                defaultValue={loan.new_amount_payable}
+                                onChange={({target}) => this.handleScheduleFormChange(target.value, index)}
                             />
                         </td>
                             {/* <td></td>
@@ -248,6 +333,35 @@ class LoanBankSchedule extends Component {
                     
                     </tbody>
                 </table>
+
+                <div className="row">
+                    <div className="col-md-3 ks-col">
+                        <label>Status</label>
+                        <select className="ks-form-control form-control" 
+                            value={txn_status || ""}
+                            onChange={({ target }) => this.setState({txn_status: target.value})}
+                            >
+                            <option value="">Status</option>
+                            <option value="1">Approve</option>
+                        </select>
+                    </div>
+                    <div className="col-md-3 ks-col">
+                        <label>Narration</label>
+                        <input type="text" name="search" 
+                        className="form-control ks-form-control" 
+                        placeholder="Search"
+                        value={narration || ""}
+                        onChange={({ target }) => this.setState({narration: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-3 ks-col">
+                        <button type="button" disabled={save_loader} className="btn" style={{ marginTop: '32px'}} onClick={()=> save_schedule()}>
+                        { save_loader &&
+                            <Spinner appearance="invert" size="medium"/>
+                        }
+                            Make Payment</button>
+                    </div>
+                </div>
                 </>
                 }
                  {/* { sorted && !sorted.length && 

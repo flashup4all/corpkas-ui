@@ -3,17 +3,19 @@ import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+// import { onError } from "apollo-link-error";
 
 import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
 import { GET_MEMBER_TXNS, GET_MEMBER } from '../../gql/members';
-import { FILTER_TRANSACTION, APPROVE_TRANSACTION } from '../../gql/transactions';
+import { FILTER_TRANSACTION, APPROVE_TRANSACTION, CREATE_TRANSACTION } from '../../gql/transactions';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
-import { getStaff } from '../shared/local'
+import { getStaff, getUser } from '../shared/local'
 import swal from '@sweetalert/with-react'
+import { ShortDate, ShortTime, MonthYear, FormatCurrency } from '../../components/shared/utils';
 
 class Transactions extends Component {
     constructor(props) {
@@ -33,7 +35,12 @@ class Transactions extends Component {
             filter_status: '',
             filter_from: '',
             filter_to: '',
-            filter_txn_id: ''
+            filter_txn_id: '',
+            txn_loader: false,
+            txnType:'',
+            txnAmount:'',
+            txnNaration:''
+
 
         }
     }
@@ -92,8 +99,10 @@ class Transactions extends Component {
                     refetchQueries:[{query: GET_MEMBER_TXNS, variables:{member_id: this.state.memberData.id, page:1}}, {query:GET_MEMBER, variables:{id: this.state.memberData.id}}]
                 }).then(response => {
                     const {data: {approveTransactions}} = response
-                    console.log(approveTransactions)
-                    this.props.handleClick
+                    this.getMemberTxn()
+                    this.props.onrefreshMember();
+
+                    // this.props.handleClick
                     swal("Transaction Processed", {
                         icon: "success",
                     });
@@ -105,6 +114,67 @@ class Transactions extends Component {
           });
     }
     
+    showMakeTransactionForm(txnType){
+        this.setState({setMode: 2, txnType: txnType})
+    }
+    validTransaction(){
+        const {txnType, txnAmount, txnNaration, memberData} = this.state 
+        return (txnAmount)
+    }
+    makeTransactionForm(){
+        this.setState({txn_loader: true})
+        const {txnType, txnAmount, txnNaration, memberData} = this.state 
+        console.log(txnType)
+        console.log(txnAmount)
+        console.log(txnNaration)
+
+        swal({
+            title: "Are you sure?",
+            text: "Approval cannot be undone!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+            .then((yes) => {
+                if (yes) {
+                    createApolloClient.mutate({
+                        mutation: CREATE_TRANSACTION,
+                        variables:{
+                            naration: txnNaration, 
+                            txn_type: txnType,
+                            amount: parseFloat(txnAmount), 
+                            member_id: memberData.id, 
+                            posted_by: parseInt(getStaff().id),
+                            payment_channel: "web"
+                        },
+                        refetchQueries:[{query: GET_MEMBER_TXNS, variables:{member_id: this.state.memberData.id, page:1}}]
+                    // refetchQueries:() => {
+                        //     return (
+                        //         [{
+                        //             query: GET_MEMBER_TXNS,
+                        //             variables: {member_id: this.state.memberData.id, page: 1},
+                        //           }]
+                        //     )
+                        // }
+                    }).then(response => {
+                        console.log(response)
+                        let {data: {createTransaction}} = response
+                        this.setState({
+                            txnType: '', txnAmount: '', txnNaration:'', setMode:0, txn_loader:false
+                        })
+                        this.getMemberTxn()
+                        this.props.onrefreshMember();
+                        swal("Contribution was Successful! awaiting approval", {
+                            icon: "success",
+                        });
+
+                }, (error) => {
+                    console.log(error) 
+                    this.setState({txn_loader: false})
+                })
+                }
+            })
+    }
     render () {
         const { transactions, sorted, setMode, activeWidget, totalPages, filter_from, filter_to, filter_status, filter_txn_id } = this.state
 
@@ -136,17 +206,22 @@ class Transactions extends Component {
                }, (error)=> console.log(error)) 
             }
         }
-      
+        const validTransaction = () =>{
+            const {txnType, txnAmount, txnNaration, memberData} = this.state 
+            return (txnAmount)
+        }
     return (
         <div>
             
             <div className="widget-section">
         <div className="bg-grey">
-        <p className="transaction-header">Transaction Details</p>
         {setMode === 0 &&
+            <>
+            <p className="transaction-header">Transaction Details</p>
              <div style={{padding:'20px'}}>
                  
                  <div className="row">
+                
                  <div className="col-md-2 ks-col">
                         <label>Txn ID</label>
                         <input type="text" name="search" 
@@ -188,6 +263,10 @@ class Transactions extends Component {
                     <div className="col-md-2">
                         <button type="button" className="btn float-right mt-4" onClick={()=> filter_form()}>Filter</button>
                     </div>
+                    <div className="col-md-12 ks-col">
+                        <button type="button" className="btn btn-danger float-right mt-4 ml-3" onClick={()=> this.showMakeTransactionForm(2)}>Withdraw</button>
+                        <button type="button" className="btn btn-secondary float-right mt-4" onClick={()=> this.showMakeTransactionForm(1)}>Contribute</button>
+                    </div>
                  </div>
              
 
@@ -204,6 +283,7 @@ class Transactions extends Component {
                      <th>Transaction Type</th>
                      <th>&#8358; Amount</th>
                      <th>Status</th>
+                     <th>Date</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
@@ -215,19 +295,23 @@ class Transactions extends Component {
                      {/* <td>{txn.rank}</td> */}
                      <td>{ txn.posted.surname } { txn.posted.other_names }</td>
                      <td>
-                        {txn.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
+                        {txn.txn_type == 1 ? <Badge type='success' title='SAVINGS'/> : <Badge type='moved' title='WITHDRAW'/>}
                     </td>
-                     <td>&#8358; {txn.amount}</td>
+                     <td>{FormatCurrency(txn.amount)}</td>
                      <td className={txn.status}>
                           <Status status={txn.status} />
                     </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
+                    <td className={txn.status}>
+                         {MonthYear(txn.inserted_at)}
+                    </td>
+                     <td>
+                         {/* <WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span> */}
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="ks-menu-dropdown bg-menu">
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>View Txn</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => console.log('view transaction')}>View Txn</Dropdown.Item>
                             <Dropdown.Divider />
                             {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Approve</Dropdown.Item>}
                         </Dropdown.Menu>
@@ -256,6 +340,7 @@ class Transactions extends Component {
              
              </div>
          </div>
+         </>
         }
         {
             setMode === 1 &&
@@ -264,6 +349,34 @@ class Transactions extends Component {
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
                 <span>Print Transaction</span>
+            </div>
+        }
+        {setMode === 2 &&
+            <div style={{padding:'20px'}}>
+                 <p className="page-title mt-5">Make a Contribution/Saving
+                    <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                </p>
+                <div className="row mt-4">
+                    <div className="col-md-6 ks-col">
+                        <label>Amount</label>
+                        <input name="search" 
+                        className="mini-search form-control ks-form-control" type="number"
+                        placeholder="100000"
+                        onChange={({ target }) => this.setState({txnAmount: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-6 ks-col">
+                        <label>Narration</label>
+                        <input name="search" 
+                        className="mini-search form-control ks-form-control" 
+                        placeholder="Naration"
+                        onChange={({ target }) => this.setState({txnNaration: target.value})}
+                        ></input>
+                    </div>
+                    <div className="col-md-12">
+                    <button type="button" disabled={!validTransaction()} className="btn btn-secondary float-right mt-4" onClick={()=> this.makeTransactionForm()}>Contribute</button>
+                    </div>
+                </div>
             </div>
         }
             {/* <StyledMain> */}

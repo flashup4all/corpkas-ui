@@ -513,6 +513,10 @@ thead {
 .btn-danger{
 	background: #dc3545!important;
 }
+.btn-secondary{
+	background: #278840!important;
+	border: #278840!important;
+}
 .btn:hover{
 	background: #0065FF;
 	border-radius: 3px;

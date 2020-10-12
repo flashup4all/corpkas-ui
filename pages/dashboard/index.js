@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
-import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
-import WatchIcon from '@atlaskit/icon/glyph/watch';
-import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 
 import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
+import { FILTER_TRANSACTION, GET_MEMBER_TOTALS } from '../../gql/members';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../../components/shared/utils'
 import AdminMainLayout from '../../layouts/main/main';
@@ -38,11 +35,20 @@ class Dashboard extends Component {
 
     componentDidMount()
     {
-       
+       this.getMemberTotals()
+    }
+    getMemberTotals()
+    {
+        createApolloClient.query({
+            query: GET_MEMBER_TOTALS,
+          }).then(response => {
+              console.log(response)
+              this.setState({memberTotals: response.data.memberTotals})
+            }, error => console.log(error))
     }
     render () {
       
-        const {transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
+        const { transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
         
         return (
             <div>
@@ -50,7 +56,7 @@ class Dashboard extends Component {
                     <div className="widget-heading d-flex justify-content-between align-items-baseline">
                     <h3 className=" manage-members">Dashboard</h3>
                     </div>
-                    <div className="row">
+                    {/* <div className="row">
                         <div className="dash-widget">
                             <div>
                             <p className="widget-p-dark"> <img src="/cards-icons/retry-icon.png" alt=""></img>  Pending Contributions
@@ -85,7 +91,7 @@ class Dashboard extends Component {
                             <p className="widget-p-light"> <span className="widget-span teal-span">+ 2.41%</span> From previous record</p>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="sheets mt-5 row">
                         <div className="graph-con col-lg-8">
@@ -108,17 +114,17 @@ class Dashboard extends Component {
                         <div className="additional-info col-lg-4 pl-0 pr-0">
                         <div className="additional-info-border-bottom ">
                             <h2>New members</h2>
-                            <h1>419</h1>
+                            <h1>{memberTotals.inactive}</h1>
                         </div>
 
                         <div  className="additional-info-border-bottom ">
                             <h2>Active members</h2>
-                            <h1>419</h1>
+                            <h1>{memberTotals.active}</h1>
                         </div>
                         
                         <div  className="additional-info-border-bottom ">
-                            <h2>Inactive members</h2>
-                            <h1>419</h1>
+                            <h2>Closed members</h2>
+                            <h1>{memberTotals.closed}</h1>
                         </div>
                         
                         {/* <div className="additional-info-border-bottom ">
@@ -126,8 +132,8 @@ class Dashboard extends Component {
                             <h1>419</h1>
                         </div> */}
                         <div >
-                            <h2>New members</h2>
-                            <h1>419</h1>
+                            <h2>Total Members</h2>
+                            <h1>{memberTotals.total}</h1>
                         </div>
                         
                         

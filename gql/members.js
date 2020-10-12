@@ -177,7 +177,6 @@ export const UPDATE_MEMBER = gql`
       $current_monthly_income: String,
       $membership_date: String,
       $rank: String,
-      $image: Upload!,
       $phone_number: String, $id: Int!) {
         updateMember(member: {
         email: $email,
@@ -192,7 +191,6 @@ export const UPDATE_MEMBER = gql`
         gender: $gender,
         rank: $rank,
         dept: $dept,
-        image: $image,
         monthly_contribution: $monthly_contribution,
         current_monthly_income: $current_monthly_income,
         membership_date: $membership_date
@@ -287,7 +285,6 @@ query ($member_id: Int!, $status: Int){
     amount_paid
 balance_payable
     detail
-    due_date
     start_date
     insurance_amount
     insurance_percent
@@ -298,6 +295,8 @@ balance_payable
     loan_amount
     status
     monthly_deduction
+    loan_payment_status
+    loan_repayment_status
     total_deduction
     total_loan
     total_paid
@@ -333,24 +332,29 @@ query ($member_id: Int!, $page: Int){
       id
       status
       amount
-      postedBy
-      approvedBy
-      paymentType
+      posted_by
+      approved_by
+      payment_type
       naration
+      txn_type
+      inserted_at
+      updated_at
         loan{
           id
-          loanAmount
+          loan_amount
+          approved_amount
+          loan_type_id
         }
         member{
           id
           surname
-          otherNames
+          other_names
           avatar
         }
       posted{
         id
         surname
-        otherNames
+        other_names
       }
       approved{
         id
@@ -359,13 +363,13 @@ query ($member_id: Int!, $page: Int){
         avatar
       }
       
-        memberId
-      loanId
+        member_id
+      loan_id
     }
-    pageSize
-    pageNumber
-    totalPages
-    totalEntries
+    page_size
+    page_number
+    total_pages
+    total_entries
   }
 }
 `;
