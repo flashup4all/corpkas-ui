@@ -58,7 +58,7 @@ const UpdateVendorProfile = () =>  {
                         <div className="col-md-6">
                             <label className="ks-label">Address</label>
                             <input className="ks-form-control form-control"
-                                placeholder="e.g U/rimi, Kaduna" type="date"
+                                placeholder="e.g U/rimi, Kaduna"
                                 value={address || ""}
                                 onChange={({ target }) => SetAddress(target.value)}
                              />

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import {UPDATE_MEMBER, GET_MEMBER} from '../../gql/members'
+import {UPDATE_MEMBER, GET_MEMBER, UPDATE_MEMBER_AVATAR} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
 import { useToasts } from 'react-toast-notifications'
 import swal from '@sweetalert/with-react'
+import SingleUpload from '../../components/shared/component/single-upload';
+import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 
-const ProfileSetting = ({memberData}) =>  {
+const ProfileSetting = ({memberData, onrefreshMember} = props) =>  {
     const { addToast } = useToasts()
     // console.log(props.memberData)
     // const memberData = props.memberData
@@ -22,6 +24,7 @@ const ProfileSetting = ({memberData}) =>  {
     const [details, setDetails] = useState(memberData.details)
     const [gender, setGender] = useState(memberData.gender)
     const [rank, setRank] = useState(memberData.rank)
+    const [avatar, setAvatar] = useState(memberData.avatar)
     const [current_monthly_income, setCurrentMonthlyIncome] = useState(memberData.current_monthly_income)
     const [monthly_contribution, setMonthlyContribution] = useState(memberData.monthly_contribution)
     
@@ -29,7 +32,6 @@ const ProfileSetting = ({memberData}) =>  {
     // update staff mutation
     const  [updateMember, {loading, error}] = useMutation( UPDATE_MEMBER, {
         onError: (error) => {
-            // console.log(e.graphQLErrors[0].message)
             console.log(error)
             addToast("Validation Error", {
                 appearance: 'warning',
@@ -37,7 +39,6 @@ const ProfileSetting = ({memberData}) =>  {
               })
         },
         onCompleted: (updateMember) =>{
-            console.log(updateMember)
             addToast("Profile Updated", {
                 appearance: 'success',
                 autoDismiss: true,
@@ -45,13 +46,50 @@ const ProfileSetting = ({memberData}) =>  {
             swal("Member has been Updated!", {
                 icon: "success",
             });
+            onrefreshMember();
         },
         refetchQueries:[{query: GET_MEMBER, variables:{id: memberData.id}}]
     })
      
+    const  [updateMemberAvatar, {imageLoading, imageError}] = useMutation(UPDATE_MEMBER_AVATAR, 
+        {
+        onError: (error) => {
+            console.log(error)
+            addToast("Validation Error", {
+                appearance: 'warning',
+                autoDismiss: true,
+            })
+        },
+        onCompleted: (updateMemberAvatar) =>{
+            console.log(updateMemberAvatar)
+            onrefreshMember();
+            addToast("Profile Image Updated", {
+                appearance: 'success',
+                autoDismiss: true,
+            })
+            swal("Profile Image has been Updated!", {
+                icon: "success",
+            });
+        },
+        refetchQueries:[{query: GET_MEMBER, variables:{id: memberData.id}}]
+    })
 
+    const prepareAvata = (avatar) => {
+        setAvatar(avatar)
+        // update avata mutation
+        if(avatar !== null){
+            updateMemberAvatar({variables:{id: memberData.id, image: avatar }})
+        }
+    }
+    
+    const changeProfileImage = () => {
+        setAvatar(null)
+    }
+    
      const submit = async (e) => {
          e.preventDefault();
+         console.log(avatar)
+         console.log(dob)
          updateMember({variables:{
             staff_no,
             surname,
@@ -60,11 +98,11 @@ const ProfileSetting = ({memberData}) =>  {
             faculty,
             phone_number,
             alt_phone_number,
-            dob: new Date(dob),
+            // dob: new Date(dob),
             details,
             rank,
             current_monthly_income,
-            monthly_contribution, id: memberData.id }})
+            monthly_contribution, id: memberData.id, image: avatar }})
          }
 
         return (
@@ -159,6 +197,7 @@ const ProfileSetting = ({memberData}) =>  {
                             <input className="ks-form-control form-control" 
                                 placeholder="E.g samuelvybz@gmail.com"
                                 value={email || ""}
+                                disabled
                                 onChange={({ target }) => setEmail(target.value)}
                              />
                         </div>
@@ -166,6 +205,7 @@ const ProfileSetting = ({memberData}) =>  {
                             <label className="ks-label">Phone Number</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="E.g 09080009000"
+                                disabled
                                 value={phone_number || ""}
                                 onChange={({ target }) => setPhoneNumber(target.value)}
                              />
@@ -186,14 +226,36 @@ const ProfileSetting = ({memberData}) =>  {
                                 onChange={({ target }) => setDetails(target.value)}
                              />
                         </div>
+                        {
+                            !avatar ?
+                            <div className="col-md-3">
+                                <SingleUpload onSelectFile={prepareAvata} loading={imageLoading} />
+                            </div>
+                            :
+                            <div className="col-md-3 mt-3">
+                                <div className="d-flex form-card">
+                                    <div>
+                                    <img src={memberData.avatar_url} style={{width: "50px",height: "56px"}}/>
+                                    </div>
+                                    <div className="form-card-p-con">
+                                        <p>
+                                            Profile Image
+                                        <span onClick={() => changeProfileImage()} className="float-right close-button"> <CrossCircleIcon primaryColor="#FF7452" /></span>
+                                        </p>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        }
+                        
                         <div className="col-12">
-                            <button className="btn float-right mt-5 " type="submit">
-                            {/* disabled={loading} 
+                            <button className="btn float-right mt-5 "  disabled={loading}  type="submit">
+                            
                             {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
-                            } */}
-                            EDIT PROFILE</button>
+                            }
+                            UPDATE PROFILE</button>
                         </div>
                     </div>
                 </form>

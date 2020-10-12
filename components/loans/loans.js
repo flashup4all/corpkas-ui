@@ -12,6 +12,7 @@ import { FILTER_LOANS, GET_LOANS } from '../../gql/loans';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 import AvatarGroup from '@atlaskit/avatar-group';
+import SingleLoanRequests from './single-loan-requests';
 
 const RANDOM_USERS = [
     {id: 1, name: "john"},
@@ -22,7 +23,6 @@ const RANDOM_USERS = [
 class Transactions extends Component {
     constructor(props) {
         super(props);
-        // setMode 0 = default, 1- create, 2- update 
         this.state = {
             loans: [],
             memberTotals: {},
@@ -38,10 +38,12 @@ class Transactions extends Component {
             filter_to: '',
             filter_txn_id: '',
             filter_txn_type: '',
-            guarantors : RANDOM_USERS.map(d => ({
-                name: d.name,
-              }))
+            guarantors : [],
+            selectedLoan: null
         }
+
+        this.refresh = this.refresh.bind(this);
+
     }
 
     componentDidMount()
@@ -56,14 +58,18 @@ class Transactions extends Component {
         // this.getMemberTotals()
     }
 
+    refresh(){
+        // this.filterLoans({status: 0})
+    }
+
     getTransactions(page = 1)
     {
         createApolloClient.query({
             query: GET_LOANS,
             variables: {page}
           }).then(response => {
-              const { data: {paginateLoans}} = response
-              console.log(paginateLoans)
+              let { data: {paginateLoans}} = response
+
               this.setState({
                   loans: paginateLoans.entries, 
                   sorted: paginateLoans.entries,
@@ -118,7 +124,7 @@ class Transactions extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {loans, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type, guarantors } = this.state
+    const {loans, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type, guarantors, selectedLoan } = this.state
     
     const filter_form = () => {
 
@@ -136,6 +142,22 @@ class Transactions extends Component {
 
     const viewTxn = (txn) => {
         console.log(txn)
+    }
+
+    const guarantorAvatar = (guarantors) => {
+    //     let array = [];
+    //     guarantors.map( g => {
+    //       array.push({id: g.member.id, name: g.member.surname +' '+g.member.other_names, href: g.member.avatar_url})
+    //   })
+    //   console.log(array)
+    const data = guarantors.map(g => ({id: g.member.id, name: g.member.surname +' '+g.member.other_names, href: g.member.avatar_url}));
+
+        return (
+            <AvatarGroup appearance="stack" data={data} />
+        )
+    }
+    const showSelectedLoan = (loan) => {
+        this.setState({setMode: 1, selectedLoan: loan })
     }
     return (
         <div>
@@ -208,8 +230,11 @@ class Transactions extends Component {
                      <th>Member</th>
                      {/* <th>Posted by</th> */}
                      <th>Loan Type</th>
-                     <th>&#8358; Amount</th>
                      <th>Interest Rate</th>
+                     <th>&#8358; Amount</th>
+                     <th>&#8358; Approved Amount</th>
+                     <th>&#8358; Amount Payable</th>
+                     <th>&#8358; Balance Payable</th>
                      <th>Date Applied</th>
                      <th>Guarantors</th>
                      <th>Status</th>
@@ -224,11 +249,14 @@ class Transactions extends Component {
                      {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
                      <td>{ loan.member.surname } { loan.member.other_names }</td>
                      <td>{loan.loan_type.name}</td>
-                     <td>&#8358; {loan.loan_amount}</td>
                      <td>{loan.loan_type.interest}</td>
+                     <td>{loan.loan_amount}</td>
+                     <td>{loan.approved_amount || '0.0'}</td>
+                     <td>{loan.amount_payable}</td>
+                     <td>{loan.balance_payable || "0.0"}</td>
                      <td>{loan.inserted_at}</td>
                      <td>
-                     <AvatarGroup appearance="stack" data={guarantors} />
+                        {guarantorAvatar(loan.guarantors)}
                      </td>
                      <td className={loan.status}>
                      {loan.status == 1 && <Badge type='success' title='APPROVED'/>}
@@ -236,7 +264,7 @@ class Transactions extends Component {
                         {loan.status == 2 && <Badge type='inprogress' title='DECLINED'/>}
                           {/* <Status status={txn.status} /> */}
                     </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td>
+                     <td onClick={() => showSelectedLoan(loan)}><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td>
                  </tr>
                   ))}
                 
@@ -264,10 +292,10 @@ class Transactions extends Component {
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Create Member Page
+                <p className="page-title mt-5">
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
-                <CreateMember />
+            <SingleLoanRequests loan={selectedLoan} onRefresh={this.refresh}/>
             </div>
         }
         </div>

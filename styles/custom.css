@@ -409,9 +409,36 @@ thead {
 	font-weight: 600;
 	font-size: 12px;
 	line-height: 16px;
-	color: #6B778C;
+	color: #808080;
 	margin-bottom: 0;
 	margin-top: 24px;
+}
+
+.ks-guarantor-label {
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 16px;
+	color: #808080;
+	margin-bottom: 0;
+	margin-top: 24px;
+}
+
+.ks-guarantor-radio {
+	margin-top: 40px;
+	display: flex;
+	flex-direction: row;
+}
+
+.ks-guarantor-radio-text {
+	font-size: 14px;
+}
+
+.ks-subheader {
+	color: #808080;
+}
+
+.Ks-createloan {
+	padding:20px;
 }
 
 .ks-form-control{
@@ -424,6 +451,23 @@ thead {
 .ks-form-control:focus{
 	border: 2px solid #4C9AFF;
 	box-shadow: none;
+}
+
+.ks-guarantorform {
+	padding:20px 0 20px 0;
+}
+
+.ks-guarantorform-header {
+	margin-bottom:-65px; 
+	padding-top:20px;
+}
+
+.ks-label {
+	color:#a4a4a4;
+}
+
+.ks-guarantordetail {
+	margin-bottom: -50px;
 }
 
 .ks-request-text {
@@ -468,6 +512,10 @@ thead {
 }
 .btn-danger{
 	background: #dc3545!important;
+}
+.btn-secondary{
+	background: #278840!important;
+	border: #278840!important;
 }
 .btn:hover{
 	background: #0065FF;
@@ -749,4 +797,38 @@ thead {
 	letter-spacing: 0.3px;
 	color: #253858;
 	padding: 0 0 1.5625em;
+}
+
+.form-card {
+	background: #ffffff;
+	border: 1px solid #deebff;
+	box-sizing: border-box;
+	border-radius: 3px;
+	/* width: 480px; */
+	padding: 8px;
+}
+.form-card-p-con{
+	width: 100%;
+}
+.form-card-p-con p{
+	margin: 0 8px;
+	
+}
+
+.form-card-img{
+	border-radius: 50%;
+}
+
+.btn-col{
+	margin-top: 42px;
+}
+
+.control-div{
+	background: #e9ecef;
+    border: 2px solid #DFE1E6;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 3px;
+	height: calc(1.5em + .75rem + 2px);
+	padding: 4px;
 }

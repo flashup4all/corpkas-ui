@@ -219,18 +219,23 @@ mutation updateLoanSetting(
 
 export const CREATE_LOAN = gql`
   mutation createLoan(
+    $monthly_net_income: String!,
     $loan_amount: String!,
     $member_id: Int!,
     $user_id: Int!,
     $loan_type_id: Int!
+    $payslip_image: Upload!
   ) {
       createLoan(loan: {
+        payslip_image: $payslip_image,
       loan_amount: $loan_amount,
       member_id: $member_id,
       user_id: $user_id,
-      loan_type_id: $loan_type_id
+      loan_type_id: $loan_type_id,
+      monthly_net_income: $monthly_net_income
     }){
-        
+      id
+      payslip_url
       actual_amount
       amount_payable
       approved_date
@@ -258,16 +263,48 @@ export const CREATE_LOAN = gql`
   }
 `;
 
+export const APPROVE_LOAN = gql`
+  mutation approveLoan(
+    $loan_amount: String!,
+    $id: Int!,
+    $member_id: Int!,
+    $user_id: Int!,
+    $loan_type_id: Int!
+    $approved_amount: String!
+    $is_insured: Boolean!
+    $upfront_deduction: Boolean!
+
+  ) {
+    approveLoan(loan: {
+      member_id: $member_id,
+      user_id: $user_id,
+      loan_amount: $loan_amount,
+      loan_type_id: $loan_type_id,
+      approved_amount: $approved_amount,
+      is_insured: $is_insured,
+      upfront_deduction: $upfront_deduction,
+    }, id: $id){
+      id
+      payslip_url
+      
+      }
+  }
+`;
+
 export const FILTER_LOANS = gql`
   mutation filterLoans(
     $member_id: Int,
     $loan_type_id: Int
     $status: Int
+    $loan_payment_status: Int
+    $loan_repayment_status: Int
     $from: String
     $to: String
     $overdue: String
   ) {
     filterLoans(filter: {
+      loan_payment_status: $loan_payment_status,
+      loan_repayment_status: $loan_repayment_status,
       member_id: $member_id,
       loan_type_id: $loan_type_id
       status: $status
@@ -275,9 +312,13 @@ export const FILTER_LOANS = gql`
       to: $to
       overdue: $overdue
     }){
-        
+      id
       actual_amount
+      approved_amount
+      amount_paid
       amount_payable
+      payback_amount
+      balance_payable
       approved_date
       reason
       detail
@@ -309,7 +350,16 @@ export const FILTER_LOANS = gql`
         name
         interest
       }
+      guarantors{
+       
+        member{
+          id
+          surname
+          other_names
+          avatar_url
+        }
       }
+    }
   }
 `;
 
@@ -318,6 +368,10 @@ query ($page: Int!){
   paginateLoans(page: $page) {
     entries{
       id
+      approved_amount
+      amount_paid
+      payback_amount
+      balance_payable
       actual_amount
       amount_payable
       approved_date
@@ -329,8 +383,10 @@ query ($page: Int!){
       interest_percent
       is_insured
       duration
+      reason
       loan_amount
       status
+      payslip_url
       monthly_deduction
       total_deduction
       total_loan
@@ -347,11 +403,23 @@ query ($page: Int!){
         id
         surname
         other_names
+        avatar_url
+        status
+        staff_no
       }
       loan_type{
         id
         name
         interest
+      }
+      guarantors{
+       
+        member{
+          id
+          surname
+          other_names
+          avatar_url
+        }
       }
     }
     page_size
@@ -360,4 +428,167 @@ query ($page: Int!){
     total_entries
   }
 }
+`;
+
+//loan guarantors
+export const CREAT_LOAN_GUARANTOR = gql`
+mutation createLoanGuarantor(
+  $member_id: Int!,
+  $loan_id: Int!,
+  $status: Int!
+){
+  createLoanGuarantor(loanGuarantor: {
+    status: $status
+		loan_id: $loan_id
+    member_id: $member_id
+  }){
+  
+    
+      id
+      status
+    	loan{
+        id
+      }
+    	member{
+        id
+      }
+    	member_id
+    loan_id
+  
+    	
+    	
+    
+  }
+}
+`
+export const GET_LOAN_GUARANTORS = gql`
+query ($loan_id: Int!){
+  loanGuarantors(loan_id: $loan_id) {
+    id
+    loan {
+      id
+      loanAmount
+    }
+    member{
+      id
+      surname
+      otherNames
+      avatar
+      avatar_url
+      staff_no
+    }
+    memberId
+      loanId
+    comment
+    status
+
+    }
+}
+`;
+
+export const CREATE_LOANS_TXNS = gql`
+mutation createLoanTransaction(
+    $status: Int
+		$loan_id: Int!
+    $member_id: Int!,
+    $naration: String
+    $txn_type: Int!
+    $payment_type: String
+    $amount: Int!
+    $posted_by: Int!
+  ){
+    createLoanTransaction(
+      loanTransaction: {
+      member_id: $member_id,
+      naration: $naration
+      txn_type: $txn_type
+      payment_type: $payment_type
+      amount: $amount
+      posted_by: $posted_by
+      loan_id: $loan_id
+      status: $status
+      }
+    ){
+
+
+      id
+      status
+      amount
+      postedBy
+      approvedBy
+      paymentType
+      naration
+        loan{
+          id
+          loanAmount
+        }
+        member{
+          id
+          surname
+          otherNames
+          avatar
+        }
+      posted{
+        id
+        surname
+        otherNames
+      }
+      approved{
+        id
+        surname
+        otherNames
+        avatar
+      }
+      
+        memberId
+      loanId
+    }
+}
+`;
+
+export const APPROVE_LOAN_TXN = gql`
+  mutation approveLoanTransaction(
+      $status: Int!,
+      $member_id: Int!,
+      $id: Int!,
+      $loan_id: Int!,
+      $approved_by: Int!,
+    ) {
+      approveLoanTransaction(loanTransaction: {
+        approved_by: $approved_by,
+        status: $status,
+        id: $id
+        member_id: $member_id
+        loan_id: $loan_id
+      }){
+      id
+      approved_by
+      status
+      
+        
+    }
+  }
+`;
+export const CANCEL_LOAN_TXN = gql`
+  mutation cancelLoanTransaction(
+      $status: Int!,
+      $member_id: Int!,
+      $id: Int!,
+      $loan_id: Int!,
+      $approved_by: Int!,
+    ) {
+      cancelLoanTransaction(loanTransaction: {
+        approved_by: $approved_by,
+        status: $status,
+        id: $id
+        member_id: $member_id
+        loan_id: $loan_id
+      }){
+      id
+      approved_by
+      status
+      
+        
+    }
+  }
 `;

@@ -64,17 +64,16 @@ class TransactionSchedule extends Component {
             variables: variables
           }).then(response => {
               let { data: {filterMembers}} = response
-              filterMembers.map(member => member.check = false)
-              console.log(filterMembers)
-              this.setState({
-                    transactions: filterMembers, 
-                    sorted: filterMembers,
-                    totalEntries: 0,
-                    totalPages: 0,
-                    pageNumber: 0,
-                    pageSize: 0,
-
-                })
+            //   filterMembers.map(member => member.check = false)
+            //   console.log(filterMembers)
+            //   this.setState({
+            //         transactions: filterMembers, 
+            //         sorted: filterMembers,
+            //         totalEntries: 0,
+            //         totalPages: 0,
+            //         pageNumber: 0,
+            //         pageSize: 0,
+            //     })
             }, error => console.log(error))
     }
     getMemberTotals(page = 1)

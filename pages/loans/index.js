@@ -6,6 +6,7 @@ import LoanTypes from '../../components/loans/loan-types';
 import LoanBankSchedule from '../../components/loans/loan-bank-schedule';
 import RepaymentSchedule from '../../components/loans/repayment-schedule';
 import Loans from '../../components/loans/loans';
+import CreateLoan from '../../components/loans/applyforloan'; 
 import { LOAN_SETTING } from '../../gql/loans'
 
 const tabs = [
@@ -41,7 +42,7 @@ const LoanSettings = () => {
         <Tabs onSelect={(selected, selectedIndex) => selectTab(selected, selectedIndex)} tabs={tabs} />
       </div>
 
-      <div className="bg-grey mt-5">
+      <div className="mt-5">
         { seletedTab === 0 &&
           <Loans status="" showSearch={true}/>
         }
@@ -51,14 +52,20 @@ const LoanSettings = () => {
         { seletedTab === 2 &&
           <Loans  status="1" />
         }
-        { seletedTab === 5 &&
-          <LoanBankSchedule status="0" />
+        { seletedTab === 3 &&
+          <Loans  status="1" />
+        }
+        { seletedTab === 4 &&
+          <CreateLoan  status="1" />
         }
         { seletedTab === 5 &&
           <LoanBankSchedule status="0" />
         }
         { seletedTab === 6 &&
-          <RepaymentSchedule status="0" />
+          <>
+          <div>coming soon</div>
+          </>
+          // <RepaymentSchedule status="0" />
         }
       </div>
     </div>

@@ -25,12 +25,12 @@ class ManageMembers extends Component {
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             members: [],
+            sorted: [],
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
             totalEntries: 0,
             totalPages: 0,
-            sorted: [],
             setMode: 0,
             activeWidget: ''
         }
@@ -44,20 +44,13 @@ class ManageMembers extends Component {
 
     getMembers(page = 1)
     {
+        let result = '';
         createApolloClient.query({
             query: GET_PAGINATE_MEMBERS,
             variables: {page: page}
           }).then(response => {
-              const result = response.data.paginateMembers
-              this.setState({
-                  members: result.entries, 
-                  sorted: result.entries,
-                  totalEntries: result.totalEntries,
-                  totalPages: result.totalPages,
-                  pageNumber: result.pageNumber,
-                  pageSize: result.pageSize,
-
-                })
+              let {entries, totalPages} = response.data.paginateMembers
+            this.setState({ members: entries, sorted: entries, totalPages: totalPages,})
             }, error => console.log(error))
     }
     getMemberTotals(page = 1)
@@ -167,7 +160,9 @@ class ManageMembers extends Component {
                      <td>{member.dept}</td>
                      <td>&#8358; {member.current_balance}</td>
                      <td>{member.phone_number}</td>
-                     <td className={member.status}> <Status status={member.status} /></td>
+                     <td className={member.status}> 
+                        <Status status={member.status} />
+                     </td>
                      <td>
                      <Link href="members/[member_id]" as={`members/${member.id}`}>
                         <a className="remove-decoration">

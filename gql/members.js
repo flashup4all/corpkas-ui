@@ -13,6 +13,7 @@ query ($page: Int){
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -48,6 +49,7 @@ query ($id: Int!){
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -78,6 +80,7 @@ query {
       altPhoneNumber
       current_balance
       avatar
+      avatar_url
       monthly_contribution
       current_monthly_income
       dept
@@ -148,7 +151,7 @@ export const CREATE_MEMBER = gql`
         gender
         avatar
         dob
-        avatar
+        avatar_url
         role
         status
         userId
@@ -166,7 +169,7 @@ export const UPDATE_MEMBER = gql`
   mutation updateMember(
       $staff_no: String, $surname: String, 
       $other_names: String, $role: String,
-      $dob: String!,$gender: String, 
+      $dob: String, $gender: String, 
       $status: String,$email: String, 
       $alt_phone_number: String,
       $dept: String,
@@ -200,9 +203,35 @@ export const UPDATE_MEMBER = gql`
         phone_number
         alt_phone_number
         gender
-        avatar
         dob
         avatar
+        avatar_url
+        role
+        status
+        userId
+        staff_no
+        inserted_at
+        updated_at
+        membership_date
+           
+        
+      }
+  }
+`;
+export const UPDATE_MEMBER_AVATAR = gql`
+  mutation uploadMemberAvatar($image: Upload!, $id: Int!) {
+        uploadMemberAvatar(image: $image, id: $id){
+        
+        id
+        surname
+        other_names
+        email
+        phone_number
+        alt_phone_number
+        gender
+        dob
+        avatar
+        avatar_url
         role
         status
         userId
@@ -216,6 +245,32 @@ export const UPDATE_MEMBER = gql`
   }
 `;
 
+export const SEARCH_MEMBERS = gql`
+query ($searchTerm: String!){
+  searchMember(searchTerm: $searchTerm) {
+    
+    id
+    surname
+    other_names
+    email
+    phone_number
+    alt_phone_number
+    gender
+    avatar
+    dob
+    dept
+    avatar_url
+    role
+    status
+    userId
+    staff_no
+    inserted_at
+    updated_at
+    membership_date
+  }
+}
+`;
+
 
 //loans
 export const GET_MEMBER_LOANS = gql`
@@ -225,8 +280,12 @@ query ($member_id: Int!, $status: Int){
     actual_amount
     amount_payable
     approved_date
+    approved_amount
+    payback_amount
+    amount_paid
+balance_payable
     detail
-    due_date
+    start_date
     insurance_amount
     insurance_percent
     interest_amount
@@ -236,6 +295,8 @@ query ($member_id: Int!, $status: Int){
     loan_amount
     status
     monthly_deduction
+    loan_payment_status
+    loan_repayment_status
     total_deduction
     total_loan
     total_paid
@@ -244,10 +305,71 @@ query ($member_id: Int!, $status: Int){
     member_id
     user_id
     due_date
+    reason
+    payslip_url
     approved_date
     inserted_at
     updated_at
+    member{
+      id
+      surname
+      other_names
+    }
+    loan_type{
+      id
+      name
+      interest
+    }
 
+  }
+}
+`;
+export const GET_MEMBER_LOANS_TXNS = gql`
+query ($member_id: Int!, $page: Int){
+  memberLoanTransactions(member_id: $member_id, page: $page){
+
+    entries{
+      id
+      status
+      amount
+      posted_by
+      approved_by
+      payment_type
+      naration
+      txn_type
+      inserted_at
+      updated_at
+        loan{
+          id
+          loan_amount
+          approved_amount
+          loan_type_id
+        }
+        member{
+          id
+          surname
+          other_names
+          avatar
+        }
+      posted{
+        id
+        surname
+        other_names
+      }
+      approved{
+        id
+        surname
+        otherNames
+        avatar
+      }
+      
+        member_id
+      loan_id
+    }
+    page_size
+    page_number
+    total_pages
+    total_entries
   }
 }
 `;
@@ -318,6 +440,7 @@ export const FILTER_MEMBERS = gql`
         altPhoneNumber
         current_balance
         avatar
+        avatar_url
         monthly_contribution
         current_monthly_income
         dept
