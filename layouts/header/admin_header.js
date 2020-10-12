@@ -13,14 +13,14 @@ class Adminheader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: undefined,
-      staff: undefined,
-      member: undefined,
+      user: getUser(),
+      staff: getStaff(),
+      member: getMember(),
     }
   }
 componentDidMount(){
   
-  
+  console.log(getUser())
 }
 componentDidUpdate()
 {
@@ -33,18 +33,7 @@ componentDidUpdate()
 
   render()
   {
-    // const { user, member, staff } = this.state
-    // let user = JSON.parse(localStorage.getItem(USER))
-
-    // console.log(user)
-    // let user = getUser()
-
-    // if(user && user.role === 'member'){
-    //   user = JSON.parse(localStorage.getItem(MEMBER))
-    // }else if((user && user.role === "admin") || (user && user.role === "staff") || (user && user.role === "manager")){
-    //   user = JSON.parse(localStorage.getItem(STAFF))
-    // }
-    // console.log(user)
+    const { user, member, staff } = this.state
 
     const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
       <a
@@ -67,11 +56,14 @@ componentDidUpdate()
             <input type="search" aria-label="Search" name="s" className="global-search" placeholder="Global search" />
           </div>
           <div className="icon-div">
-            <img src="/top-nav-icons/notifications.png" alt=""></img>
-            <HipchatChevronDownIcon />
+            {/* <img src="/top-nav-icons/notifications.png" alt=""></img> */}
+            {/* <HipchatChevronDownIcon /> */}
             <div className="profile-user">
-              {/* {user && user.role != "super_admin" && <h4>{ user.surname +' '+ user.other_names }</h4>} */}
-            {/* <p>{user && user.role.replace('_', ' ')}</p> */}
+              {user && user.role == "super_admin" && <h4>{ user.email}</h4>} 
+              {user && user.role == "admin" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
+              {user && user.role == "manager" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
+              {user && user.role == "member" && <h4>{ member.surname +' '+ member.other_names }</h4>}
+            <p>{user && user.role.replace('_', ' ')}</p>
             </div>
             {/* <img src="/top-nav-icons/profile circle.png" alt=""></img> */}
             
