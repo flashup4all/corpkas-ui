@@ -42,7 +42,6 @@ class Dashboard extends Component {
         createApolloClient.query({
             query: GET_MEMBER_TOTALS,
           }).then(response => {
-              console.log(response)
               this.setState({memberTotals: response.data.memberTotals})
             }, error => console.log(error))
     }

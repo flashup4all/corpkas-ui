@@ -65,9 +65,10 @@ componentDidUpdate()
             {/* <HipchatChevronDownIcon /> */}
             <div className="profile-user">
               {user && user.role == "super_admin" && <h4>{ user.email}</h4>} 
-              {user && user.role == "admin" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
-              {user && user.role == "manager" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
-              {user && user.role == "member" && <h4>{ member.surname +' '+ member.other_names }</h4>}
+              {user && user.role == "admin" && <h4>{ staff.surname || '' } {staff.other_names || ''}</h4>}
+              {user && user.role == "manager" && <h4>{ staff.surname || '' } {staff.other_names || ''}</h4>}
+              {user && user.role == "staff" && <h4>{ staff.surname || '' } {staff.other_names || ''}</h4>}
+              {user && user.role == "member" && <h4>{ member.surname || '' } {member.other_names || ''}</h4>}
               <p>{user && user.role.replace('_', ' ')}</p>
             </div>
             {/* <img src="/top-nav-icons/profile circle.png" alt=""></img> */}
