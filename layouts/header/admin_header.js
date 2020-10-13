@@ -13,18 +13,24 @@ class Adminheader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: getUser(),
-      staff: getStaff(),
-      member: getMember(),
+      user: '',
+      staff: '',
+      member: '',
     }
   }
 componentDidMount(){
-  
-  console.log(getUser())
+  let user = getUser()
+  let staff = getStaff()
+  let member = getMember()
+  this.setState({
+    user: user,
+    staff: staff,
+    member: member,
+  })
 }
 componentDidUpdate()
 {
-
+  
 }
   logout(){
     clearStorage()
@@ -34,7 +40,6 @@ componentDidUpdate()
   render()
   {
     const { user, member, staff } = this.state
-
     const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
       <a
         href=""
@@ -63,7 +68,7 @@ componentDidUpdate()
               {user && user.role == "admin" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
               {user && user.role == "manager" && <h4>{ staff.surname +' '+ staff.other_names }</h4>}
               {user && user.role == "member" && <h4>{ member.surname +' '+ member.other_names }</h4>}
-            <p>{user && user.role.replace('_', ' ')}</p>
+              <p>{user && user.role.replace('_', ' ')}</p>
             </div>
             {/* <img src="/top-nav-icons/profile circle.png" alt=""></img> */}
             

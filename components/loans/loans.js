@@ -264,7 +264,9 @@ class Transactions extends Component {
                         {loan.status == 2 && <Badge type='inprogress' title='DECLINED'/>}
                           {/* <Status status={txn.status} /> */}
                     </td>
-                     <td onClick={() => showSelectedLoan(loan)}><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span></td>
+                     <td className="cursor" onClick={() => showSelectedLoan(loan)}> 
+                     {/* <WatchIcon size="meduim" isBold primaryColor="#0052CC" /> */}
+                     <span className="view-icon">VIEW</span></td>
                  </tr>
                   ))}
                 
