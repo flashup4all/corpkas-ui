@@ -11,15 +11,18 @@ import { useState, useEffect, setState, withState } from 'react';
 
 function AdminMainLayout ({ children }){
 
-  // const [user, setUser] = useState()
+  // const [user, setUser] = useState(undefined)
 // let user;
-  // useEffect(() => {
-    // setState(state => ({ ...state, user: getUser() }));
-    // setUser(getUser())
-    // console.log(user)
+const [user, setUser] = useState({}, () => {
+  const localData = getUser();
+  return localData ? localData : {};
+});
+  useEffect(() => {
+   
+    
 
-  // }, [getUser()]);
-// console.log(user)
+  }, []);
+console.log(user)
   return(<div className="d-flex" id="wrapper">
     <Head>
       <title>KASU MPCS</title>

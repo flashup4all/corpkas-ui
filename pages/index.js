@@ -10,17 +10,16 @@ const LoginForm = ({ setError, setToken }) =>{
 
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
+  const [formLoader, setFormLoader] = useState(false)
 
   const [ authenticate, { loading, error } ] = useMutation(LOGIN, {
     onError: (error) => {
-        // console.log(error)
     //   setError(error.graphQLErrors[0].message)
     },
     onCompleted({authenticate}){
       const token = authenticate.token
       const user = authenticate.user
       const vendor = authenticate.vendor
-      console.log(vendor)
       storeToken(token)
       storeUser(user)
       storeVendor(vendor)
@@ -35,6 +34,7 @@ const LoginForm = ({ setError, setToken }) =>{
           const staff = authenticate.staff
           storeStaff(staff)
       }
+      setFormLoader(false)
       // setTimeout(() => {
       router.push('/dashboard')
       // }, 500);
@@ -54,6 +54,7 @@ const LoginForm = ({ setError, setToken }) =>{
 
   const submit = async (event) => {
     event.preventDefault()
+    setFormLoader(true)
     authenticate({ variables: { email, password } })
   }
 
@@ -85,7 +86,7 @@ const LoginForm = ({ setError, setToken }) =>{
                       </div>
                   <button disabled={loading} className="btn btn-md btn-primary btn-block text-uppercase" type='submit'>
                       {
-                        loading &&
+                        formLoader &&
                         <Spinner appearance="invert" size="medium"/>
                       }
                      <span className="ml-2" >login</span>

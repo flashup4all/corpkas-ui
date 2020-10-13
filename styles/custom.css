@@ -832,3 +832,6 @@ thead {
 	height: calc(1.5em + .75rem + 2px);
 	padding: 4px;
 }
+.cursor{
+	cursor: pointer;
+}

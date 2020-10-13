@@ -290,7 +290,7 @@ class Transactions extends Component {
                      </td>
                      <td className={loan_repayment.status}> <Status status={loan_repayment.status} /></td>
                      <td>{MonthYear(loan_repayment.loan.inserted_at)}</td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
+                     <td className="cursor"><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
