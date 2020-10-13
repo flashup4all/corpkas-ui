@@ -5,7 +5,7 @@ import {clearStorage, getVendor, getUser, getStaff, getMember} from '../../compo
 import { useState, useEffect, setState, withState } from 'react';
 
 function AdminMainLayout ({ children }){
-  
+
   return(<div className="d-flex" id="wrapper">
     <Head>
       <title>KASU MPCS</title>
