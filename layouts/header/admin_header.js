@@ -39,7 +39,6 @@ componentDidUpdate()
 
   render()
   {
-    
     const { user, member, staff } = this.state
     const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
       <a
