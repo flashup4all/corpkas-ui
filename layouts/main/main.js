@@ -4,25 +4,8 @@ import SideBarNav from '../sidebar/sidebar-nav';
 import {clearStorage, getVendor, getUser, getStaff, getMember} from '../../components/shared/local'
 import { useState, useEffect, setState, withState } from 'react';
 
-// const user = getUser()
-// const member = getMember()
-// const staff = getStaff()
-// console.log(user)
-
 function AdminMainLayout ({ children }){
 
-  // const [user, setUser] = useState(undefined)
-// let user;
-const [user, setUser] = useState({}, () => {
-  const localData = getUser();
-  return localData ? localData : {};
-});
-  useEffect(() => {
-   
-    
-
-  }, []);
-console.log(user)
   return(<div className="d-flex" id="wrapper">
     <Head>
       <title>KASU MPCS</title>
