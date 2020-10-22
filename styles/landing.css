@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
+
+/* nav */
+.page-nav {
+    padding: 2.1875em 11.5em;
+    background: #ECF5FE;
+    box-shadow: 0px 3px 5px rgba(9, 30, 66, 0.2), 0px 0px 1px rgba(9, 30, 66, 0.31);
+}
+
+.nav-h1 {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 18px;
+    color: #172B4D;
+}
+
+/* section-one */
+.section-one {
+    background: url(../public/images/hero_banner.png), #ECF5FE;
+    padding: 10em 11.5em 10em;
+}
+
+.page-heading {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: 1px;
+    color: #172B4D;
+}
+
+.page-para {
+    font-family: 'Titillium Web', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 1px;
+    color: #172B4D;
+    text-align: justify;
+
+}
+
+.service-link {
+    background: #0081FF;
+    border-radius: 4px;
+    font-family: Helvetica;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+    color: #FFF;
+    align-self: center;
+    margin: 10px 0px;
+    padding: 0.75em 2em;
+}
+
+.service-link:hover {
+    color: #FFF;
+    text-decoration: none;
+}
+
+/* form */
+.form {
+    background: #FFFFFF;
+    border: 0.5px solid #DFE0EB;
+    box-sizing: border-box;
+    border-radius: 4px;
+    padding: 2em 2em 3em 2em;
+}
+
+.form-heading {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 40px;
+    letter-spacing: 1px;
+    color: #172B4D;
+}
+
+.form-para {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 1px;
+    color: #252733;
+}
+
+.form-label {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 1px;
+    color: #6B778C;
+}
+
+::placeholder {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 1px;
+    color: #344563;
+}
+
+.forgot-pw {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 1px;
+    color: #344563;
+}
+
+/* .section-two */
+.section-two {
+    padding: 7em 11.5em;
+}
+
+.service-h2 {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 40px;
+    line-height: 53px;
+    color: #172B4D;
+}
+
+.blue-border {
+    border-bottom: 4px solid #0081FF;
+    width: 40px;
+    margin: 0 auto;
+}
+
+.h3 {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 23px;
+    line-height: 28px;
+    color: #172B4D;
+    margin: 1.4375em 0 1.5875em;
+}
+
+/* footer */
+.page-footer {
+    background: #F4F5F7;
+    padding: 7em 11.5em;
+}
+
+.footer-para {
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 20px;
+    color: #091E42;
+}
+
+@media (max-width: 1000px) {
+    .page-nav {
+        padding: 2.1875em 3em;
+    }
+
+    .section-one {
+        padding: 10em 3em 7em;
+    }
+    
+
+    .section-two {
+        padding: 3em 8em;
+        text-align: center;
+    }
+    .page-footer {
+        background: #F4F5F7;
+        padding: 7em 3em;
+    }
+    .form {
+        margin-top:5em;
+    }
+}
+@media (max-width: 500px) {
+    .page-heading{
+        font-size: 32px;
+        text-align: center;
+    }
+    .service-h2{
+        font-size: 32px;
+    }
+    .page-nav {
+        padding: 2.1875em 1em;
+    }
+
+    .section-one {
+        padding: 10em 1em 7em;
+    }
+    
+
+    .section-two {
+        padding: 3em 1em;
+        text-align: center;
+    }
+    .h3{
+        margin: 1em 0 1em;
+    }
+    .page-footer {
+        background: #F4F5F7;
+        padding: 7em 1em;
+    }
+}

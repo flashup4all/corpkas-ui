@@ -1,0 +1,119 @@
+
+
+.active-mobile-tab{
+	color: #fff;
+	cursor: pointer;
+}
+.inactive-mobile-tab{
+	color: #ffffff82;;
+	cursor: pointer;
+}
+.bg-gray{
+	background: #F4F5F7;
+}
+.gray-border{
+	border-bottom: 0.2px solid #8993A4;
+	margin: 0;
+	color:  #8993A4;
+}
+.greeting-text {
+	/* font-family: "SF Pro Text Regular"; */
+	font-style: normal;
+	font-weight: 500;
+	font-size: 16px;
+	line-height: 154.3%;
+	color: #172b4d;
+}
+.main-log-card {
+	border-radius: 4px;
+}
+
+.individual-card_des {
+	font-size: 2.1875rem;
+	line-height: 40px;
+	color: #172b4d;
+}
+
+.log-card p {
+	/* font-family: Helvetica; */
+	font-size: 12px;
+	line-height: 24px;
+	color: #172b4d;
+	margin: 0;
+}
+.log-card h1 {
+	font-size: 24px;
+	line-height: 24px;
+}
+.activated {
+	padding: 3px 4px 2px;
+	font-size: 11px;
+	line-height: 16px;
+
+	display: flex;
+	/* flex-direction: column; */
+	align-items: center;
+	text-align: center;
+	letter-spacing: -0.084px;
+	text-transform: uppercase;
+	color: #ffffff;
+	background: #0052cc;
+	border-radius: 3px;
+	margin-right: 12px;
+}
+.active-loans {
+	display: flex;
+	padding: 3px 4px 2px;
+	align-items: center;
+	text-align: center;
+	letter-spacing: -0.084px;
+	text-transform: uppercase;
+	color: #ffffff;
+	background: #42526e;
+	border-radius: 3px;
+	font-size: 11px;
+	line-height: 16px;
+}
+
+.sub-menu {
+	padding: 1.75em 0;
+	background: #2177f8;
+	border-radius: 10px;
+	margin-bottom: 2em;
+}
+.sub-menu h3 {
+	/* font-family: "SF Pro Text Regular"; */
+	font-style: normal;
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 14px;
+}
+.sub-menu div {
+	text-align: center;
+}
+
+.date-h3 {
+	/* font-family: "SF Pro Text Regular"; */
+	font-style: normal;
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 14px;
+	color: #474747;
+}
+.bold-h2 {
+	/* font-family: "SF Pro Text Regular"; */
+	font-style: normal;
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 17px;
+	color: #2e2c47;
+}
+
+.green-figure {
+	/* font-family: "SF Pro Text Regular"; */
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 17px;
+	color: #36b37e;
+}

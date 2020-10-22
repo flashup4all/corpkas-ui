@@ -5,6 +5,7 @@ import Spinner from '@atlaskit/spinner';
 import { ToastProvider, useToasts } from 'react-toast-notifications'
 import {Badge} from '../../layouts/extras';
 import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
+import EmptyData from '../../layouts/empty';
 
 
 // export class extends Component {
@@ -50,7 +51,7 @@ const LoanRequests = ({ memberData }) =>  {
     
         return (
             <div className="grey-container">
-                <p className="active-loan">Active Loans</p>
+                { memberLoans && memberLoans.length >0 &&  <p className="active-loan">Active Loans</p>}
                     { memberLoans && 
                         memberLoans.map(loan => {
                             return (
@@ -163,6 +164,12 @@ const LoanRequests = ({ memberData }) =>  {
                                 </div>
                             )
                         })
+                    }
+                    { memberLoans && memberLoans.length ==0 &&
+                        <div>
+                            <EmptyData title="" text=""/>
+                            <p className="row align-items-center justify-content-center">You do not have any active loan currently. </p> 
+                        </div>
                     }
                     
             </div>

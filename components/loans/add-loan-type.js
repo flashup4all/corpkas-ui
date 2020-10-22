@@ -9,7 +9,6 @@ import { Checkbox } from '@atlaskit/checkbox';
 import swal from '@sweetalert/with-react'
 
 const AddLoanType = ({ handleClick, selectedLoanType }) =>  {
-    console.log(getUser())
     const editLoanType = selectedLoanType
     const { addToast } = useToasts()
     const [buttonName, setButtonName] = useState('Create')
@@ -64,25 +63,9 @@ const AddLoanType = ({ handleClick, selectedLoanType }) =>  {
               swal("Data has been Created!", {
                     icon: "success",
                 });
-              resetForm()
+            //   resetForm()
         },
         refetchQueries: [{ query: LOAN_TYPES}],
-        // update: (cache, {data: {updateLoanType}}) => {
-        //     try {
-        //         let { loanTypes } = cache.readQuery({ query: LOAN_TYPES });
-        //         var foundIndex = loanTypes.findIndex(x => x.id == data.id);
-        //         loanTypes[foundIndex] = data;
-        //         cache.writeQuery({
-        //           query: LOAN_TYPES,
-        //           data: {
-        //               'loanTypes': loanTypes
-        //           }
-        //         });
-        //         LoanSettings.selectTab(0,0)
-        //       } catch (e) {
-        //           console.log(e)
-        //       }
-        // }
     })
     const resetForm = () => {
         setName('')
@@ -123,6 +106,9 @@ const AddLoanType = ({ handleClick, selectedLoanType }) =>  {
     }
     const checkBoxValue = (e,) => {
         console.log(e)
+    }
+    const checkValid = () => {
+        return (name && duration && maximum_amount && interest && insurance_percent_charge && status)
     }
         return (
             <div className="">
@@ -230,7 +216,7 @@ const AddLoanType = ({ handleClick, selectedLoanType }) =>  {
                             />
                         </div>
                         <div className="col-12">
-                            <button disabled={loading}  className="btn float-right mt-5 " type="submit">
+                            <button disabled={loading || !checkValid()}  className="btn float-right mt-5 " type="submit">
                             {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>

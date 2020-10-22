@@ -220,7 +220,7 @@ mutation updateLoanSetting(
 export const CREATE_LOAN = gql`
   mutation createLoan(
     $monthly_net_income: String!,
-    $loan_amount: String!,
+    $loan_amount: Float!,
     $member_id: Int!,
     $user_id: Int!,
     $loan_type_id: Int!

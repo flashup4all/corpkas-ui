@@ -4,7 +4,7 @@ import SideBarNav from '../sidebar/sidebar-nav';
 import {clearStorage, getVendor, getUser, getStaff, getMember} from '../../components/shared/local'
 import { useState, useEffect, setState, withState } from 'react';
 
-function AdminMainLayout ({ children }){
+function MobileLayout ({ children }){
 
   return(
   <div className="d-flex" id="wrapper">
@@ -19,7 +19,7 @@ function AdminMainLayout ({ children }){
     <Adminheader />
     <div className="container-fluid mb-4 ks-pages0container">
       <br></br>
-      <div className="content-wrapper layout mt-1 ">{children}</div>
+      <div className="content-wrapper mt-1 ">{children}</div>
     </div>
     </div>
     
@@ -42,4 +42,4 @@ function AdminMainLayout ({ children }){
   );
 }
 
-export default AdminMainLayout;
+export default MobileLayout;

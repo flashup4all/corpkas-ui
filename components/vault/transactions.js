@@ -9,18 +9,19 @@ import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
 import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
+import { GET_VAULT_TYPES, GET_VAULT_TRANSACTIONS } from '../../gql/vault';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 import * as xlsx from 'xlsx';
 import * as FileSaver from 'file-saver';
 
-class Transactions extends Component {
+class VualtTransactions extends Component {
     constructor(props) {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
             transactions: [],
-            memberTotals: {},
+            vaultTypes: [],
             pageNumber: 1,
             pageSize: 0,
             totalEntries: 0,
@@ -45,23 +46,24 @@ class Transactions extends Component {
             this.getTransactions()
         }
         
-        // this.getMemberTotals()
+        this.getVaultTypes()
     }
 
     getTransactions(page = 1)
     {
         createApolloClient.query({
-            query: GET_TRANSACTIONS,
+            query: GET_VAULT_TRANSACTIONS,
             variables: {page}
           }).then(response => {
-              const { data: {paginateTransactions}} = response
+              console.log(response)
+              const { data: {paginateVaultTransactions}} = response
               this.setState({
-                  transactions: paginateTransactions.entries, 
-                  sorted: paginateTransactions.entries,
-                  totalEntries: paginateTransactions.total_entries,
-                  totalPages: paginateTransactions.total_pages,
-                  pageNumber: paginateTransactions.page_number,
-                  pageSize: paginateTransactions.page_size,
+                  transactions: paginateVaultTransactions.entries, 
+                  sorted: paginateVaultTransactions.entries,
+                  totalEntries: paginateVaultTransactions.total_entries,
+                  totalPages: paginateVaultTransactions.total_pages,
+                  pageNumber: paginateVaultTransactions.page_number,
+                  pageSize: paginateVaultTransactions.page_size,
                 })
             }, error => console.log(error))
     }
@@ -84,12 +86,13 @@ class Transactions extends Component {
                 })
             }, error => console.log(error))
     }
-    getMemberTotals(page = 1)
+    getVaultTypes(page = 1)
     {
         createApolloClient.query({
-            query: GET_MEMBER_TOTALS,
+            query: GET_VAULT_TYPES,
           }).then(response => {
-              this.setState({memberTotals: response.data.memberTotals})
+              const {data: {vaultTypes}} = response
+              this.setState({vaultTypes: vaultTypes})
             }, error => console.log(error))
     }
     
@@ -122,7 +125,7 @@ class Transactions extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
+    const {vaultTypes, transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
     
     const filter_form = () => {
 
@@ -133,7 +136,6 @@ class Transactions extends Component {
             filter_to ? variables.to = new Date(filter_to)  : null
             filter_txn_type ? variables.txn_type = parseInt(filter_txn_type) : null
             filter_status ? variables.status = parseInt(filter_status) : null
-            // variables.member_id =  this.state.memberData.id
             this.filterTransactions(variables)
         }
     }
@@ -161,8 +163,8 @@ class Transactions extends Component {
              <div >
                  {this.props.status !== "0" && 
                     <div style={{padding:'20px'}}>
-                        <div className="row">
-                        <div className="col-md-3 ks-col">
+                       {/* <div className="row">
+                         <div className="col-md-3 ks-col">
                                 <label>Txn ID</label>
                                 <input type="text" name="search" 
                                 className="form-control ks-form-control" 
@@ -201,16 +203,17 @@ class Transactions extends Component {
                                 </select>
                             </div>
                         </div>
+                             */}
+
                         <div className="row mt-3">
                             <div className="col-md-3 ks-col">
-                                <label>Status</label>
+                                <label>Type</label>
                                 <select className="ks-form-control form-control" 
                                     value={filter_status || ""}
                                     onChange={({ target }) => this.setState({filter_status: target.value})}
                                     >
-                                    <option value="">Status</option>
-                                    <option value="1">Approved</option>
-                                    <option value="0">Pending</option>
+                                    <option value="">Select Filter</option>
+                                    {vaultTypes && vaultTypes.map((vaultType, index) => <option key={index} value={vaultType.id}>{vaultType.name}</option>)}
                                 </select>
                             </div>
                             <div className="col-md-2 ks-col">
@@ -220,7 +223,7 @@ class Transactions extends Component {
                     </div>
                  }
                  
-                <button onClick={(e) => exportToCSV(sorted,"fileName")}>Export</button>
+                {/* <button onClick={(e) => exportToCSV(sorted,"fileName")}>Export</button> */}
 
              <div className="table-responsive p-3">
                  { sorted.length > 0 &&
@@ -229,9 +232,7 @@ class Transactions extends Component {
                  <thead>
                  <tr>
                      <th>&#x23;</th>
-                     {/* <th>Approved by</th> */}
-                     <th>Member</th>
-                     {/* <th>Posted by</th> */}
+                     <th>Vault Type</th>
                      <th>Transaction Type</th>
                      <th>&#8358; Amount</th>
                      <th>Status</th>
@@ -242,16 +243,13 @@ class Transactions extends Component {
                  { sorted.map((txn, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
-                     {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
-                     {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
-                     <td>{ txn.members.surname } { txn.members.other_names }</td>
+                     <td>{ txn.vault_type.name }</td>
                      <td>
                         {txn.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
                     </td>
                      <td>&#8358; {txn.amount}</td>
                      <td className={txn.status}>
                         {txn.status == 1 ? <Badge type='success' title='POSTED'/> : <Badge type='moved' title='PRE-POST'/>}
-                          {/* <Status status={txn.status} /> */}
                     </td>
                      <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
                      <Dropdown className="drop-link">
@@ -262,6 +260,7 @@ class Transactions extends Component {
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => viewTxn(txn)}>View Txn</Dropdown.Item>
                             <Dropdown.Divider />
                             {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Approve</Dropdown.Item>}
+                            {txn.status === 1 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Cancel</Dropdown.Item>}
                         </Dropdown.Menu>
                         </Dropdown>
                      </td>
@@ -305,4 +304,4 @@ class Transactions extends Component {
 }
 };
 
-export default Transactions;
+export default VualtTransactions;

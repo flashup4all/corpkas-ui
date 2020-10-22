@@ -116,10 +116,6 @@ class Transactions extends Component {
     makeTransactionForm(){
         this.setState({txn_loader: true})
         const {txnType, txnAmount, txnNaration, txnLoanId, memberData} = this.state 
-        console.log(txnType)
-        console.log(txnAmount)
-        console.log(txnNaration)
-        console.log(txnLoanId)
 
         swal({
             title: "Are you sure?",

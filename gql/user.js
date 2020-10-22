@@ -52,12 +52,12 @@ export const LOGIN = gql`
             surname
             role
             email
-            userId
+            user_id
             avatar
             details
-            insertedAt
-            otherNames
-            phoneNumber
+            inserted_at
+            other_names
+            phone_number
             role
             dob
             status
@@ -65,10 +65,11 @@ export const LOGIN = gql`
           vendor{
             id
             name
-            accountStatus
-            defaultCurrency
+            account_status
+            default_currency
             description
             address
+            phone_numbers
             
           }
         
@@ -76,3 +77,31 @@ export const LOGIN = gql`
   }
 `;
 
+export const UPDATE_PASSWORD = gql`
+  mutation updateUserPassword($id: Int!, $password: String!, $old_password: String!) {
+    updateUserPassword(user: {
+      id: $id,
+      password: $password,
+      old_password: $old_password
+      }){
+        
+          id
+          email
+        
+      }
+  }
+`;
+
+export const GENERATE_LOGIN_DETAILS = gql`
+query ($user_id: Int!) {
+    generateLoginDetails(user_id: $user_id) {
+      id
+      email
+      role
+      new_password
+      staff_no
+      surname
+      other_names
+    }
+  }
+`;

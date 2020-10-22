@@ -216,7 +216,7 @@ class CreateLoan extends Component {
                     variables:{
                         loan_type_id: parseInt(loanTypeId), 
                         monthly_net_income: monthlyNet,
-                        loan_amount: loanAmount, member_id: selectedMember.id, 
+                        loan_amount: parseFloat(loanAmount), member_id: selectedMember.id, 
                         user_id: parseInt(getUser().id),
                         reason: reason,
                         payslip_image: payslip,
