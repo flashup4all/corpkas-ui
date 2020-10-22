@@ -28,8 +28,6 @@ const MemberProfile = () => {
   const router = useRouter()
   const {member_id} = router.query
   const [memberData, setMemberData] = useState();
-  const forceUpdate = useCallback(() => setMemberData({}), []);
-  // const memberData = {id: member_id, name: "john doe"
 
   const {loading, error, data, refetch} = useQuery( GET_MEMBER,
     {
@@ -41,9 +39,6 @@ const MemberProfile = () => {
           setMemberData(findMember)
       }
     })
-    if(!loading){
-      console.log(data)
-    }
 
   const [seletedTab, setSeletedTab] = useState(0)
   const selectTab = (selected, selectedIndex) => {
@@ -51,11 +46,9 @@ const MemberProfile = () => {
   }
 
   const changeTab = (index) => {
-    console.log(index)
     setSeletedTab(index)
   }
   const refreshMember = () => {
-    console.log('refetch')
     refetch().then(({data: {findMember}}) => setMemberData(findMember))
   }
   

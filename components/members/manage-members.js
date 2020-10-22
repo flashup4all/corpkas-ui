@@ -15,6 +15,7 @@ import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
 import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+import { GENERATE_LOGIN_DETAILS } from '../../gql/user';
 import { CustomToggle, Status } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 import CreateMember from './create-member'
@@ -32,7 +33,8 @@ class ManageMembers extends Component {
             totalEntries: 0,
             totalPages: 0,
             setMode: 0,
-            activeWidget: ''
+            activeWidget: '',
+            loginDetails:{}
         }
     }
 
@@ -61,6 +63,17 @@ class ManageMembers extends Component {
               this.setState({memberTotals: response.data.memberTotals})
             }, error => console.log(error))
     }
+
+    generateLoginDetails(id)
+    {
+        createApolloClient.query({
+            query: GENERATE_LOGIN_DETAILS,
+            variables:{user_id: parseInt(id)}
+          }).then(response => {
+              let { data: {generateLoginDetails}} = response
+              this.setState({setMode: 2, loginDetails: generateLoginDetails})
+            }, error => console.log(error))
+    }
     
     paginate = (e, page, analyticsEvent) => {
         this.getMembers(page)
@@ -78,7 +91,7 @@ class ManageMembers extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
+    const {loginDetails, members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
       
     return (
         <div>
@@ -166,7 +179,8 @@ class ManageMembers extends Component {
                      <td>
                      <Link href="members/[member_id]" as={`members/${member.id}`}>
                         <a className="remove-decoration">
-                        <WatchIcon size="meduim" isBold primaryColor="#0052CC"  /> <span className="view-icon">VIEW</span>
+                        {/* <WatchIcon size="meduim" isBold primaryColor="#0052CC"  /> */}
+                         <span className="view-icon">VIEW</span>
                         </a>
                         </Link>
                          
@@ -175,7 +189,7 @@ class ManageMembers extends Component {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="ks-menu-dropdown bg-menu">
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('posts')}>Reset Login Details</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.generateLoginDetails(member.user_id)}>Reset Login Details</Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => Router.push('vendor-profile')}>Deactivate</Dropdown.Item>
                         </Dropdown.Menu>
@@ -214,11 +228,30 @@ class ManageMembers extends Component {
                 <CreateMember />
             </div>
         }
-            {/* <StyledMain> */}
-            
-           
-            {/* </StyledMain> */}
         </div>
+        {
+            setMode === 2 &&
+            <div className="p-4">
+                <p className="page-title mt-5">New Login Details
+                    <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                </p>
+                <div>
+                    <div className="">
+                        <div className="confirm-con pt-5" >
+
+                            <div className="row justify-content-center">
+                                <div className="col-6 p-4">
+                                    <li className="li-item ">Staff no. <span className="float-right bold-li">{loginDetails.staff_no}</span>   </li>
+                                    <li className="li-item">Full Name <span className="float-right bold-li">{loginDetails.surname} {loginDetails.other_names}</span> </li>
+                                    <li className="li-item">Email <span className="float-right bold-li">{loginDetails.email}</span></li>
+                                    <li className="li-item">New Password <span className="float-right bold-li">{loginDetails.new_password}</span></li>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
         </div>
 
     )

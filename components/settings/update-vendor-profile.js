@@ -1,47 +1,79 @@
-import React, { useState } from 'react';
-import { gql, useMutation, useLazyQuery } from '@apollo/client';
-import {CREATE_STAFF} from '../../gql/staff'
+import React, { Component } from 'react';
 import Spinner from '@atlaskit/spinner';
-import { ToastProvider, useToasts } from 'react-toast-notifications'
+import { UPDATE_VENDOR  } from '../../gql/vendor';
+import {getUser, getVendor} from '../../components/shared/local'
+import { createApolloClient } from '../../lib/apolloClient'
 
-const UpdateVendorProfile = () =>  {
-    const { addToast } = useToasts()
 
-    const [name, setName] = useState()
-    const [description, setDescription] = useState()
-    const [phone_numbers, setPhoneNumbers] = useState()
-    const [account_status, setAccountStatus] = useState()
-    const [default_currency, setDefaultCurrency] = useState('NGN')
-    const [address, SetAddress] = useState()
-
-    //create staff mutation
-    const  [createStaff, {loading, error}] = useMutation( CREATE_STAFF, {
-        onError: (error) => {
-            addToast("Validation Error", {
-                appearance: 'warning',
-                autoDismiss: true,
-              })
-        },
-        onCompleted: (createStaff) =>{
-            console.log(createStaff)
-            addToast("Staff Created", {
-                appearance: 'success',
-                autoDismiss: true,
-              })
-              resetForm()
+class UpdateVendorProfile extends Component  {
+    constructor(props){
+        super(props);
+        this.state = {
+            name: '',
+            description: '',
+            phone_numbers: '',
+            account_status: '',
+            default_currency: '',
+            address: '',
         }
-    })
-    const resetForm = () => {
-        setName('')
-        setDescription('')
-        setPhoneNumbers('')
-        setAccountStatus('')
-        setDefaultCurrency('NGN')
-        SetAddress('')
+    }
+
+    componentDidMount()
+    {
+        let vendor = getVendor()
+        this.setState({
+          vendor: vendor,
+          name: vendor.name,
+            description: vendor.description,
+            account_status: vendor.account_status,
+            default_currency: vendor.default_currency,
+            address: vendor.address,
+            phone_numbers: vendor.phone_numbers,
+            
+        })
+    }
+
+    render(){
+    const {vendor, name, description, phone_numbers, account_status, default_currency, address, loading } = this.state
+    const checkValid = () => {
+        return (name && phone_numbers && account_status && default_currency && address)
     }
     const submit = async (e) => {
         e.preventDefault();
-        createStaff({variables:{name, description, default_currency, phone_numbers, account_status, address}})
+        this.setState({loading: true})
+        swal({
+            title: "Are you sure?",
+            text: "You want to change your password!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+                createApolloClient.mutate({
+                    mutation: UPDATE_VENDOR,
+                    variables:{ 
+                        name, 
+                        phone_numbers, 
+                        description, 
+                        account_status, default_currency ,
+                        address,
+                        id: parseInt(vendor.id)
+                    },
+                })
+                .then(response => {
+                    this.setState({loading: false, password: '', old_password:''})
+                    swal("Password has been updated!", {
+                            icon: "success",
+                          });
+                }, error => {
+                this.setState({loading: false})
+            })
+              
+            } else {
+              return;
+            }
+          });
     }
         return (
             <div className="p-4">
@@ -52,7 +84,7 @@ const UpdateVendorProfile = () =>  {
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g KASU Multipurpose Cooperative Society"
                                 value={name || ""}
-                                onChange={({ target }) => setName(target.value)}
+                                onChange={({ target }) => this.setState({name: target.value})}
                             />
                         </div>
                         <div className="col-md-6">
@@ -60,7 +92,7 @@ const UpdateVendorProfile = () =>  {
                             <input className="ks-form-control form-control"
                                 placeholder="e.g U/rimi, Kaduna"
                                 value={address || ""}
-                                onChange={({ target }) => SetAddress(target.value)}
+                                onChange={({ target }) => this.setState({address: target.value})}
                              />
                         </div>
                         
@@ -69,14 +101,14 @@ const UpdateVendorProfile = () =>  {
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g 09080009000, 08099998888"
                                 value={phone_numbers || ""}
-                                onChange={({ target }) => setPhoneNumbers(target.value)}
+                                onChange={({ target }) => this.setState({phone_numbers: target.value})}
                              />
                         </div>
                         <div className="col-md-6">
                             <label className="ks-label">Status</label>
                             <select className="ks-form-control form-control"
                                 value={account_status || ""}
-                                onChange={({ target }) => setAccountStatus(target.value)} 
+                                onChange={({ target }) => this.setState({status: target.value})} 
                             >
                                 <option value="">Options</option>
                                 <option value="1">Active</option>
@@ -87,7 +119,7 @@ const UpdateVendorProfile = () =>  {
                             <label className="ks-label">Default Currency</label>
                             <select className="ks-form-control form-control"
                                 value={default_currency || ""}
-                                onChange={({ target }) => setDefaultCurrency(target.value)} 
+                                onChange={({ target }) => this.setState({default_currency: target.value})} 
                             >
                                 <option value="">Options</option>
                                 <option value="NGN">NGN</option>
@@ -98,11 +130,11 @@ const UpdateVendorProfile = () =>  {
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g details"
                                 value={description || ""}
-                                onChange={({ target }) => setDescription(target.value)}
+                                onChange={({ target }) => this.setState({description: target.value})}
                              />
                         </div>
                         <div className="col-12">
-                            <button disabled={loading}  className="btn float-right mt-5 " type="submit">
+                            <button disabled={loading || !checkValid()}  className="btn float-right mt-5 " type="submit">
                             {
                                 loading &&
                                 <Spinner appearance="invert" size="medium"/>
@@ -113,6 +145,7 @@ const UpdateVendorProfile = () =>  {
                 </form>
             </div>
         )
+    }
 }
 
 export default UpdateVendorProfile;

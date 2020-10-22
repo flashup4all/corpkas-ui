@@ -12,6 +12,7 @@ import { getUser } from '../../components/shared/local';
 import GuarantorAndPayslip from '../../components/shared/component/guarantor-and-payslip';
 import swal from '@sweetalert/with-react'
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
 
 import { Checkbox } from '@atlaskit/checkbox';
 
@@ -82,6 +83,7 @@ class LoanRequests extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            user:{},
             memberLoans: [],
             firstLoan: [],
             sorted: [],
@@ -122,6 +124,8 @@ class LoanRequests extends Component {
     {
         this.getLoanTypes()
         this.getMemberLoans(this.state.memberData.id)
+        let user = getUser()
+        this.setState({user: user})
     }
    
 
@@ -133,6 +137,7 @@ class LoanRequests extends Component {
             fetchPolicy: 'no-cache'
           }).then(response => {
               let {data: {memberLoans}} = response
+              console.log(memberLoans)
               let firstLoan= memberLoans[0]
               if(firstLoan)
               {
@@ -253,7 +258,7 @@ class LoanRequests extends Component {
         this.setState({payslip: payslip})
     }
     render(){
-        const {appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
+        const {user, appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
                 loan_type_id, reason, monthly_deduction, duration, loan_amount, is_insured, 
                 upfront_deduction, insurance_charge, upfront_deduction_charge, approved_amount, total_deduction,
                 monthly_net_income, loanGuarantors, applied_payslip, payslip,
@@ -335,7 +340,7 @@ class LoanRequests extends Component {
                             <form onSubmit={approveLoan}>
                                 <div className="row mt-5 pb-5 bg-white">
                                     <div className="col-md-6 mt-3">
-                                        <p className="ks-request-text">Loan request for ₦ {firstLoan.actual_amount}</p>
+                                        <p className="ks-request-text">Loan request for ₦ {FormatCurrency(firstLoan.loan_amount)}</p>
                                         <p className="">This Loan is still pending approval <Badge type="_removed" title="PENDING"/></p>
                                     </div>
                                     <div className="col-md-6 mt-3" style={{ textAlign: "end"}}>
@@ -366,7 +371,7 @@ class LoanRequests extends Component {
                                         <label className="ks-label">Amount Applied</label>
                                         <input className="ks-form-control form-control"
                                         placeholder="Access Diamond" disabled
-                                            defaultValue={loan_amount || ""}
+                                            defaultValue={FormatCurrency(loan_amount) || ""}
                                             onChange={({ target }) => this.setState({ loan_amount :target.value})}
                                         />
                                     </div>
@@ -511,31 +516,15 @@ class LoanRequests extends Component {
                                             
                                         }
                                      </div>
-                                    
-                                    {/* <div className="col-md-3">
-                                        <label className="ks-label">Monthly Deduction</label>
-                                        <input className="ks-form-control form-control"
-                                        placeholder="Access Diamond"
-                                            value={loan.monthly_deduction || ""}
-                                            onChange={({ target }) => setLoanAmount(target.value)}
-                                        />
-                                    </div> */}
+                                    { user.role == 'super_admin' || user.role == 'admin' || user.role == 'manager' && 
+
                                     <div className="col-12">
-                                    <button className="btn float-right mt-5 btn-danger ml-3 " type="button" onClick={() => declineLoan()}>
-                                        {/* disabled={loading} */}
-                                        {/* {
-                                            loading &&
-                                            <Spinner appearance="invert" size="medium"/>
-                                        } */}
+                                        <button className="btn float-right mt-5 btn-danger ml-3 " type="button" onClick={() => declineLoan()}>
                                         DECLINE LOAN</button>
                                         <button className="btn float-right mt-5 " type="submit">
-                                        {/* disabled={loading} */}
-                                        {/* {
-                                            loading &&
-                                            <Spinner appearance="invert" size="medium"/>
-                                        } */}
                                         APPROVE LOAN</button>
                                     </div>
+                                     }
                                 </div>
                                 
                                 <div className="row d-flex justify-content-center">  
@@ -551,7 +540,7 @@ class LoanRequests extends Component {
                 {setMode == 0 && sorted && !sorted.length &&
                     <div>
                         <EmptyData title="" text=""/>
-                        <p className="row align-items-center justify-content-center">You do not have any active loan running currently. 
+                        <p className="row align-items-center justify-content-center">You do not have any pending loan currently. 
                         <br />You can click the button below to apply for one.</p> 
                         <div className="row align-items-center justify-content-center">
                             <button className="btn" type="submit" onClick={() => this.setState({ setMode: 1})}>APPLY FOR LOAN</button>

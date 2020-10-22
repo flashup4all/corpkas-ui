@@ -8,6 +8,8 @@ import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
 import { LOAN_TYPES, DELETE_LOAN_TYPE } from '../../gql/loans';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
+import { ShortDate } from '../../components/shared/utils'
+
 import AddLoanType from './add-loan-type';
 import { useToasts } from 'react-toast-notifications'
 import swal from '@sweetalert/with-react'
@@ -27,15 +29,8 @@ class LoanTypes extends Component {
             activeWidget: '',
             selectedLoanType: null
         }
-    this.forceUpdateHandler = this.forceUpdateHandler.bind(this);
-
-    // const { addToast } = useToasts()
-
     }
-    forceUpdateHandler(){
-        console.log('refresh')
-        this.forceUpdate();
-      };
+   
     componentDidMount()
     {
         this.getLoanTypes()
@@ -76,31 +71,13 @@ class LoanTypes extends Component {
                 createApolloClient.mutate({
                     mutation: DELETE_LOAN_TYPE,
                     variables:{ id },
-                    // refetchQueries: () => [`loanTypes`]
-                    
-
-                    update: (cache, {data: {deleteLoanType}}) => {
-                        try {
-                            let { loanTypes } = cache.readQuery({ query: LOAN_TYPES });
-                            loanTypes = loanTypes.filter(x => x.id != id);
-                            // loanTypes[foundIndex] = data;
-                            console.log(loanTypes)
-                            this.setState({sorted: loanTypes})
-                cache.writeQuery({ query: LOAN_TYPES }, loanTypes);
-                // cache.writeQuery({query: LOAN_TYPES, data: {'loanTypes': loanTypes}});
-                            swal("Data has been deleted!", {
-                                icon: "success",
-                            });
-                            // component.forceUpdate(callback)
-                            this.forceUpdateHandler()
-                            // LoanSettings.selectTab(0,0)
-                          } catch (e) {
-                              console.log(e)
-                          }
-                    }
+                    refetchQueries: [{query: LOAN_TYPES}]
                 })
                 .then(response => {
-                    this.forceUpdateHandler()
+                    let array=[]
+                    array = this.state.sorted.filter(type => type.id !== id)
+                    this.setState({loanTypes: array, sorted: array})
+                    this.getLoanTypes()
                     swal("Data has been deleted!", {
                             icon: "success",
                           });
@@ -115,7 +92,7 @@ class LoanTypes extends Component {
     render () {
        
     const {loanTypes, sorted, setMode, selectedLoanType } = this.state
-    
+
     return (
         <div>   
         <div className="bg-grey">
@@ -158,8 +135,8 @@ class LoanTypes extends Component {
                          {type.is_insured ? <Badge type='success' title='True'/> : <Badge type='moved' title='False'/>}
                          </td>
                      <td className={type.status}> <Status status={type.status} /></td>
-                     <td> {type.inserted_at}</td>
-                     <td><EditFilledIcon size="meduim" isBold primaryColor="#0052CC" onClick={() => this.editLoanType(type)} /> <span className="view-icon" onClick={() => this.editLoanType(type)}>Edit</span>
+                     <td> {ShortDate(type.inserted_at)}</td>
+                     <td><EditFilledIcon size="meduim" isBold primaryColor="#0052CC" onClick={() => this.editLoanType(type)} /> <span className="view-icon cursor" onClick={() => this.editLoanType(type)}>Edit</span>
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>

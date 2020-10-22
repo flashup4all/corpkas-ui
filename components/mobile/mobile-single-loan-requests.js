@@ -12,7 +12,7 @@ import { getUser } from '../shared/local';
 import GuarantorAndPayslip from '../shared/component/guarantor-and-payslip';
 import swal from '@sweetalert/with-react'
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
-import { ShortDate, FormatCurrency } from '../../components/shared/utils';
+import { ShortDate, FormatCurrency } from '../shared/utils';
 
 import { Checkbox } from '@atlaskit/checkbox';
 
@@ -78,7 +78,7 @@ const FILTER_LOANS = gql`
 `
 
 
-class SingleLoanRequests extends Component {
+class MobileSingleLoanRequests extends Component {
 
     constructor(props) {
         super(props);
@@ -185,51 +185,10 @@ class SingleLoanRequests extends Component {
                 apply_loan_type_id, apply_loan_amount, apply_monthly_net_income, apply_reason, apply_loader, loan, user
             } = this.state
 
-        const approveLoan = (e) => {
-            e.preventDefault();
+        const cancelLoan = () =>{
             swal({
                 title: "Are you sure?",
-                text: "Approval cannot be undone!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-              })
-              .then((yes) => {
-                if (yes) {
-                    this.setState({apply_loader: true})
-                    createApolloClient.mutate({
-                        mutation: APPROVE_LOAN,
-                        // refetchQueries:[{ query: GET_MEMBER_LOANS, variables:{member_id: memberData.id, status: 0}}],
-                        variables: {
-                            approved_amount: parseFloat(approved_amount), 
-                            loan_amount : parseFloat(loan_amount), upfront_deduction, is_insured, 
-                            insurance_charge, user_id: parseInt(getUser().id), 
-                            member_id: parseInt(memberData.id),
-                            loan_type_id: parseInt(loan_type_id),
-                            id: parseInt(loan.id)
-                        }
-                    }).then(response => {
-                        let {data: {approveLoan}} = response
-                        swal("This Loan Approval was successful", {icon:'success'})
-                        this.props.onRefresh();
-                        this.setState({apply_loader: false})
-
-                      }, error => console.log(error))
-                } else {
-                    this.setState({apply_loader: false})
-                }
-              });
-        }
-
-        const checkValidApplication = () => {
-
-            return (apply_monthly_net_income && loanGuarantors.length > 0 && apply_loan_type_id && apply_loan_amount && payslip)
-        }
-
-        const declineLoan = () =>{
-            swal({
-                title: "Are you sure?",
-                text: "Decline cannot be undone!",
+                text: "This action cannot be undone!",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
@@ -240,15 +199,13 @@ class SingleLoanRequests extends Component {
                         {
                             mutation: DECLINE_LOAN, 
                             variables:{
-                                status: 2, 
+                                status: 3, 
                                 id: parseInt(loan.id)
                             }
                         }).then(response => {
                         let {data: {updateLoan}} = response
                         swal("This Loan has been Declined", {icon:'success'})
                       }, error => console.log(error))
-                } else {
-                  swal("Your imaginary file is safe!");
                 }
               });
         }
@@ -258,13 +215,14 @@ class SingleLoanRequests extends Component {
                 <p className="">Loan Requests</p>
                 { setMode == 0 && loan && 
                 <div>
-                            <form onSubmit={approveLoan}>
+                            <form>
                                 <div className="row mt-5 pb-5 bg-white">
                                     <div className="col-md-6 mt-3">
                                         <p className="ks-request-text">Loan request for {FormatCurrency(loan.loan_amount)}</p>
                                             { loan.status == 0 && <p className="">This Loan is still pending approval <Badge type="_removed" title="PENDING"/></p> }
                                             { loan.status == 1 && <p className="">This Loan is  <Badge type="_success" title="APPROVED"/></p> }
                                             { loan.status == 2 && <p className="">This Loan is  <Badge type="removed" title="DECLINED"/></p> }
+                                            { loan.status == 3 && <p className="">This Loan is  <Badge type="removed" title="CANCELLED"/></p> }
                                     </div>
                                     <div className="col-md-6 mt-3" style={{ textAlign: "end"}}>
                                         <h6 className="ks-request-text">{ShortDate(loan.inserted_at)}</h6>
@@ -272,111 +230,6 @@ class SingleLoanRequests extends Component {
                                     </div>
                                 <div className="loan-request-row">
                                 </div>
-                                { loan.status == 0 &&
-                                    <>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Type of Loan</label>
-                                            <select className="ks-form-control form-control" disabled
-                                                value={loan_type_id || ""}
-                                                onChange={({ target }) => this.setState({ loan_type_id :target.value})}
-                                                >
-                                                <option value="">Options</option>
-                                                { loanTypes && loanTypes.map(type => <option key={type.id} value={type.id}>{type.name} - {type.interest}%</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Period of Repayment (Months)</label>
-                                            <input className="ks-form-control form-control" 
-                                                placeholder="18 months" disabled
-                                                defaultValue={duration || ""}
-                                                onChange={({ target }) => this.setState({ duration :target.value})}
-                                            />
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Amount Applied</label>
-                                            <input className="ks-form-control form-control"
-                                            placeholder="" disabled
-                                                defaultValue={loan_amount || ""}
-                                                onChange={({ target }) => this.setState({ loan_amount :target.value})}
-                                            />
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Approved Amount</label>
-                                            <input className="ks-form-control form-control"
-                                            placeholder=""
-                                                defaultValue={loan_amount || ""}
-                                                onChange={({ target }) => {
-                                                    let calc_monthly_deduction = target.value/duration
-                                                    this.setState({ approved_amount :target.value, monthly_deduction: calc_monthly_deduction.toFixed(2)})
-                                                }
-                                            }
-                                            />
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Monthly Deduction</label>
-                                            <input className="ks-form-control form-control"
-                                            placeholder="Access Diamond" disabled
-                                                value={monthly_deduction || ""}
-                                            />
-                                        </div>
-                                        <div className="col-md-3">
-                                            <label className="ks-label">Reason</label>
-                                            <div className="control-div">{reason ? reason : "Nil"}</div>
-                                        </div>
-                                        <div className="col-md-3 mt-5">
-                                            <Checkbox
-                                                defaultChecked={is_insured}
-                                                label="Apply Insurance"
-                                                // value={is_insured}
-                                                onChange={({target}) => this.setState({ is_insured: target.checked})}
-                                                name="checkbox-default"
-                                                testId="cb-default"
-                                            />
-                                        </div>
-                                        <div className="col-md-3 mt-5">
-                                            <Checkbox
-                                                defaultChecked={upfront_deduction}
-                                                // value={upfront_deduction}
-                                                label="Upfront Deduction"
-                                                onChange={({target}) => this.setState({ upfront_deduction: target.checked})}
-                                                name="checkbox-default"
-                                                testId="cb-default"
-                                            />
-                                        </div>
-                                    
-                                        {
-                                            is_insured && 
-                                            <div className="col-md-3">
-                                                <label className="ks-label">Insurance Charge (1.5%)</label>
-                                                <input className="ks-form-control form-control"
-                                                placeholder="Access Diamond"
-                                                    value={insurance_charge || ""}
-                                                    onChange={({ target }) => this.setState({ insurance_charge: target.checked})}
-                                                />
-                                            </div>
-                                        }
-                                        {
-                                            upfront_deduction && 
-                                            <div className="col-md-3">
-                                                <label className="ks-label">Total Deduction</label>
-                                                <input className="ks-form-control form-control"
-                                                placeholder="Total Deduction"
-                                                    value={total_deduction || ""}
-                                                    onChange={({ target }) => this.setState({upfront_deduction_charge: target.checked})}
-                                                />
-                                            </div>
-                                        }
-                                        <div className="row d-flex justify-content-center">
-                                            <div className="col-md-4">
-                                                <img src="/images/loan.svg" className="img-responsive" alt="Some picture" width="410" height="307"></img>
-                                                </div>
-                                            <div className="col-md-4">
-                                                <p className="text mt-5">We are currently working on your loan and we will get back to you soon with an offer. If you think this is taking longer than it should, feel free to leave us a follow up messgae.</p>
-                                            </div>
-                                        </div>
-                                    </>
-                                }
-                                { loan.status !== 0 && 
                                     <>
                                         <div className="col-md-3">
                                             <label className="ks-label">Type of Loan</label>
@@ -394,6 +247,20 @@ class SingleLoanRequests extends Component {
                                         <div className="col-md-3">
                                             <label className="ks-label">Approved Amount</label>
                                             <div className="control-div">{FormatCurrency(loan.approved_amount)}</div>
+                                        </div>
+                                        <div className="col-md-3">
+                                            <label className="ks-label">Upfront Deduction</label>
+                                            <div className="">
+                                            { loan.upfront_deduction && <Badge type="_removed" title="True"/>}
+                                            { !loan.upfront_deduction && <Badge type="_success" title="False"/> }
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3">
+                                            <label className="ks-label">Insurance </label>
+                                            <div className="">
+                                                { loan.is_insured && <Badge type="_removed" title="True"/>}
+                                                { !loan.is_insured && <Badge type="_success" title="False"/> }
+                                            </div>
                                         </div>
                                         <div className="col-md-3">
                                             <label className="ks-label">Amount Payable</label>
@@ -438,8 +305,6 @@ class SingleLoanRequests extends Component {
                                             <div className="control-div">{loan.total_paid || "Not Yet"}</div>
                                         </div>
                                     </>
-
-                                }
                                     
                                     
                                     <div className="row justify-content-md-center mt-4 mb-4 col-md-12">
@@ -487,30 +352,15 @@ class SingleLoanRequests extends Component {
                                             
                                         }
                                      </div>
-                                    
-                                    {/* <div className="col-md-3">
-                                        <label className="ks-label">Monthly Deduction</label>
-                                        <input className="ks-form-control form-control"
-                                        placeholder="Access Diamond"
-                                            value={loan.monthly_deduction || ""}
-                                            onChange={({ target }) => setLoanAmount(target.value)}
-                                        />
-                                    </div> */}
-                                    {loan.status == 0 && user.role !== "member" && user.role !== "staff" &&
+                                    {loan.status == 0 &&
                                         <div className="col-12">
-                                            <button className="btn float-right mt-5 btn-danger ml-3 " type="button" onClick={() => declineLoan()}>
+                                            <button className="btn float-right mt-5 btn-danger ml-3 " type="button" onClick={() => cancelLoan()}>
                                                 {/* disabled={loading} */}
                                                 {/* {
                                                     loading &&
                                                     <Spinner appearance="invert" size="medium"/>
                                                 } */}
-                                                DECLINE LOAN</button>
-                                                <button className="btn float-right mt-5 " disabled={apply_loader} type="submit">
-                                                {
-                                                    apply_loader &&
-                                                    <Spinner appearance="invert" size="medium"/>
-                                                }
-                                                APPROVE LOAN</button>
+                                                CANCEL LOAN APPLICATION</button>
                                             </div>
                                     }
                                     
@@ -531,4 +381,4 @@ class SingleLoanRequests extends Component {
 
 }        
 
-export default SingleLoanRequests;
+export default MobileSingleLoanRequests;
