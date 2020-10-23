@@ -22,8 +22,8 @@ class UpdateVendorProfile extends Component  {
     {
         let vendor = getVendor()
         this.setState({
-          vendor: vendor,
-          name: vendor.name,
+            vendor: vendor,
+            name: vendor.name,
             description: vendor.description,
             account_status: vendor.account_status,
             default_currency: vendor.default_currency,
@@ -83,7 +83,7 @@ class UpdateVendorProfile extends Component  {
                             <label className="ks-label">Name</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g KASU Multipurpose Cooperative Society"
-                                value={name || ""}
+                                defaultValue={name || ""}
                                 onChange={({ target }) => this.setState({name: target.value})}
                             />
                         </div>
@@ -100,7 +100,7 @@ class UpdateVendorProfile extends Component  {
                             <label className="ks-label">Phone Number(s)</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g 09080009000, 08099998888"
-                                value={phone_numbers || ""}
+                                defaultValue={phone_numbers || ""}
                                 onChange={({ target }) => this.setState({phone_numbers: target.value})}
                              />
                         </div>
@@ -118,7 +118,7 @@ class UpdateVendorProfile extends Component  {
                         <div className="col-md-6">
                             <label className="ks-label">Default Currency</label>
                             <select className="ks-form-control form-control"
-                                value={default_currency || ""}
+                                defaultValue={default_currency || ""}
                                 onChange={({ target }) => this.setState({default_currency: target.value})} 
                             >
                                 <option value="">Options</option>
@@ -129,7 +129,7 @@ class UpdateVendorProfile extends Component  {
                             <label className="ks-label">Description</label>
                             <input className="ks-form-control form-control" 
                                 placeholder="e.g details"
-                                value={description || ""}
+                                defaultValue={description || ""}
                                 onChange={({ target }) => this.setState({description: target.value})}
                              />
                         </div>
