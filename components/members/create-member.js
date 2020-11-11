@@ -90,7 +90,7 @@ const CreateMember = ({onrefreshMember}) =>  {
     const submit = async (e) => {
         e.preventDefault();
         // if(handleValidation()) {
-        createMember({variables:{staff_no, surname, other_names, first_name, gender, dob: new Date(dob), 
+        createMember({variables:{staff_no, surname, other_names, first_name, gender, dob: new Date(dob),
             membership_date: new Date(membership_date), phone_number, alt_phone_number, 
             status, role, email, rank, current_monthly_income, monthly_contribution, dept }})
         // }
