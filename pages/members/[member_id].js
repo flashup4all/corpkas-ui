@@ -1,14 +1,14 @@
 import React, {useState, useCallback} from 'react';
 import { useRouter} from 'next/router';
 import Tabs from '@atlaskit/tabs';
-import {GET_MEMBER} from '../../gql/members'
+import {GET_MEMBER, GET_MEMBER_LOANS} from '../../gql/members'
 import { useQuery } from '@apollo/client';
 
 import AdminMainLayout from '../../layouts/main/main';
 import ProfileSetting from '../../components/members/profile-setting';
 import Transactions from '../../components/members/transactions';
 import LoanRequests from '../../components/members/loan-requests';
-import ActiveLoans from '../../components/members/active-loans';
+import ActiveLoanRequests from '../../components/members/active-loans';
 import LoanRepayments from '../../components/members/loan-repayments';
 import Loader from '../../layouts/loader'
 import { Badge } from '../../layouts/extras'
@@ -28,6 +28,7 @@ const MemberProfile = () => {
   const router = useRouter()
   const {member_id} = router.query
   const [memberData, setMemberData] = useState();
+  const [memberActiveLoans, setMemberActiveLoans] = useState('');
 
   const {loading, error, data, refetch} = useQuery( GET_MEMBER,
     {
@@ -36,10 +37,21 @@ const MemberProfile = () => {
           console.log(error)
       },
       onCompleted: ({findMember}) =>{
-          setMemberData(findMember)
+        setMemberData(findMember)
       }
     })
 
+    const {loansLoading, loansError, loansData} = useQuery( GET_MEMBER_LOANS,
+    {
+      variables:{member_id : parseInt(member_id), status: 1},
+      onError: (error) => {
+          console.log(error)
+      },
+      onCompleted: ({memberLoans}) =>{
+        setMemberActiveLoans(memberLoans.length)
+      }
+    })
+    
   const [seletedTab, setSeletedTab] = useState(0)
   const selectTab = (selected, selectedIndex) => {
     setSeletedTab(selectedIndex)
@@ -70,7 +82,7 @@ const MemberProfile = () => {
             <h1>{FormatCurrency(memberData.current_balance)}</h1>
             <p className="mb-3">
               A/C Name: 
-              <span className="bold"> {memberData.surname} {memberData.other_names} </span>
+              <span className="bold"> {memberData.surname} {memberData.first_name} {memberData.other_names} </span>
             </p>
             <p className="d-flex"
             ><span className="mr-2">
@@ -79,7 +91,7 @@ const MemberProfile = () => {
               {memberData.status == 2 && <Badge title='Closed' type="removed" />}
               </span> 
             <span className="">
-              <Badge title='active loans: 1' type="default" />
+              <Badge title={'active loans: '+memberActiveLoans} type="default" />
               </span>
             </p>
           </div>
@@ -99,7 +111,7 @@ const MemberProfile = () => {
             <LoanRequests onChangeTab={changeTab} memberData={memberData} />
           }
           { seletedTab === 3 &&
-            <ActiveLoans memberData={memberData} />
+            <ActiveLoanRequests memberData={memberData} />
           }
           { seletedTab === 4 &&
             <LoanRepayments memberData={memberData} />

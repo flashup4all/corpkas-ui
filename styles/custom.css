@@ -208,6 +208,9 @@
 	font-size: 14px;
 	line-height: 24px;
 }
+.active-side-menu {
+    background: #091e42 !important;
+}
 .sidebar-navigation li:hover {
 	background: #091e42 !important;
 	cursor: pointer;
@@ -602,7 +605,12 @@ thead {
 	align-items: center;
 	justify-content: center;
 }
-
+.error{
+	color: red !important;
+}
+.success{
+	color: #00875A !important;
+}
 .txn-widget-icon {
 	border-radius: 50%;
 	width: 36px;
@@ -889,4 +897,22 @@ thead {
 	font-size: 16px;
 	color: #6b778c;
 	line-height: 3em;
+}
+
+.bold-li {
+	font-size: 16px;
+	color: #172b4d;
+	font-weight: bold;
+}
+.close-btn {
+	font-family: Helvetica;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 16px;
+	
+	color: #091e42;
+	cursor: pointer;
+	position: absolute;
+	left: 73%;
+	top: 1%;
 }

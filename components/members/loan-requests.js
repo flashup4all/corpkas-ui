@@ -13,6 +13,7 @@ import GuarantorAndPayslip from '../../components/shared/component/guarantor-and
 import swal from '@sweetalert/with-react'
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
 import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
+import Loader from '../../layouts/loader';
 
 import { Checkbox } from '@atlaskit/checkbox';
 
@@ -112,8 +113,8 @@ class LoanRequests extends Component {
             apply_reason: '',
             apply_monthly_net_income: 0.0,
             apply_loader: false,
-            apply_guarantors: []
-
+            apply_guarantors: [],
+            tableLoader: false
         }
         this.handleGuarantorList = this.handleGuarantorList.bind(this);
         this.handlePayslip = this.handlePayslip.bind(this);
@@ -130,38 +131,43 @@ class LoanRequests extends Component {
    
 
     getMemberLoans(member_id){
-
-        createApolloClient.query({
-            query: GET_MEMBER_LOANS,
-            variables: {member_id: member_id, status: 0},
-            fetchPolicy: 'no-cache'
-          }).then(response => {
-              let {data: {memberLoans}} = response
-              console.log(memberLoans)
-              let firstLoan= memberLoans[0]
-              if(firstLoan)
-              {
-                this.setState({
-                    memberLoans: memberLoans, 
-                    sorted: memberLoans, 
-                    firstLoan: firstLoan,
-                    loan_type_id: firstLoan.loan_type_id,
-                    loan_amount: firstLoan.loan_amount,
-                    approved_amount: firstLoan.loan_amount,
-                    monthly_deduction: firstLoan.monthly_deduction,
-                    upfront_deduction: firstLoan.upfront_deduction,
-                    upfront_deduction_charge:'',
-                    is_insured: firstLoan.is_insured,
-                    insurance_charge: firstLoan.insurance_amount,
-                    duration: firstLoan.duration,
-                    reason: firstLoan.reason,
-                    total_deduction: firstLoan.total_deduction,
-                    applied_payslip: firstLoan.payslip_url
+        this.setState({tableLoader: true})
+        setTimeout(() => {
+            createApolloClient.query({
+                query: GET_MEMBER_LOANS,
+                variables: {member_id: member_id, status: 0},
+                fetchPolicy: 'no-cache'
+              }).then(response => {
+                  let {data: {memberLoans}} = response
+                  let firstLoan= memberLoans[0]
+                  if(firstLoan)
+                  {
+                    this.setState({
+                        memberLoans: memberLoans, 
+                        sorted: memberLoans, 
+                        firstLoan: firstLoan,
+                        loan_type_id: firstLoan.loan_type_id,
+                        loan_amount: firstLoan.loan_amount,
+                        approved_amount: firstLoan.loan_amount,
+                        monthly_deduction: firstLoan.monthly_deduction,
+                        upfront_deduction: firstLoan.upfront_deduction,
+                        upfront_deduction_charge:'',
+                        is_insured: firstLoan.is_insured,
+                        insurance_charge: firstLoan.insurance_amount,
+                        interest_amount: firstLoan.interest_amount,
+                        duration: firstLoan.duration,
+                        reason: firstLoan.reason,
+                        total_deduction: firstLoan.total_deduction,
+                        applied_payslip: firstLoan.payslip_url,
+                        tableLoader: false
+                    })
+                    this.getAppliedLoanGuarantors(firstLoan.id)
+                  }
+                this.setState({tableLoader: false})
+                }, error => {
+                    this.setState({tableLoader: false})
                 })
-                this.getAppliedLoanGuarantors(firstLoan.id)
-              }
-              
-            }, error => console.log(error))
+        }, 500)
     }
     getLoanTypes(){
         createApolloClient.query({
@@ -219,11 +225,13 @@ class LoanRequests extends Component {
 
                 }, error => console.log(error))
             })
+            this.getMemberLoans(memberData.id)
             swal("Loan Application Successful! awaiting approval", {
                 icon: "success",
             });
             this.resetApplyForm()
-            this.setState({apply_loader: false})
+            
+            this.setState({apply_loader: false, setMode: 0})
 
           }, error => { 
             this.setState({apply_loader: false})
@@ -258,7 +266,7 @@ class LoanRequests extends Component {
         this.setState({payslip: payslip})
     }
     render(){
-        const {user, appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
+        const {interest_amount, tableLoader, user, appliedLoanGuarantors, memberData, firstLoan, setMode, memberLoans, loanTypes, sorted, 
                 loan_type_id, reason, monthly_deduction, duration, loan_amount, is_insured, 
                 upfront_deduction, insurance_charge, upfront_deduction_charge, approved_amount, total_deduction,
                 monthly_net_income, loanGuarantors, applied_payslip, payslip,
@@ -278,7 +286,7 @@ class LoanRequests extends Component {
                 if (yes) {
                     createApolloClient.mutate({
                         mutation: APPROVE_LOAN,
-                        refetchQueries:[{ query: GET_MEMBER_LOANS, variables:{member_id: memberData.id, status: 0}}],
+                        refetchQueries:[{ query: GET_MEMBER_LOANS, variables:{member_id: memberData.id, status: 1}}],
                         variables: {
                             approved_amount: parseFloat(approved_amount), 
                             loan_amount, upfront_deduction, is_insured, 
@@ -289,12 +297,10 @@ class LoanRequests extends Component {
                         }
                     }).then(response => {
                         let {data: {approveLoan}} = response
-                        swal("This Loan Approval was successful", {icon:'success'})
+                        swal("Loan Approval was successful", {icon:'success'})
                         this.getMemberLoans(memberData.id)
                         this.props.onChangeTab(3);
                       }, error => console.log(error))
-                } else {
-                  swal("Your imaginary file is safe!");
                 }
               });
         }
@@ -325,8 +331,6 @@ class LoanRequests extends Component {
                         let {data: {updateLoan}} = response
                         swal("This Loan has been Declined", {icon:'success'})
                       }, error => console.log(error))
-                } else {
-                  swal("Your imaginary file is safe!");
                 }
               });
         }
@@ -334,6 +338,7 @@ class LoanRequests extends Component {
         return (
             <div className="grey-container">
                 <p className="">Loan Requests</p>
+                {tableLoader && <Loader />}
                 { setMode == 0 && memberLoans.length > 0 && 
                 <div>
                     {memberLoans.length > 0 && 
@@ -351,7 +356,7 @@ class LoanRequests extends Component {
                                 </div>
                                     <div className="col-md-3">
                                         <label className="ks-label">Type of Loan</label>
-                                        <select className="ks-form-control form-control" 
+                                        <select className="ks-form-control form-control" disabled
                                             defaultValue={loan_type_id || ""}
                                             onChange={({ target }) => this.setState({ loan_type_id :target.value})}
                                             >
@@ -443,9 +448,9 @@ class LoanRequests extends Component {
                                     {
                                         is_insured && 
                                         <div className="col-md-3">
-                                            <label className="ks-label">Insurance Charge (1.5%)</label>
+                                            <label className="ks-label">Insurance Charge</label>
                                             <input className="ks-form-control form-control"
-                                            placeholder="Access Diamond"
+                                            placeholder="Access Diamond" disabled
                                                 value={insurance_charge || ""}
                                                 onChange={({ target }) => this.setState({ insurance_charge: target.checked})}
                                             />
@@ -454,10 +459,10 @@ class LoanRequests extends Component {
                                     {
                                         upfront_deduction && 
                                         <div className="col-md-3">
-                                            <label className="ks-label">Total Deduction</label>
+                                            <label className="ks-label">Interest Charge</label>
                                             <input className="ks-form-control form-control"
-                                            placeholder="Total Deduction"
-                                                value={total_deduction || ""}
+                                            placeholder="Total Deduction" disabled
+                                                value={interest_amount || ""}
                                                 onChange={({ target }) => this.setState({upfront_deduction_charge: target.checked})}
                                             />
                                         </div>
@@ -537,7 +542,7 @@ class LoanRequests extends Component {
                 </div>
                     
                 }
-                {setMode == 0 && sorted && !sorted.length &&
+                {setMode == 0 && sorted && !sorted.length && !tableLoader &&
                     <div>
                         <EmptyData title="" text=""/>
                         <p className="row align-items-center justify-content-center">You do not have any pending loan currently. 

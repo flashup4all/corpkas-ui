@@ -17,7 +17,7 @@ class TransactionSchedule extends Component {
         super(props);
         // setMode 0 = default, 1- create, 2- update 
         this.state = {
-            transactions: [],
+            members: [],
             memberTotals: {},
             pageNumber: 1,
             pageSize: 0,
@@ -30,7 +30,8 @@ class TransactionSchedule extends Component {
             filter_from: '',
             filter_to: '',
             filter_txn_id: '',
-            filter_txn_type: ''
+            filter_txn_type: '',
+            tableLoader: false
         }
     }
 
@@ -47,7 +48,7 @@ class TransactionSchedule extends Component {
     //       }).then(response => {
     //           const { data: {paginateTransactions}} = response
     //           this.setState({
-    //               transactions: paginateTransactions.entries, 
+    //               members: paginateTransactions.entries, 
     //               sorted: paginateTransactions.entries,
     //               totalEntries: paginateTransactions.total_entries,
     //               totalPages: paginateTransactions.total_pages,
@@ -59,22 +60,22 @@ class TransactionSchedule extends Component {
 
     filterMembers(variables)
     {
-        createApolloClient.mutate({
-            mutation: FILTER_MEMBERS,
-            variables: variables
-          }).then(response => {
-              let { data: {filterMembers}} = response
-            //   filterMembers.map(member => member.check = false)
-            //   console.log(filterMembers)
-            //   this.setState({
-            //         transactions: filterMembers, 
-            //         sorted: filterMembers,
-            //         totalEntries: 0,
-            //         totalPages: 0,
-            //         pageNumber: 0,
-            //         pageSize: 0,
-            //     })
-            }, error => console.log(error))
+        this.setState({tableLoader: true})
+        setTimeout(() => {
+            createApolloClient.mutate({
+                mutation: FILTER_MEMBERS,
+                variables: variables
+              }).then(response => {
+                  let { data: {filterMembers}} = response
+                  this.setState({
+                        members: filterMembers, 
+                        sorted: filterMembers,
+                        tableLoader: false,
+                    })
+                }, error => {
+                    this.setState({tableLoader: true})
+                })
+        },400)
     }
     getMemberTotals(page = 1)
     {
@@ -87,8 +88,17 @@ class TransactionSchedule extends Component {
     
     paginate(e, page, analyticsEvent){
         // this.getTransactions(page)
-      }
-
+    }
+    checkAll(value)
+    {
+        let { sorted } = this.state
+        sorted.map(member => member.checked = value)
+        this.setState({sorted: sorted})
+    }
+    bulkPayment()
+    {
+        console.log(this.state.sorted)
+    }
     render () {
         const filterMembers = (status = "") => {
             let membersData = [];
@@ -101,7 +111,7 @@ class TransactionSchedule extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
+    const {members, tableLoader, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
     
     const filter_form = () => {
 
@@ -116,10 +126,19 @@ class TransactionSchedule extends Component {
             this.filterMembers(variables)
         }
     }
-
-    const viewTxn = (txn) => {
-        console.log(txn)
-    }
+    const handleFormChange = (value,index) => {
+        const array = sorted.map((member, idx) => {
+          if (idx !== index) return member;
+          if(parseFloat(value) <= 0 ){
+              swal("Amount cant be Zero (0)")
+              return { ...member, new_amount_payable: member.monthly_contribution };
+          }else{
+            return { ...member, new_amount_payable: value };
+          }
+        });
+        this.setState({ sorted: array });
+        
+      };
     return (
         <div>
             
@@ -185,42 +204,49 @@ class TransactionSchedule extends Component {
                 </div> */}
 
              <div className="table-responsive p-3">
-                 { sorted.length > 0 &&
+                 { tableLoader  && <Loader />}
+                 { sorted.length > 0 && !tableLoader &&
                  <div>
                  <table className="table table-borderless">
                  <thead>
                  <tr>
                  <th>
-                     <input className="ks-control" type="checkbox" />
+                     #
+                     {/* <input className="ks-control" type="checkbox" onChange={({target}) => this.checkAll(target.checked)}/> */}
                  </th>
+                     <th>Staff No.</th>
                      <th>Name</th>
-                     {/* <th>Rank</th> */}
                      <th>Gender</th>
                      <th>Department</th>
                      <th>Phone number</th>
-                     <th>Status</th>
+                     {/* <th>Status</th> */}
                      <th>₦ Monthly Contribution</th>
                  </tr>
                  </thead>
                  <tbody>
                  { sorted.map((member, index) => (
                  <tr key={index}>
-                     <td> <input className="ks-control" type="checkbox" /></td>
-                     <td>{member.surname} {member.other_names}</td>
+                     <td> 
+                        {index + 1}
+                         {/* <input className="ks-control" type="checkbox" checked={member.checked}/> */}
+                    </td>
+                    <td>{member.staff_no}</td>
+                     <td>{member.surname} {member.first_name} {member.other_names}</td>
                      {/* <td>{member.rank}</td> */}
                      <td>{member.gender}</td>
                      <td>{member.dept}</td>
                      <td>{member.phone_number}</td>
-                     <td className={member.status}> <Status status={member.status} /></td>
+                     {/* <td className={member.status}> <Status status={member.status} /></td> */}
                      <td>
-                         <input className="form-control ks-control" value={member.monthly_contribution} />
+                        {member.monthly_contribution}
+                         {/* <input className="form-control ks-control" disabled={member.disabled} defaultValue={member.monthly_contribution} onChange={({target}) => handleFormChange(target.value, index)}/> */}
                      </td>
                  </tr>
                   ))}
                 
                  </tbody>
              </table>
-             <div className="row" style={{padding:'20px'}}>
+             {/* <div className="row" style={{padding:'20px'}}>
                 <div className="col-md-3">
                     <label>Status</label>
                     <select className="ks-form-control form-control" 
@@ -233,24 +259,16 @@ class TransactionSchedule extends Component {
                     </select>
                 </div>
                 <div className="col-md-3">
-                    <button type="button" className="btn" style={{ marginTop: '32px'}} onClick={()=> filter_form()}>Make schedule</button>
+                    <button type="button" className="btn" style={{ marginTop: '32px'}} onClick={()=> this.bulkPayment()}>Make Schedule</button>
                 </div>
-            </div>
-             { totalPages > 1 && 
-                <div className="row align-items-center justify-content-center">
-                <Pagination onChange={(event, page, analyticsEvent) => this.paginate(event, page, analyticsEvent)} pages={page_range(1,totalPages)} />
-                </div>
-             }
+            </div> */}
+            
                 
              </div>
                  }
-                 { sorted && !sorted.length && 
+                 { sorted && !sorted.length && !tableLoader &&
                      <EmptyData title="Empty Savings" text="No Available Members Data"/>
                  } 
-                 { !sorted
-                     &&
-                    <Loader />
-                 }
              
              </div>
          </div>

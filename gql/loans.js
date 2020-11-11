@@ -300,7 +300,7 @@ export const FILTER_LOANS = gql`
     $loan_repayment_status: Int
     $from: String
     $to: String
-    $overdue: String
+    $due_date: String
   ) {
     filterLoans(filter: {
       loan_payment_status: $loan_payment_status,
@@ -310,7 +310,7 @@ export const FILTER_LOANS = gql`
       status: $status
       from: $from
       to: $to
-      overdue: $overdue
+      due_date: $due_date
     }){
       id
       actual_amount
@@ -323,6 +323,7 @@ export const FILTER_LOANS = gql`
       reason
       detail
       due_date
+      start_date
       insurance_amount
       insurance_percent
       interest_amount
@@ -330,6 +331,7 @@ export const FILTER_LOANS = gql`
       is_insured
       loan_amount
       status
+      payslip_url
       total_deduction
       total_loan
       total_paid

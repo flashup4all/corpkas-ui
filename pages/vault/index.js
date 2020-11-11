@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useQuery} from 'react';
 
 import Tabs from '@atlaskit/tabs';
 import AdminMainLayout from '../../layouts/main/main';
 import VualtTransactions from '../../components/vault/transactions';
 import TransactionSchedule from '../../components/transactions/transaction-schedule';
 import Withdrawals from '../../components/transactions/withdrawals';
+import { VAULT_TOTALS } from '../../gql/vault';
 
 const tabs = [
   { label: 'Incomes', components: () => null },
@@ -18,13 +19,26 @@ const ManageTransactions = () => {
   const selectTab = (selected, selectedIndex) => {
     setSeletedTab(selectedIndex)
   }
+
+  // const {loading, error, data} = useQuery(VAULT_TOTALS,
+  //   {
+  //     variables:{ status: 1},
+  //     onError: (error) => {
+  //         console.log(error)
+  //     },
+  //     onCompleted: ({vaultTotals}) =>{
+  //       console.log(vaultTotals)
+
+  //     }
+  //   })
+
   return (
     <div>
       <div className="d-flex align-items-baseline mb-3 mt-3">
         <p>{tabName} </p><h3 className="ml-1 page-title bold"> | Manage Vault </h3>
       </div>
       <div className="row d-flex justify-content-around">
-        <div className="card-box col-md-4 col-md-4 p-4">
+        {/* <div className="card-box col-md-4 col-md-4 p-4">
             <div>
                 <p className="card-box-p">Incoming Interest Charge</p>
             </div>
@@ -56,7 +70,7 @@ const ManageTransactions = () => {
                 </div>
                 <h1 className="card-box-h1">₦950,500.00</h1>
             </div>
-        </div>
+        </div> */}
         {/* <div className="col-lg-2 d-flex flex-column align-items-center justify-content-center pt-4">
             <div className="init-btn"><img src="/cards-icons/+.png" alt="" /></div>
             <p className="card-box-p mt-3">Initiate Withdrawal</p>
