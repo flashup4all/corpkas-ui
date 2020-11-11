@@ -53,7 +53,7 @@ const LoginForm = ({ setError, setToken }) =>{
           setFormLoader(false)
           router.push('/members-app')
       }
-      if(user.role === "admin" || user.role === "staff" || user.role === "manager")
+      if(user.role === "super_admin" || user.role === "admin" || user.role === "staff" || user.role === "manager")
       {
           const staff = authenticate.staff
           storeStaff(staff)
