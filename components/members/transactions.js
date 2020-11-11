@@ -3,7 +3,7 @@ import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
-// import { onError } from "apollo-link-error";
+import ViewSingleTransaction from '../../components/transactions/view-single-transaction';
 
 import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
@@ -39,9 +39,10 @@ class Transactions extends Component {
             txn_loader: false,
             txnType:'',
             txnAmount:'',
-            txnNaration:''
-
-
+            txnNaration:'',
+            tableLoader: false,
+            selectedTxn: {},
+            txnFormTitle: "Make a Contribution/Savings"
         }
     }
 
@@ -54,21 +55,28 @@ class Transactions extends Component {
 
     getMemberTxn(page = 1)
     {
-        createApolloClient.query({
-            query: GET_MEMBER_TXNS,
-            variables: {member_id: this.state.memberData.id, page}
-          }).then(response => {
-            const {data: {memberTransactions}} = response
-              this.setState({
-                  transactions: memberTransactions.entries, 
-                  sorted: memberTransactions.entries,
-                  totalEntries: memberTransactions.total_entries,
-                  totalPages: memberTransactions.total_pages,
-                  pageNumber: memberTransactions.page_number,
-                  pageSize: memberTransactions.page_size,
-
+        console.log('refesh')
+        setTimeout(() => {
+            createApolloClient.query({
+                query: GET_MEMBER_TXNS,
+                variables: {member_id: this.state.memberData.id, page}
+              }).then(response => {
+                const {data: {memberTransactions}} = response
+                  this.setState({
+                      transactions: memberTransactions.entries, 
+                      sorted: memberTransactions.entries,
+                      totalEntries: memberTransactions.total_entries,
+                      totalPages: memberTransactions.total_pages,
+                      pageNumber: memberTransactions.page_number,
+                      pageSize: memberTransactions.page_size,
+                    tableLoader: false
+                    })
+                }, error => {
+                    this.setState({tableLoader: false})
                 })
-            }, error => console.log(error))
+        },500)
+        this.setState({tableLoader: true})
+        
     }
     // getMemberTotals(page = 1)
     // {
@@ -86,7 +94,7 @@ class Transactions extends Component {
     approveTransaction(txn){
         swal({
             title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this  file!",
+            text: "Once Approved, cannot be undone!",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -111,11 +119,11 @@ class Transactions extends Component {
             } else {
               return;
             }
-          });
+        });
     }
     
     showMakeTransactionForm(txnType){
-        this.setState({setMode: 2, txnType: txnType})
+        txnType == 1? this.setState({setMode: 2, txnType: txnType, txnFormTitle: "Make a Contribution/Savings"}) : this.setState({setMode: 2, txnType: txnType, txnFormTitle: "Make a Withdrawal"})
     }
     validTransaction(){
         const {txnType, txnAmount, txnNaration, memberData} = this.state 
@@ -124,13 +132,10 @@ class Transactions extends Component {
     makeTransactionForm(){
         this.setState({txn_loader: true})
         const {txnType, txnAmount, txnNaration, memberData} = this.state 
-        console.log(txnType)
-        console.log(txnAmount)
-        console.log(txnNaration)
 
         swal({
             title: "Are you sure?",
-            text: "Approval cannot be undone!",
+            text: "Transaction cannot be undone!",
             icon: "warning",
             buttons: true,
             dangerMode: true,
@@ -157,26 +162,24 @@ class Transactions extends Component {
                         //     )
                         // }
                     }).then(response => {
-                        console.log(response)
                         let {data: {createTransaction}} = response
                         this.setState({
                             txnType: '', txnAmount: '', txnNaration:'', setMode:0, txn_loader:false
                         })
                         this.getMemberTxn()
-                        this.props.onrefreshMember();
+                        // this.props.onrefreshMember();
                         swal("Contribution was Successful! awaiting approval", {
                             icon: "success",
                         });
 
                 }, (error) => {
-                    console.log(error) 
                     this.setState({txn_loader: false})
                 })
                 }
             })
     }
     render () {
-        const { transactions, sorted, setMode, activeWidget, totalPages, filter_from, filter_to, filter_status, filter_txn_id } = this.state
+        const { selectedTxn, tableLoader, transactions, sorted, setMode, activeWidget, totalPages, filter_from, filter_to, filter_status, filter_txn_id } = this.state
 
         const filter_form = () => {
 
@@ -192,7 +195,6 @@ class Transactions extends Component {
                    variables: variables
                }).then(response => {
                    const { data: {filterTransactions}} =  response
-                   console.log(filterTransactions)
                 //    let result = response.data.filterStaff
                    this.setState({
                         transactions: filterTransactions, 
@@ -210,13 +212,18 @@ class Transactions extends Component {
             const {txnType, txnAmount, txnNaration, memberData} = this.state 
             return (txnAmount)
         }
+
+        const viewTxn = (txn) => {
+            console.log(txn)
+            this.setState({selectedTxn: txn, setMode: 3})
+        }
     return (
         <div>
-            
-            <div className="widget-section">
-        <div className="bg-grey">
-        {setMode === 0 &&
+        {tableLoader && <Loader />}
+        <div className="">
+        {setMode === 0 && !tableLoader &&
             <>
+        <div className="bg-grey">
             <p className="transaction-header">Transaction Details</p>
              <div style={{padding:'20px'}}>
                  
@@ -305,13 +312,12 @@ class Transactions extends Component {
                          {MonthYear(txn.inserted_at)}
                     </td>
                      <td>
-                         {/* <WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span> */}
                      <Dropdown className="drop-link">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="ks-menu-dropdown bg-menu">
-                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => console.log('view transaction')}>View Txn</Dropdown.Item>
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => viewTxn(txn)}>View Txn</Dropdown.Item>
                             <Dropdown.Divider />
                             {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Approve</Dropdown.Item>}
                         </Dropdown.Menu>
@@ -340,6 +346,7 @@ class Transactions extends Component {
              
              </div>
          </div>
+         </div>
          </>
         }
         {
@@ -352,6 +359,7 @@ class Transactions extends Component {
             </div>
         }
         {setMode === 2 &&
+        <div className="bg-grey">
             <div style={{padding:'20px'}}>
                  <p className="page-title mt-5">Make a Contribution/Saving
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
@@ -374,16 +382,31 @@ class Transactions extends Component {
                         ></input>
                     </div>
                     <div className="col-md-12">
-                    <button type="button" disabled={!validTransaction()} className="btn btn-secondary float-right mt-4" onClick={()=> this.makeTransactionForm()}>Contribute</button>
+                    <button type="button" disabled={!validTransaction()} className="btn btn-secondary float-right mt-4" onClick={()=> this.makeTransactionForm()}>Submit</button>
                     </div>
                 </div>
             </div>
-        }
-            {/* <StyledMain> */}
-            
-           
-            {/* </StyledMain> */}
         </div>
+        }
+        {
+            setMode === 3 &&
+            <div className="p-4">
+                <div className="row justify-content-center">
+                <div className="col-8">
+                    <div className="confirm-con pt-5" >
+                    <p className="page-title p-4"># 000{selectedTxn.id}
+                        <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                    </p>
+                        {/* <h3 className="close-btn">
+                            Close <img src="./images/members-mobile-veiw/cross-circle.png" alt="" />
+                        </h3> */}
+                        <ViewSingleTransaction transaction={selectedTxn} />
+                    </div>
+                </div>
+            
+            </div>
+            </div>
+        }
         </div>
         </div>
 

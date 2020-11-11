@@ -49,3 +49,23 @@ query ($page: Int){
   }
 }
 `;
+
+export const VAULT_TOTALS = gql`
+  mutation vaultTotals($status: Int) {
+    vaultTotals(filter: {status: $status}) {
+      totalCount
+      countClosed
+      countActive
+      countInactive
+      activeTotal
+      inactiveTotal
+      closedTotal
+      insuranceActiveTotal
+      insuranceInactiveTotal
+      withdrawalActiveCharge
+      withdrawalInactiveCharge
+      loanActiveCharge
+      loanInactiveCharge
+    }
+  }
+`;

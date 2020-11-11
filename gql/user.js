@@ -92,6 +92,27 @@ export const UPDATE_PASSWORD = gql`
   }
 `;
 
+export const SEND_OTP = gql`
+  mutation sendOtp($email: String!) {
+    sendOtp(email: $email){
+      email
+      status
+      message
+    }
+  }
+`;
+
+export const VALIDATE_OTP = gql`
+  mutation validateOtp($email: String!, $otp: String!) {
+    validateOtp(email: $email, otp: $otp){
+      email
+    id
+    role
+    }
+  }
+`;
+
+
 export const GENERATE_LOGIN_DETAILS = gql`
 query ($user_id: Int!) {
     generateLoginDetails(user_id: $user_id) {

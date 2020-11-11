@@ -9,7 +9,7 @@ import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
 import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
-import { GET_VAULT_TYPES, GET_VAULT_TRANSACTIONS } from '../../gql/vault';
+import { GET_VAULT_TYPES, GET_VAULT_TRANSACTIONS, VAULT_TOTALS } from '../../gql/vault';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
 import * as xlsx from 'xlsx';
@@ -47,6 +47,7 @@ class VualtTransactions extends Component {
         }
         
         this.getVaultTypes()
+        // this.getVaultTotals()
     }
 
     getTransactions(page = 1)
@@ -55,7 +56,6 @@ class VualtTransactions extends Component {
             query: GET_VAULT_TRANSACTIONS,
             variables: {page}
           }).then(response => {
-              console.log(response)
               const { data: {paginateVaultTransactions}} = response
               this.setState({
                   transactions: paginateVaultTransactions.entries, 
@@ -67,6 +67,16 @@ class VualtTransactions extends Component {
                 })
             }, error => console.log(error))
     }
+
+    // getVaultTotals()
+    // {
+    //     createApolloClient.mutate({
+    //         mutation: VAULT_TOTALS,
+    //       }).then(response => {
+    //           console.log(response)
+            
+    //         }, error => console.log(error))
+    // }
 
     filterTransactions(variables)
     {

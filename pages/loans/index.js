@@ -6,6 +6,7 @@ import LoanTypes from '../../components/loans/loan-types';
 import LoanBankSchedule from '../../components/loans/loan-bank-schedule';
 import RepaymentSchedule from '../../components/loans/repayment-schedule';
 import Loans from '../../components/loans/loans';
+import OverDueLoans from '../../components/loans/overdue';
 import CreateLoan from '../../components/loans/applyforloan'; 
 import { LOAN_SETTING } from '../../gql/loans'
 
@@ -53,7 +54,7 @@ const LoanSettings = () => {
           <Loans  status="1" />
         }
         { seletedTab === 3 &&
-          <Loans  status="1" />
+          <Loans  overdue={true} />
         }
         { seletedTab === 4 &&
           <CreateLoan  status="1" />

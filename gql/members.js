@@ -8,6 +8,7 @@ query ($page: Int){
       id
       email
       surname
+      first_name
       other_names
       user_id
       altPhoneNumber
@@ -44,6 +45,7 @@ query ($id: Int!){
       id
       email
       surname
+      first_name
       other_names
       user_id
       altPhoneNumber
@@ -75,6 +77,7 @@ query {
         id
         email
       surname
+      first_name
       other_names
       user_id
       altPhoneNumber
@@ -114,14 +117,15 @@ query {
 export const CREATE_MEMBER = gql`
   mutation createMember(
       $staff_no: String!, $surname: String!, 
-      $other_names: String!, $role: String!,
+      $other_names: String, $role: String!,
+      $first_name: String!,
       $dob: String!,$gender: String!, 
       $status: String!,$email: String!, 
       $alt_phone_number: String,
       $dept: String,
-      $monthly_contribution: String!,
-      $current_monthly_income: String!,
-      $membership_date: String!,
+      $monthly_contribution: String,
+      $current_monthly_income: String,
+      $membership_date: String,
       $rank: String,
       $phone_number: String!) {
     createMember(member: {
@@ -129,6 +133,7 @@ export const CREATE_MEMBER = gql`
         status: $status,
         role: $role,
         surname: $surname,
+        first_name: $first_name,
         other_names: $other_names,
         phone_number: $phone_number,
         alt_phone_number: $alt_phone_number,
@@ -144,6 +149,7 @@ export const CREATE_MEMBER = gql`
         
         id
         surname
+        first_name
         other_names
         email
         phone_number
@@ -168,7 +174,9 @@ export const CREATE_MEMBER = gql`
 export const UPDATE_MEMBER = gql`
   mutation updateMember(
       $staff_no: String, $surname: String, 
-      $other_names: String, $role: String,
+      $first_name: String,
+      $other_names: String,
+       $role: String,
       $dob: String, $gender: String, 
       $status: String,$email: String, 
       $alt_phone_number: String,
@@ -183,6 +191,7 @@ export const UPDATE_MEMBER = gql`
         status: $status,
         role: $role,
         surname: $surname,
+        first_name: $first_name,
         other_names: $other_names,
         phone_number: $phone_number,
         alt_phone_number: $alt_phone_number,
@@ -198,6 +207,7 @@ export const UPDATE_MEMBER = gql`
         
         id
         surname
+        first_name
         other_names
         email
         phone_number
@@ -224,6 +234,7 @@ export const UPDATE_MEMBER_AVATAR = gql`
         
         id
         surname
+        first_name
         other_names
         email
         phone_number
@@ -251,6 +262,7 @@ query ($searchTerm: String!){
     
     id
     surname
+    first_name
     other_names
     email
     phone_number
@@ -313,6 +325,7 @@ balance_payable
     member{
       id
       surname
+      first_name
       other_names
     }
     loan_type{
@@ -348,6 +361,7 @@ query ($member_id: Int!, $page: Int){
         member{
           id
           surname
+          first_name
           other_names
           avatar
         }
@@ -397,6 +411,8 @@ query ($member_id: Int!, $page: Int){
       members{
         id
         surname
+        staff_no
+        first_name
         other_names
       }
       posted{
@@ -406,6 +422,7 @@ query ($member_id: Int!, $page: Int){
       }
       approved{
         id
+        staff_no
         surname
         other_names
       }
@@ -421,7 +438,7 @@ query ($member_id: Int!, $page: Int){
 
 export const FILTER_MEMBERS = gql`
   mutation filterMembers(
-      $status: Int,
+      $status: String,
       $from: String,
       $to: String, 
       $member_id: Int 
@@ -435,6 +452,7 @@ export const FILTER_MEMBERS = gql`
         id
         email
         surname
+        first_name
         other_names
         user_id
         altPhoneNumber

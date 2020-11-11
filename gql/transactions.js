@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const GET_TRANSACTIONS = gql`
-query ($page: Int){
-  paginateTransactions(page: $page) {
+query ($page: Int, $status: Int){
+  paginateTransactions(page: $page, status: $status) {
     entries {
       id
       member_id
@@ -20,7 +20,9 @@ query ($page: Int){
       updated_at
       members{
         id
+        staff_no
         surname
+        first_name
         other_names
       }
       posted{
@@ -74,7 +76,9 @@ export const FILTER_TRANSACTION = gql`
       updated_at
       members{
         id
+        staff_no
         surname
+        first_name
         other_names
       }
       posted{
@@ -125,7 +129,9 @@ export const CREATE_TRANSACTION = gql`
       updated_at
       members{
         id
+        staff_no
         surname
+        first_name
         other_names
       }
       posted{

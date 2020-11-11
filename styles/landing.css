@@ -53,7 +53,7 @@
     font-size: 16px;
     line-height: 20px;
     color: #FFF;
-    align-self: center;
+    align-self: end;
     margin: 10px 0px;
     padding: 0.75em 2em;
 }
@@ -91,6 +91,26 @@
     letter-spacing: 1px;
     color: #252733;
 }
+
+/* input#exampleInputPassword1.form-control {
+    background: #F4F4F4;
+    font-family: Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 1px;
+    color: #344563;
+}
+
+.form-control {
+    padding: 1em 1.5em;
+    border: 0;
+}
+
+input#exampleInputPassword1.form-control:focus {
+    border: none !important;
+} */
 
 .form-label {
     font-family: Helvetica;

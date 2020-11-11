@@ -1,58 +1,68 @@
-import React, { useState } from 'react';
-import { gql, useMutation, useLazyQuery, useQuery } from '@apollo/client';
+import React, { Component } from 'react';
+import { createApolloClient } from '../../lib/apolloClient'
+
 import {GET_MEMBER_LOANS} from '../../gql/members'
 import Spinner from '@atlaskit/spinner';
-import { ToastProvider, useToasts } from 'react-toast-notifications'
 import {Badge} from '../../layouts/extras';
 import { ShortDate, ShortTime, FormatCurrency } from '../../components/shared/utils';
 import EmptyData from '../../layouts/empty';
+import Loader from '../../layouts/loader';
+import { getUser } from '../../components/shared/local';
 
-
-// export class extends Component {
-
-// }
-const LoanRequests = ({ memberData }) =>  {
-    const { addToast } = useToasts()
-
-
-    const [loan_type, setLoanType] = useState()
-    const [repayment_period, setRepaymentPeriod] = useState()
-    const [account_credited, setAccountCredited] = useState()
-    const [account_no, setAccountNo] = useState()
-    const [amount_credited, setAmountCredited] = useState()
-    const [date_approved, setDateApproved] = useState()
-    const [memberLoans, setmemberLoans] = useState()
-   
-
-    //create staff mutation
-    const {loading, error, data} = useQuery( GET_MEMBER_LOANS, {
-        variables:{member_id: memberData.id, status: 1},
-        onError: (e) => {
-            console.log(error)
-            
-        },
-        onCompleted: ({memberLoans}) =>{
-            setmemberLoans(memberLoans)
-            
+class ActiveLoanRequests extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            memberData: this.props.memberData,
+            loan_type: [],
+            repayment_period:'',
+            account_credited:'',
+            account_no:'',
+            amount_credited:'',
+            date_approved:'',
+            memberLoans:'',
+            tableLoader: false,
+            user:{}
         }
-    })
-    const resetForm = () => {
-        setLoanType('')
-        setRepaymentPeriod('')
-        setAccountCredited('')
-        setAccountNo('')
     }
 
+    componentDidMount()
+    {
+        this.getMemberActiveLoans(this.state.memberData.id)
+        let user = getUser()
+        this.setState({user: user})
+    }
 
-    const submit = async (e) => {
-        e.preventDefault();
-        sendFollowUpMessage({variables:{loan_type, repayment_period, account_credited, account_no }})
+    getMemberActiveLoans(member_id){
+        this.setState({tableLoader: true})
+        setTimeout(() => {
+            createApolloClient.query({
+                query: GET_MEMBER_LOANS,
+                variables: {member_id: member_id, status: 1},
+              }).then(response => {
+                  let {data: {memberLoans}} = response
+                  this.setState({
+                    memberLoans: memberLoans, 
+                    tableLoader: false
+                    })
+                }, error => {
+                this.setState({tableLoader: false})
+            })
+        },500)
+    }
+
+    render()
+    {
+        const {loan_type, repayment_period, account_credited, account_no, amount_credited, date_approved, memberLoans, tableLoader} = this.state
+        const submit = async (e) => {
+            e.preventDefault();
+            sendFollowUpMessage({variables:{loan_type, repayment_period, account_credited, account_no }})
         }
-    
         return (
             <div className="grey-container">
-                { memberLoans && memberLoans.length >0 &&  <p className="active-loan">Active Loans</p>}
-                    { memberLoans && 
+                {tableLoader && <Loader />}
+                { memberLoans && memberLoans.length >0 && !tableLoader && <p className="active-loan">Active Loans</p>}
+                    { memberLoans && !tableLoader &&
                         memberLoans.map(loan => {
                             return (
                                 <div key={loan.id} className="row mt-5">
@@ -127,45 +137,12 @@ const LoanRequests = ({ memberData }) =>  {
                                         <label className="ks-label">Total Paid Loan</label>
                                         <div className="control-div">{loan.total_paid || "Not Yet"}</div>
                                     </div>
-                                    {/* <div className="col-md-3">
-                                        <label className="ks-label">Account to be Credited</label>
-                                        <input className="ks-form-control form-control"
-                                        placeholder="Access Diamond"
-                                            value={account_credited || ""}
-                                            onChange={({ target }) => setAccountCredited(target.value)}
-                                        />
-                                    </div>
-                                    
-                                    <div className="col-md-3">
-                                        <label className="ks-label">Account Number</label>
-                                        <input className="ks-form-control form-control"
-                                            value={account_no || ""}
-                                            placeholder="0026637289"
-                                            onChange={({ target }) => setAccountNo(target.value)}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label className="ks-label">Amount Credited</label>
-                                        <input className="ks-form-control form-control"
-                                            value={amount_credited || ""}
-                                            placeholder="0026637289"
-                                            onChange={({ target }) => setAmountCredited(target.value)}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <label className="ks-label">Date Approved</label>
-                                        <input className="ks-form-control form-control" 
-                                            placeholder="dd/mm/yyy" type="date"
-                                            value={date_approved || ""}
-                                            onChange={({ target }) => setDateApproved(target.value)}
-                                        />
-                                    </div> */}
                                 
                                 </div>
                             )
                         })
                     }
-                    { memberLoans && memberLoans.length ==0 &&
+                    { memberLoans && memberLoans.length ==0 && !tableLoader &&
                         <div>
                             <EmptyData title="" text=""/>
                             <p className="row align-items-center justify-content-center">You do not have any active loan currently. </p> 
@@ -174,6 +151,37 @@ const LoanRequests = ({ memberData }) =>  {
                     
             </div>
         )
+    }
 }
+export default ActiveLoanRequests;
 
-export default LoanRequests;
+// const ActiveLoanRequests = ({ memberData }) =>  {
+//     const { addToast } = useToasts()
+
+
+//     const [loan_type, setLoanType] = useState()
+//     const [repayment_period, setRepaymentPeriod] = useState()
+//     const [account_credited, setAccountCredited] = useState()
+//     const [account_no, setAccountNo] = useState()
+//     const [amount_credited, setAmountCredited] = useState()
+//     const [date_approved, setDateApproved] = useState()
+//     const [memberLoans, setmemberLoans] = useState()
+
+   
+
+//     //create staff mutation
+//     const {loading, error, data} = useQuery( GET_MEMBER_LOANS, {
+//         variables:{member_id: memberData.id, status: 1},
+//         onError: (e) => {
+//             console.log(error)
+            
+//         },
+//         onCompleted: ({memberLoans}) =>{
+//             setmemberLoans(memberLoans)
+            
+//         }
+//     })
+    
+// }
+
+// export default LoanRequests;

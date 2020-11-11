@@ -3,15 +3,19 @@ import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
 import WatchIcon from '@atlaskit/icon/glyph/watch';
 import CrossCircleIcon from '@atlaskit/icon/glyph/cross-circle';
+import { getStaff, getUser } from '../shared/local'
+import { MonthYear, FormatCurrency } from '../../components/shared/utils';
+import ViewSingleTransaction from '../../components/transactions/view-single-transaction';
 
 import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { FILTER_TRANSACTION, GET_TRANSACTIONS } from '../../gql/transactions';
+import { FILTER_TRANSACTION, GET_TRANSACTIONS, APPROVE_TRANSACTION } from '../../gql/transactions';
 import { CustomToggle, Status, Badge } from '../../layouts/extras'
 import { page_range } from '../shared/utils'
-import * as xlsx from 'xlsx';
+// import * as xlsx from 'xlsx';
+import XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
 
 class Transactions extends Component {
@@ -32,7 +36,9 @@ class Transactions extends Component {
             filter_from: '',
             filter_to: '',
             filter_txn_id: '',
-            filter_txn_type: ''
+            filter_txn_type: '',
+            tableLoader: false,
+            selectedTxn: {},
         }
     }
 
@@ -40,7 +46,7 @@ class Transactions extends Component {
     {
         if(this.props.status == "0")
         {
-            this.filterTransactions({status: 1})
+            this.filterTransactions({status: 0})
         }else{
             this.getTransactions()
         }
@@ -50,39 +56,52 @@ class Transactions extends Component {
 
     getTransactions(page = 1)
     {
-        createApolloClient.query({
-            query: GET_TRANSACTIONS,
-            variables: {page}
-          }).then(response => {
-              const { data: {paginateTransactions}} = response
-              this.setState({
-                  transactions: paginateTransactions.entries, 
-                  sorted: paginateTransactions.entries,
-                  totalEntries: paginateTransactions.total_entries,
-                  totalPages: paginateTransactions.total_pages,
-                  pageNumber: paginateTransactions.page_number,
-                  pageSize: paginateTransactions.page_size,
+        this.setState({tableLoader: true})
+        setTimeout(() => {
+            createApolloClient.query({
+                query: GET_TRANSACTIONS,
+                variables: {page}
+              }).then(response => {
+                  const { data: {paginateTransactions}} = response
+                  this.setState({
+                      transactions: paginateTransactions.entries, 
+                      sorted: paginateTransactions.entries,
+                      totalEntries: paginateTransactions.total_entries,
+                      totalPages: paginateTransactions.total_pages,
+                      pageNumber: paginateTransactions.page_number,
+                      pageSize: paginateTransactions.page_size,
+                    })
+                this.setState({tableLoader: false})
+                }, error => {
+                    this.setState({tableLoader: false})
                 })
-            }, error => console.log(error))
+        },500)
+        
     }
 
     filterTransactions(variables)
     {
-        createApolloClient.mutate({
-            mutation: FILTER_TRANSACTION,
-            variables: variables
-          }).then(response => {
-              const { data: {filterTransactions}} = response
-              this.setState({
-                    transactions: filterTransactions, 
-                  sorted: filterTransactions,
-                  totalEntries: 0,
-                  totalPages: 0,
-                  pageNumber: 0,
-                  pageSize: 0,
-
+        this.setState({tableLoader: true})
+        setTimeout(() => {
+            createApolloClient.mutate({
+                mutation: FILTER_TRANSACTION,
+                variables: variables
+              }).then(response => {
+                  const { data: {filterTransactions}} = response
+                  this.setState({
+                        transactions: filterTransactions, 
+                      sorted: filterTransactions,
+                      totalEntries: 0,
+                      totalPages: 0,
+                      pageNumber: 0,
+                      pageSize: 0,
+    
+                    })
+                    this.setState({tableLoader: false})
+                }, error => {
+                    this.setState({tableLoader: false})
                 })
-            }, error => console.log(error))
+        },300)
     }
     getMemberTotals(page = 1)
     {
@@ -98,7 +117,8 @@ class Transactions extends Component {
       }
 
       exportToExcel() {
-    
+        var workbook = XLSX.utils.table_to_book(document.getElementById('table1'));
+        console.log(workbook)
         const fileName = `stock.xlsx`;
         // const ws: xlsx.WorkSheet =   
         // xlsx.utils.table_to_sheet(this.stocks.nativeElement);
@@ -108,7 +128,38 @@ class Transactions extends Component {
         // const wb: xlsx.WorkBook = xlsx.utils.book_new();
         // xlsx.utils.book_append_sheet(wb, ws, 'Sheet1');
         // xlsx.writeFile(wb, fileName);
-       }
+    }
+
+    changeTransactionStatus(txn, status){
+        swal({
+            title: "Are you sure?",
+            text: "Once Approved, cannot be undone!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+                createApolloClient.mutate({
+                    mutation: APPROVE_TRANSACTION,
+                    variables: {id: txn.id, status: parseInt(status), approved_by: parseInt(getStaff().id)},
+                    // refetchQueries:[{query: GET_MEMBER_TXNS, variables:{member_id: this.state.memberData.id, page:1}}, {query:GET_MEMBER, variables:{id: this.state.memberData.id}}]
+                }).then(response => {
+                    const {data: {approveTransactions}} = response
+                    // this.getMemberTxn()
+                    this.getTransactions();
+
+                    // this.props.handleClick
+                    swal("Transaction Processed", {
+                        icon: "success",
+                    });
+                    }, error => console.log(error))
+              
+            } else {
+              return;
+            }
+        });
+    }
 
     render () {
         const filterMembers = (status = "") => {
@@ -122,7 +173,7 @@ class Transactions extends Component {
             }
             this.setState({sorted: membersData})
         }
-    const {transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
+    const {selectedTxn, tableLoader, transactions, sorted, setMode, activeWidget, totalPages, memberTotals, filter_from, filter_to, filter_status, filter_txn_id, filter_txn_type } = this.state
     
     const filter_form = () => {
 
@@ -139,26 +190,28 @@ class Transactions extends Component {
     }
 
     const viewTxn = (txn) => {
-        console.log(txn)
+        this.setState({selectedTxn: txn, setMode: 1})
     }
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
 
     const exportToCSV = (csvData, fileName) => {
-        const ws = xlsx.utils.json_to_sheet(csvData);
-        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
-        const excelBuffer = xlsx.write(wb, { bookType: 'xlsx', type: 'array' });
-        const data = new Blob([excelBuffer], {type: fileType});
-        FileSaver.saveAs(data, fileName + fileExtension);
+        var workbook = XLSX.utils.table_to_book(document.getElementById('table1'), {sheet: "Sheet Js"});
+        console.log(workbook)
+        // const ws = xlsx.utils.json_to_sheet(csvData);
+        // const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        // const excelBuffer = xlsx.write(wb, { bookType: 'xlsx', type: 'array' });
+        // const data = new Blob([excelBuffer], {type: fileType});
+        // FileSaver.saveAs(data, fileName + fileExtension);
     }
 
     return (
         <div>
             
-        <div className="bg-grey">
             
         {setMode === 0 &&
-             <div >
+        <div className="bg-grey">
+            <div >
                  {this.props.status !== "0" && 
                     <div style={{padding:'20px'}}>
                         <div className="row">
@@ -223,18 +276,21 @@ class Transactions extends Component {
                 <button onClick={(e) => exportToCSV(sorted,"fileName")}>Export</button>
 
              <div className="table-responsive p-3">
+                { tableLoader && <Loader />}
                  { sorted.length > 0 &&
                  <div>
-                 <table className="table table-borderless">
+                 <table className="table table-borderless" id="table1">
                  <thead>
                  <tr>
                      <th>&#x23;</th>
                      {/* <th>Approved by</th> */}
-                     <th>Member</th>
+                     <th>Staff No.</th>
+                     <th>Name</th>
                      {/* <th>Posted by</th> */}
                      <th>Transaction Type</th>
                      <th>&#8358; Amount</th>
                      <th>Status</th>
+                     <th>Date</th>
                      <th>Actions</th>
                  </tr>
                  </thead>
@@ -242,26 +298,35 @@ class Transactions extends Component {
                  { sorted.map((txn, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
-                     {/* <td>{ txn.approved ? txn.approved.surname + " " + txn.approved.other_names : "Not Yet Approved"}</td> */}
-                     {/* <td>{ txn.posted.surname } { txn.posted.other_names }</td> */}
-                     <td>{ txn.members.surname } { txn.members.other_names }</td>
+                     <td>{ txn.members.staff_no } </td>
+                     <td>{ txn.members.surname } { txn.members.first_name } { txn.members.other_names }</td>
                      <td>
-                        {txn.txn_type == 1 ? <Badge type='success' title='CREDITED'/> : <Badge type='moved' title='DEBITED'/>}
+                        {txn.txn_type == 1 ? <Badge type='success' title='SAVINGS'/> : <Badge type='moved' title='WITHDRAW'/>}
                     </td>
-                     <td>&#8358; {txn.amount}</td>
+                     <td>{FormatCurrency(txn.amount)}</td>
                      <td className={txn.status}>
                         {txn.status == 1 ? <Badge type='success' title='POSTED'/> : <Badge type='moved' title='PRE-POST'/>}
                           {/* <Status status={txn.status} /> */}
                     </td>
-                     <td><WatchIcon size="meduim" isBold primaryColor="#0052CC" /> <span className="view-icon">VIEW</span>
-                     <Dropdown className="drop-link">
+                    <td>{MonthYear(txn.inserted_at)}</td>
+                     <td>
+                     <Dropdown className="">
                         <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu className="ks-menu-dropdown bg-menu">
                             <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => viewTxn(txn)}>View Txn</Dropdown.Item>
+                            {txn.status === 0 && 
+                            <>
+                                <Dropdown.Divider />
+                                <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.changeTransactionStatus(txn, 1)}>Approve</Dropdown.Item>
+                            </>
+                            }
+                            {txn.status === 0 && 
+                            <>
                             <Dropdown.Divider />
-                            {txn.status === 0 && <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.approveTransaction(txn)}>Approve</Dropdown.Item>}
+                            <Dropdown.Item className="ks-menu-dropdown-item" onClick={() => this.changeTransactionStatus(txn, 2)}>Decline</Dropdown.Item>
+                            </>}
                         </Dropdown.Menu>
                         </Dropdown>
                      </td>
@@ -278,7 +343,7 @@ class Transactions extends Component {
                 
              </div>
                  }
-                 { sorted && !sorted.length && 
+                 { sorted && !sorted.length && !tableLoader &&
                      <EmptyData title="Empty Transactions" text="No Available Transactions Data"/>
                  } 
                  { !sorted
@@ -288,17 +353,27 @@ class Transactions extends Component {
              
              </div>
          </div>
-        }
+        </div>
+    }
         {
             setMode === 1 &&
             <div className="p-4">
-                <p className="page-title mt-5">Create Member Page
-                    <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
-                </p>
-                <CreateMember />
+                <div className="row justify-content-center">
+                <div className="col-8">
+                    <div className="confirm-con pt-5" >
+                    <p className="page-title p-4"># 000{selectedTxn.id}
+                        <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
+                    </p>
+                        {/* <h3 className="close-btn">
+                            Close <img src="./images/members-mobile-veiw/cross-circle.png" alt="" />
+                        </h3> */}
+                        <ViewSingleTransaction transaction={selectedTxn} />
+                    </div>
+                </div>
+            
+            </div>
             </div>
         }
-        </div>
         </div>
 
     )

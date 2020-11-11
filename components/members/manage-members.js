@@ -3,8 +3,6 @@ import Router  from 'next/router';
 import Link from 'next/link';
 import { useQuery, gql } from '@apollo/client';
 import { createApolloClient } from '../../lib/apolloClient'
-import WatchIcon from '@atlaskit/icon/glyph/watch';
-import EditorMoreIcon from '@atlaskit/icon/glyph/editor/more';
 import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
 import PersonWithTickIcon from '@atlaskit/icon/glyph/person-with-tick';
 import PeopleIcon from '@atlaskit/icon/glyph/people';
@@ -14,10 +12,10 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import EmptyData from '../../layouts/empty';
 import Loader from '../../layouts/loader';
 import Pagination from '@atlaskit/pagination';
-import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS } from '../../gql/members';
+import { GET_PAGINATE_MEMBERS, GET_MEMBER_TOTALS, FILTER_MEMBERS } from '../../gql/members';
 import { GENERATE_LOGIN_DETAILS } from '../../gql/user';
 import { CustomToggle, Status } from '../../layouts/extras'
-import { page_range } from '../shared/utils'
+import { page_range, FormatCurrency } from '../shared/utils'
 import CreateMember from './create-member'
 
 class ManageMembers extends Component {
@@ -34,7 +32,8 @@ class ManageMembers extends Component {
             totalPages: 0,
             setMode: 0,
             activeWidget: '',
-            loginDetails:{}
+            loginDetails:{},
+            tableLoader: false
         }
     }
 
@@ -47,13 +46,31 @@ class ManageMembers extends Component {
     getMembers(page = 1)
     {
         let result = '';
+        this.setState({tableLoader: true})
         createApolloClient.query({
             query: GET_PAGINATE_MEMBERS,
             variables: {page: page}
           }).then(response => {
               let {entries, totalPages} = response.data.paginateMembers
-            this.setState({ members: entries, sorted: entries, totalPages: totalPages,})
-            }, error => console.log(error))
+            this.setState({ members: entries, sorted: entries, totalPages: totalPages, tableLoader: false})
+            }, error => {
+                return;
+            })
+    }
+
+    filter(variables)
+    {
+        this.setState({tableLoader: true})
+        createApolloClient.mutate({
+            mutation: FILTER_MEMBERS,
+            variables: variables
+          }).then(response => {
+              let {data: {filterMembers}} = response
+            this.setState({ members: filterMembers, sorted: filterMembers, tableLoader: false})
+            }, error => {
+            this.setState({tableLoader: true})
+
+        })
     }
     getMemberTotals(page = 1)
     {
@@ -61,9 +78,23 @@ class ManageMembers extends Component {
             query: GET_MEMBER_TOTALS,
           }).then(response => {
               this.setState({memberTotals: response.data.memberTotals})
-            }, error => console.log(error))
+            }, error => {return;})
     }
-
+    refreshMember() {
+        this.setState({tableLoader: true, setMode: 0})
+        setTimeout(() => {
+            this.getMemberTotals()
+            createApolloClient.query({
+                query: GET_PAGINATE_MEMBERS,
+                variables: {page: 1}
+              }).then(response => {
+                  let {entries, totalPages} = response.data.paginateMembers
+                this.setState({ members: entries, sorted: entries, totalPages: totalPages, tableLoader: false})
+                }, error => {return;})
+        }, 500)
+        
+        // refetch().then(({data: {findMember}}) => setMemberData(findMember))
+      }
     generateLoginDetails(id)
     {
         createApolloClient.query({
@@ -72,7 +103,7 @@ class ManageMembers extends Component {
           }).then(response => {
               let { data: {generateLoginDetails}} = response
               this.setState({setMode: 2, loginDetails: generateLoginDetails})
-            }, error => console.log(error))
+            }, error => {return;})
     }
     
     paginate = (e, page, analyticsEvent) => {
@@ -81,18 +112,25 @@ class ManageMembers extends Component {
     
     render () {
         const filterMembers = (status = "") => {
-            let membersData = [];
+            // let membersData = [];
             this.setState({activeWidget: status, setMode: 0})
             if(status != "")
             {
-                membersData = members.filter(x => x.status === status)
+                this.filter({status: parseInt(status)})
+    
+                // membersData = members.filter(x => x.status === status)
             }else{
-                membersData = members
+                // this.filter({sorted: members})
+                this.getMembers()
+    
+                // membersData = members
             }
-            this.setState({sorted: membersData})
+            // this.setState({sorted: membersData})
         }
-    const {loginDetails, members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
+    const {tableLoader, loginDetails, members, sorted, setMode, activeWidget, totalPages, memberTotals } = this.state
       
+    
+
     return (
         <div>
             <div className="widget-section">
@@ -118,7 +156,7 @@ class ManageMembers extends Component {
                         <p>Total Active Members</p>
                     </div>
                     </div>
-                    <div onClick={() => filterMembers(0)} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
+                    <div onClick={() => filterMembers('0')} className={ activeWidget ===0 ? 'widget no-shadow' : 'widget shadow'}>
                     <div className="widget-icon widget-icon-danger">
                         <PeopleIcon />
                     </div>
@@ -130,8 +168,7 @@ class ManageMembers extends Component {
                 </div>
                 </div>
         <div className="bg-grey">
-            
-        {setMode === 0 &&
+        {setMode === 0 && 
              <div >
                  <div className="row">
                      <div className="col-md-4">
@@ -147,13 +184,14 @@ class ManageMembers extends Component {
              
 
              <div className="table-responsive p-3">
-                 { sorted.length > 0 &&
+                {tableLoader && <Loader />}
+                 { sorted.length > 0 && !tableLoader &&
                  <div>
                  <table className="table table-borderless">
                  <thead>
                  <tr>
                      <th>&#x23;</th>
-                     <th>Name</th>
+                     <th  onClick={() => this.refreshMember()}>Name</th>
                      <th>Rank</th>
                      <th>Gender</th>
                      <th>Department</th>
@@ -167,11 +205,11 @@ class ManageMembers extends Component {
                  { sorted.map((member, index) => (
                  <tr key={index}>
                      <td>{index + 1}</td>
-                     <td>{member.surname} {member.other_names}</td>
+                     <td>{member.surname} {member.first_name} {member.other_names}</td>
                      <td>{member.rank}</td>
                      <td>{member.gender}</td>
                      <td>{member.dept}</td>
-                     <td>&#8358; {member.current_balance}</td>
+                     <td>{FormatCurrency(member.current_balance)}</td>
                      <td>{member.phone_number}</td>
                      <td className={member.status}> 
                         <Status status={member.status} />
@@ -208,7 +246,7 @@ class ManageMembers extends Component {
                 
              </div>
                  }
-                 { sorted && !sorted.length && 
+                 { sorted && !sorted.length && !tableLoader &&
                      <EmptyData title="Empty Members" text="No Available Members Data"/>
                  } 
                  { !sorted
@@ -225,7 +263,7 @@ class ManageMembers extends Component {
                 <p className="page-title mt-5">Create Member Page
                     <span onClick={() => this.setState({setMode: 0})} className="float-right close-button">Close <CrossCircleIcon primaryColor="#FF7452" /></span>
                 </p>
-                <CreateMember />
+                <CreateMember onrefreshMember={() => this.refreshMember()}/>
             </div>
         }
         </div>
