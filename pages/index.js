@@ -193,7 +193,7 @@ const LoginForm = ({setError, setToken}) => {
                 <span style={{color: '#0081FF'}}>Welcome</span> to KASU
               </h1>
               <h1 className="page-heading">
-                Multipurpose Corperative Society.
+                Multipurpose Cooperative Society.
               </h1>
               <p className="page-para">
                 a fast growing  financial society in Nigeria . we are interested in delivering excellent, quality and speedy services for customers satisfaction while consistently being transparent, expanding our clients base and legacy nationally and internationally.
