@@ -184,7 +184,7 @@ const LoginForm = ({setError, setToken}) => {
     <Fragment>
       <div className="container-fluid px-0">
         <nav className="page-nav fixed-top">
-          <h1 className="nav-h1 my-0">KASU CORPERATIVE</h1>
+          <h1 className="nav-h1 my-0">KASU COOPERATIVE</h1>
         </nav>
         <section className="section-one">
           <header className="page-header row">
