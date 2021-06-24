@@ -46,7 +46,8 @@ class Transactions extends Component {
     {
         if(this.props.status == "0")
         {
-            this.filterTransactions({status: 0})
+            // this.getTransactions()
+            this.filterTransactions({status: 1})
         }else{
             this.getTransactions()
         }

@@ -50,6 +50,7 @@ class Transactions extends Component {
     {
 
         this.getMemberTxn()
+        console.log(getStaff())
         // this.getMemberTotals()
     }
 
